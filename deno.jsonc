@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "build": "deno run --allow-run --allow-write --allow-env --allow-read ./build_npm.ts"
+    "build": "deno run --allow-run --allow-write --allow-env --allow-read ./build_npm.ts",
+    "test": "deno test --allow-env --allow-read"
   },
   "imports": {
     "dev_deps": "./dev_deps.ts"
