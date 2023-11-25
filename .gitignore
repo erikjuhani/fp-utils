@@ -1,0 +1,4 @@
+cov.lcov
+cov/
+npm/
+dist/
