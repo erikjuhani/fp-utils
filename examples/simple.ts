@@ -8,98 +8,102 @@
 // The option example demonstrates how easy it is to attach options to existing
 // TypeScript functionality and how options can ultimately compress the lines
 // of code by making the logic into one sequence.
-import * as Option from "option";
-import { assertEquals } from "std:assert";
+import * as Option from "../option/mod.ts";
+import { std } from "dev_deps";
+
+const { assert } = std;
 
 // deno-lint-ignore no-namespace
 namespace WithoutOption {
   const tryGetDenoInfoSuccess = () =>
-    Shared.fetchDenoInfoSuccess()
+    fetchDenoInfoSuccess()
       .then((response) => response.json())
       .catch(() => undefined);
 
   export const formatDenoInfoSuccess = async () => {
     const denoInfo = await tryGetDenoInfoSuccess();
-    if (denoInfo) return Shared.formatDenoInfo(denoInfo);
-    else return Shared.notFound();
+    if (denoInfo) return formatDenoInfo(denoInfo);
+    else return notFound();
   };
 
   const tryGetDenoInfoFailure = () =>
-    Shared.fetchDenoInfoFailure()
+    fetchDenoInfoFailure()
       .then((response) => response.json())
       .catch(() => undefined);
 
   export const formatDenoInfoFailure = async () => {
     const denoInfo = await tryGetDenoInfoFailure();
-    if (denoInfo) return Shared.formatDenoInfo(denoInfo);
-    else return Shared.notFound();
+    if (denoInfo) return formatDenoInfo(denoInfo);
+    else return notFound();
   };
 }
 
 // deno-lint-ignore no-namespace
 namespace WithOption {
   const tryGetDenoInfoSuccess = () =>
-    Shared.fetchDenoInfoSuccess()
+    fetchDenoInfoSuccess()
       .then((response) => response.json())
       .then(Option.some)
       .catch(Option.none);
 
   export const formatDenoInfoSuccess = async () =>
     (await tryGetDenoInfoSuccess()).match(
-      Shared.notFound,
-      Shared.formatDenoInfo,
+      notFound,
+      formatDenoInfo,
     );
 
   const tryGetDenoInfoFailure = () =>
-    Shared.fetchDenoInfoFailure()
+    fetchDenoInfoFailure()
       .then(Option.some)
       .then(Option.map((response) => response.json()))
       .catch(Option.none);
 
   export const formatDenoInfoFailure = async () =>
     (await tryGetDenoInfoFailure()).match(
-      Shared.notFound,
-      Shared.formatDenoInfo,
+      notFound,
+      formatDenoInfo,
     );
 }
 
-assertEquals(
+assert.assertEquals(
   `Deno
  | 2018
  | Deno is a runtime for JavaScript, TypeScript, and WebAssembly. Deno was co-created by Ryan Dahl, who also created Node.js.`,
   await WithoutOption.formatDenoInfoSuccess(),
 );
 
-assertEquals(
+assert.assertEquals(
   "No info found",
   await WithoutOption.formatDenoInfoFailure(),
 );
 
-assertEquals(
+assert.assertEquals(
   `Deno
  | 2018
  | Deno is a runtime for JavaScript, TypeScript, and WebAssembly. Deno was co-created by Ryan Dahl, who also created Node.js.`,
   await WithOption.formatDenoInfoSuccess(),
 );
 
-assertEquals(
+assert.assertEquals(
   "No info found",
   await WithOption.formatDenoInfoFailure(),
 );
 
-// deno-lint-ignore no-namespace
-namespace Shared {
-  export const notFound = (): string => "No info found";
+function notFound(): string {
+  return "No info found";
+}
 
-  export const formatDenoInfo = (denoInfo: DenoInfo): string =>
-    `${denoInfo.name}\n | ${denoInfo.initialRelease}\n | ${denoInfo.description}`;
+function formatDenoInfo(denoInfo: DenoInfo): string {
+  return `${denoInfo.name}\n | ${denoInfo.initialRelease}\n | ${denoInfo.description}`;
+}
 
-  type DenoInfo = {
-    name: string;
-    initialRelease: number;
-    description: string;
-  };
+type DenoInfo = {
+  name: string;
+  initialRelease: number;
+  description: string;
+};
 
+function fetchDenoInfoSuccess(): Promise<{ json: () => DenoInfo }> {
   const denoInfoResponse = {
     json: () => ({
       name: "Deno",
@@ -109,9 +113,9 @@ namespace Shared {
     }),
   };
 
-  export const fetchDenoInfoSuccess = (): Promise<typeof denoInfoResponse> =>
-    Promise.resolve(denoInfoResponse);
+  return Promise.resolve(denoInfoResponse);
+}
 
-  export const fetchDenoInfoFailure = (): Promise<typeof denoInfoResponse> =>
-    Promise.reject();
+function fetchDenoInfoFailure(): Promise<{ json: () => DenoInfo }> {
+  return Promise.reject();
 }
