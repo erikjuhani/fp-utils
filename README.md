@@ -36,23 +36,6 @@ the 'happy path'.
 ```ts
 // deno
 import * as Option from "https://deno.land/x/fp_utils@0.1.0/option/mod.ts";
-
-const tryGetHead = <T extends NonNullable<unknown>>(arr: T[]) =>
-  arr.length ? Option.some(arr[0]) : Option.none();
-
-const toUpperCase = (value: string) => value.toUpperCase();
-
-const headToUpperCase = (arr: string[]) =>
-  tryGetHead(arr)
-    .map(toUpperCase)
-    .match(
-      () => "Nothing to uppercase",
-      (value) => value,
-    );
-
-headToUpperCase([]); // Nothing to uppercase
-headToUpperCase(["fp-utils"]); // FP-UTILS
-
 // node
 import * as Option from "@fp-utils/option";
 
