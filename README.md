@@ -90,7 +90,7 @@ Option.some("Forty-two")
 
 ### `Option.inspect`
 
-Signature: (fn: (value: T) => void): Option<T>;
+Signature: `(fn: (value: T) => void): Option<T>`
 
 Option.inspect calls the provided function `fn` with a reference to the
 contained option value `T` if the option is some.
