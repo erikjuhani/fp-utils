@@ -30,6 +30,21 @@ export interface Type<T> {
   bind<U>(fn: (value: T) => Type<U>): Type<U>;
 
   /**
+   * Option.inspect calls the provided function `fn` with a reference to the
+   * contained option value `T` if the option is some.
+   *
+   * @example
+   * ```ts
+   * Option.none()
+   *   .inspect((x) => console.log(x * 2)); // Evaluates to None
+   *
+   * Option.some(42)
+   *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
+   * ```
+   */
+  inspect(fn: (value: T) => void): Type<T>;
+
+  /**
    * Option.map applies a function `fn` to option value `T` and transforms it
    * into value `U`.
    *
@@ -153,6 +168,21 @@ export class Some<T> implements Option<T> {
   }
 
   /**
+   * Some.inspect calls the provided function `fn` with a reference to the
+   * contained option value `T`.
+   *
+   * @example
+   * ```ts
+   * Option.some(42)
+   *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
+   * ```
+   */
+  inspect(fn: (value: T) => void): Option<T> {
+    fn(this.value);
+    return this;
+  }
+
+  /**
    * Some.map applies a function `fn` to option value `T` and transforms it
    * into value `U`.
    *
@@ -254,6 +284,20 @@ export class None implements Option<never> {
    * ```
    */
   bind() {
+    return this;
+  }
+
+  /**
+   * None.inspect performs no calculations and returns None. It cannot be given
+   * a `fn` function parameter like in Some.inspect.
+   *
+   * @example
+   * ```ts
+   * Option.none()
+   *   .inspect((x) => console.log(x * 2)); // Evaluates to None
+   * ```
+   */
+  inspect() {
     return this;
   }
 
@@ -430,6 +474,25 @@ export function map<T, U = unknown>(
   fn: (value: T) => U,
 ): (option: Option<T>) => Option<U> {
   return (option) => option.map(fn);
+}
+
+/**
+ * Option.inspect calls the provided function `fn` with a reference to the
+ * contained option value `T` if the option is some.
+ *
+ * @example
+ * ```ts
+ * Option.none()
+ *   .inspect((x) => console.log(x * 2)); // Evaluates to None
+ *
+ * Option.some(42)
+ *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
+ * ```
+ */
+export function inspect<T>(
+  fn: (value: T) => void,
+): (option: Option<T>) => Option<T> {
+  return (option) => option.inspect(fn);
 }
 
 /**

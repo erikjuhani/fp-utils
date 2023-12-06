@@ -88,6 +88,26 @@ Option.some("Forty-two")
 
 </details>
 
+### `Option.inspect`
+
+Signature: (fn: (value: T) => void): Option<T>;
+
+Option.inspect calls the provided function `fn` with a reference to the
+contained option value `T` if the option is some.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option.none()
+  .inspect((x) => console.log(x * 2)); // Prints nothing
+
+Option.some(42)
+  .inspect((x) => console.log(x * 2)); // Prints 84
+```
+
+</details>
+
 ### `Option.map`
 
 Signature: `<U>(fn: (value: T) => U): Option<U>`

@@ -53,6 +53,20 @@ test("Option.unwrapOr on None returns or value", () => {
   assertEquals(Option.unwrapOr(1)(Option.none()), 1);
 });
 
+test("Option.inspect", () => {
+  const mapSpy = mock.spy((value: number) => value + 1);
+  const actual = Option.inspect(mapSpy)(Option.some(0));
+  mock.assertSpyCalls(mapSpy, 1);
+  assertEquals(actual, Option.some(0));
+});
+
+test("Option.inspect on None does not execute", () => {
+  const mapSpy = mock.spy((value: number) => value + 1);
+  const actual = Option.inspect(mapSpy)(Option.none());
+  mock.assertSpyCalls(mapSpy, 0);
+  assertEquals(actual, Option.none());
+});
+
 test("Option.map", () => {
   const mapSpy = mock.spy((value: number) => value + 1);
   const actual = Option.map(mapSpy)(Option.some(0));
