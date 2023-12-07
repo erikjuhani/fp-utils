@@ -90,7 +90,7 @@ const updateBorrowedBook = (bookName: string) => (patron: Patron) =>
       book.available || console.log(`'${bookName}' is not available`)
     )
     // Check that the book is available, if not we do not want to proceed with mutations
-    .bind((book) => book.available ? Option.some(book) : Option.none())
+    .flatMap((book) => book.available ? Option.some(book) : Option.none())
     // Set the book as not available
     .map(updateBookAvailability(false))
     // Add the book to borrowed books list for patron
@@ -111,7 +111,7 @@ const borrowBook = (patronId: number, bookName: string) => {
         console.log(`${patron.name} has already two books borrowed`);
     })
     // Only patrons that have less than 3 books borrowed should be considered
-    .bind((patron) =>
+    .flatMap((patron) =>
       patron.borrowedBooks.length < 3 ? Option.some(patron) : Option.none()
     )
     .match(
@@ -127,12 +127,12 @@ const returnBook = (patronId: number, bookId: number) => {
       console.log(`${patron.name} has not borrowed a book with id ${bookId}`)
     )
     // Only patrons that have the book should be considered
-    .bind((patron) =>
+    .flatMap((patron) =>
       patron.borrowedBooks.find((b) => b.id === bookId)
         ? Option.some(patron)
         : Option.none()
     )
-    .bind((patron) =>
+    .flatMap((patron) =>
       Option.fromNullable(
         patron.borrowedBooks.find((book) => bookId === book.id),
       ).map((book) => [patron, book] as const)

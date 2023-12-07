@@ -82,16 +82,16 @@ test("Option.map on None does not execute", () => {
   assertEquals(actual, Option.none());
 });
 
-test("Option.bind", () => {
+test("Option.flatMap", () => {
   const mapSpy = mock.spy((value: number) => Option.some(value + 1));
-  const actual = Option.bind(mapSpy)(Option.some(0));
+  const actual = Option.flatMap(mapSpy)(Option.some(0));
   mock.assertSpyCalls(mapSpy, 1);
   assertEquals(actual, Option.some(1));
 });
 
-test("Option.bind on None does not execute", () => {
+test("Option.flatMap on None does not execute", () => {
   const mapSpy = mock.spy((value: number) => Option.some(value + 1));
-  const actual = Option.bind(mapSpy)(Option.none());
+  const actual = Option.flatMap(mapSpy)(Option.none());
   mock.assertSpyCalls(mapSpy, 0);
   assertEquals(actual, Option.none());
 });

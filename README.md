@@ -58,11 +58,11 @@ headToUpperCase(["fp-utils"]); // FP-UTILS
 
 ### Usage
 
-### `Option.bind`
+### `Option.flatMap`
 
 Signature: `<U>(fn: (value: T) => Option<U>): Option<U>`
 
-Option.bind applies a function `fn` to the content of option `T` and transforms
+Option.flatMap applies a function `fn` to the content of option `T` and transforms
 it into an option `U`.
 
 <details>
@@ -77,13 +77,13 @@ const tryParse: TryParse = (input: string) => {
 };
 
 Option.none()
-  .bind(tryParse); // Impossible state
+  .flatMap(tryParse); // Impossible state
 
 Option.some("42")
-  .bind(tryParse); // Evaluates to Some 42
+  .flatMap(tryParse); // Evaluates to Some 42
 
 Option.some("Forty-two")
-  .bind(tryParse); // Evaluates to None
+  .flatMap(tryParse); // Evaluates to None
 ```
 
 </details>

@@ -5,7 +5,7 @@
  */
 export interface Type<T> {
   /**
-   * Option.bind applies a function `fn` to the content of option `T` and
+   * Option.flatMap applies a function `fn` to the content of option `T` and
    * transforms it into an option `U`.
    *
    * @example
@@ -18,16 +18,16 @@ export interface Type<T> {
    * };
    *
    * Option.none()
-   *   .bind(tryParse); // Impossible state
+   *   .flatMap(tryParse); // Impossible state
    *
    * Option.some("42")
-   *   .bind(tryParse); // Evaluates to Some 42
+   *   .flatMap(tryParse); // Evaluates to Some 42
    *
    * Option.some("Forty-two")
-   *   .bind(tryParse); // Evaluates to None
+   *   .flatMap(tryParse); // Evaluates to None
    * ```
    */
-  bind<U>(fn: (value: T) => Type<U>): Type<U>;
+  flatMap<U>(fn: (value: T) => Type<U>): Type<U>;
 
   /**
    * Option.inspect calls the provided function `fn` with a reference to the
@@ -144,7 +144,7 @@ export class Some<T> implements Option<T> {
     this.value = value;
   }
   /**
-   * Some.bind applies a function `fn` to the content of Option<T> and
+   * Some.flatMap applies a function `fn` to the content of Option<T> and
    * transforms it into an Option<U>.
    *
    * @example
@@ -157,13 +157,13 @@ export class Some<T> implements Option<T> {
    * };
    *
    * Option.some("42")
-   *   .bind(tryParse); // Evaluates to Some 42
+   *   .flatMap(tryParse); // Evaluates to Some 42
    *
    * Option.some("Forty-two")
-   *   .bind(tryParse); // Evaluates to None
+   *   .flatMap(tryParse); // Evaluates to None
    * ```
    */
-  bind<U>(fn: (value: T) => Option<U>) {
+  flatMap<U>(fn: (value: T) => Option<U>) {
     return fn(this.value);
   }
 
@@ -264,8 +264,8 @@ export class Some<T> implements Option<T> {
  */
 export class None implements Option<never> {
   /**
-   * None.bind performs no calculation and returns None. It cannot be given a
-   * `fn` function parameter like in Some.bind.
+   * None.flatMap performs no calculation and returns None. It cannot be given a
+   * `fn` function parameter like in Some.flatMap.
    *
    * @example
    * ```ts
@@ -277,13 +277,13 @@ export class None implements Option<never> {
    * };
    *
    * Option.none()
-   *   .bind(tryParse); // Impossible state
+   *   .flatMap(tryParse); // Impossible state
    *
    * Option.none()
-   *   .bind(); // Evaluates to None
+   *   .flatMap(); // Evaluates to None
    * ```
    */
-  bind() {
+  flatMap() {
     return this;
   }
 
@@ -524,7 +524,7 @@ export function isNone<T>(option: Option<T>): option is None {
 }
 
 /**
- * Option.bind applies a function `fn` to the content of option `T` and
+ * Option.flatMap applies a function `fn` to the content of option `T` and
  * transforms it into an option `U`.
  *
  * @example
@@ -537,19 +537,19 @@ export function isNone<T>(option: Option<T>): option is None {
  * };
  *
  * Option.none()
- *   .bind(tryParse); // Impossible state
+ *   .flatMap(tryParse); // Impossible state
  *
  * Option.some("42")
- *   .bind(tryParse); // Evaluates to Some 42
+ *   .flatMap(tryParse); // Evaluates to Some 42
  *
  * Option.some("Forty-two")
- *   .bind(tryParse); // Evaluates to None
+ *   .flatMap(tryParse); // Evaluates to None
  * ```
  */
-export function bind<T, U>(
+export function flatMap<T, U>(
   fn: (value: T) => Option<U>,
 ): (option: Option<T>) => Option<U> {
-  return (option) => option.bind(fn);
+  return (option) => option.flatMap(fn);
 }
 
 /**
