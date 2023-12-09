@@ -21,3 +21,4 @@ basics of functional programming before using these utilities.
 ## Modules
 
 - [Option](/option/README.md)
+- [Result](/result/README.md)
