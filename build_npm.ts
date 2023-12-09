@@ -23,10 +23,10 @@ const version = parsedVersion ??
 async function build() {
   const outDir = `./${mod}/dist`;
 
-  const copyReadmeAndLicense = (dir: string) => () =>
-    ["LICENSE", "README.md"].forEach((input) =>
-      Deno.copyFileSync(input, `${dir}/${input}`)
-    );
+  const copyReadmeAndLicense = (dir: string) => () => {
+    Deno.copyFileSync("LICENSE", `${dir}/LICENSE`);
+    Deno.copyFileSync(`${mod}/README.md`, `${dir}/README.md`);
+  };
 
   await dnt.emptyDir(outDir);
 
