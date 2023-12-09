@@ -71,7 +71,7 @@ const value = parseInt(input);
 };
 
 Result.err("message")
-  .flatMap(tryParse); // Impossible state
+  .flatMap(tryParse); // Evaluates to Err "message"
 
 Result.ok("42")
   .flatMap(tryParse); // Evaluates to Ok 42
@@ -94,7 +94,7 @@ contained result value `T` if the result is ok.
 
 ```ts
 Result.err(42)
-  .inspect((x) => console.log(x * 2)); // Impossible state
+  .inspect((x) => console.log(x * 2)); // Prints nothing
 
 Result.ok(42)
   .inspect((x) => console.log(x * 2)); // Evaluates to 84
@@ -117,7 +117,7 @@ Result.err(42)
   .inspectErr((x) => console.log(x * 2)); // Evaluates to 84
 
 Result.ok(42)
-  .inspectErr((x) => console.log(x * 2)); // Impossible state
+  .inspectErr((x) => console.log(x * 2)); // Prints nothing
 ```
 
 </details>
@@ -134,7 +134,7 @@ value `U`.
 
 ```ts
 Result.err(42)
-  .map((x) => x * 2); // Impossible state
+  .map((x) => x * 2); // Evaluates to Err 42
 
 Result.ok(42)
   .map((x) => x * 2); // Evaluates to Ok 84
@@ -157,7 +157,7 @@ Result.err(42)
   .mapErr((x) => x * 2); // Evaluates to Err 84
 
 Result.ok(42)
-  .mapErr((x) => x * 2); // Impossible state
+  .mapErr((x) => x * 2); // Evaluates to Ok 42
 ```
 
 </details>
@@ -196,7 +196,7 @@ otherwise it will throw.
 ```ts
 Result.ok(42).unwrap(); // Evaluates to 42
 
-Result.err(42).unwrap(); // ! Throws an exception
+Result.err(42).unwrap(); // Throws an exception!
 ```
 
 </details>
@@ -212,7 +212,7 @@ Result.unwrapErr returns the value `E` from the associated result if it is
   <summary>Example</summary>
 
 ```ts
-Result.ok(42).unwrapErr(); // ! Throws an exception
+Result.ok(42).unwrapErr(); // Throws an exception!
 
 Result.err(42).unwrapErr(); // Evaluates to 42
 ```

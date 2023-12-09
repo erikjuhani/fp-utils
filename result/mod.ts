@@ -18,7 +18,7 @@ export interface Type<T, E> {
    * };
    *
    * Result.err("message")
-   *   .flatMap(tryParse); // Impossible state
+   *   .flatMap(tryParse); // Evaluates to Err "message"
    *
    * Result.ok("42")
    *   .flatMap(tryParse); // Evaluates to Ok 42
@@ -36,7 +36,7 @@ export interface Type<T, E> {
    * @example
    * ```ts
    * Result.err(42)
-   *   .inspect((x) => console.log(x * 2)); // Impossible state
+   *   .inspect((x) => console.log(x * 2)); // Prints nothing
    *
    * Result.ok(42)
    *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
@@ -54,7 +54,7 @@ export interface Type<T, E> {
    *   .inspectErr((x) => console.log(x * 2)); // Evaluates to 84
    *
    * Result.ok(42)
-   *   .inspectErr((x) => console.log(x * 2)); // Impossible state
+   *   .inspectErr((x) => console.log(x * 2)); // Prints nothing
    * ```
    */
   inspectErr(fn: (value: E) => void): Type<T, E>;
@@ -66,7 +66,7 @@ export interface Type<T, E> {
    * @example
    * ```ts
    * Result.err(42)
-   *   .map((x) => x * 2); // Impossible state
+   *   .map((x) => x * 2); // Evaluates to Err 42
    *
    * Result.ok(42)
    *   .map((x) => x * 2); // Evaluates to Ok 84
@@ -84,7 +84,7 @@ export interface Type<T, E> {
    *   .mapErr((x) => x * 2); // Evaluates to Err 84
    *
    * Result.ok(42)
-   *   .mapErr((x) => x * 2); // Impossible state
+   *   .mapErr((x) => x * 2); // Evaluates to Ok 42
    * ```
    */
   mapErr<F>(fn: (value: E) => F): Type<T, F>;
@@ -113,7 +113,7 @@ export interface Type<T, E> {
    * ```ts
    * Result.ok(42).unwrap(); // Evaluates to 42
    *
-   * Result.err(42).unwrap(); // ! Throws an exception
+   * Result.err(42).unwrap(); // Throws an exception!
    * ```
    */
   unwrap(): T;
@@ -124,7 +124,7 @@ export interface Type<T, E> {
    *
    * @example
    * ```ts
-   * Result.ok(42).unwrapErr(); // ! Throws an exception
+   * Result.ok(42).unwrapErr(); // Throws an exception!
    *
    * Result.err(42).unwrapErr(); // Evaluates to 42
    * ```
@@ -226,16 +226,15 @@ export class Ok<T> implements Result<T, never> {
   }
 
   /**
-   * Ok.inspectErr performs no calculations and returns Ok<T>. It cannot be
-   * given a `fn` function parameter like Err.inspectErr.
+   * Ok.inspectErr performs no calculations and returns Ok<T>.
    *
    * @example
    * ```ts
    * Result.ok(42)
-   *   .inspectErr((x) => console.log(x * 2)); // Impossible state
+   *   .inspectErr((x) => console.log(x * 2)); // Prints nothing
    * ```
    */
-  inspectErr() {
+  inspectErr(_fn: (value: never) => void) {
     return this;
   }
 
@@ -254,16 +253,15 @@ export class Ok<T> implements Result<T, never> {
   }
 
   /**
-   * Ok.mapErr performs no calculations and returns Ok<T>. It cannot be given a
-   * `fn` function parameter like Err.mapErr.
+   * Ok.mapErr performs no calculations and returns Ok<T>.
    *
    * @example
    * ```ts
    * Result.ok(42)
-   *   .mapErr((x) => x * 2); // Impossible state
+   *   .mapErr((x) => x * 2); // Evaluates to Ok 42
    * ```
    */
-  mapErr() {
+  mapErr<F>(_fn: (value: never) => F) {
     return this;
   }
 
@@ -298,7 +296,7 @@ export class Ok<T> implements Result<T, never> {
    *
    * @example
    * ```ts
-   * Result.ok(42).unwrapErr(); // ! Throws an exception
+   * Result.ok(42).unwrapErr(); // Throws an exception!
    * ```
    */
   unwrapErr(): never {
@@ -354,8 +352,7 @@ export class Err<T> implements Result<never, T> {
   }
 
   /**
-   * Err.flatMap performs no calculation and returns Err<T>. It cannot be given
-   * a `fn` function parameter like in Ok.flatMap.
+   * Err.flatMap performs no calculation and returns Err<T>.
    *
    * @example
    * ```ts
@@ -367,24 +364,23 @@ export class Err<T> implements Result<never, T> {
    * };
    *
    * Result.err("message")
-   *   .flatMap(tryParse); // Impossible state
+   *   .flatMap(tryParse); // Evaluates to Err "message"
    * ```
    */
-  flatMap() {
+  flatMap<U>(_fn: (value: never) => Type<U, T>) {
     return this;
   }
 
   /**
-   * Err.inspect performs no calculations and returns Err<T>. It cannot be
-   * given a `fn` function parameter like Ok.inspect.
+   * Err.inspect performs no calculations and returns Err<T>.
    *
    * @example
    * ```ts
    * Result.err(42)
-   *   .inspect((x) => console.log(x * 2)); // Impossible state
+   *   .inspect((x) => console.log(x * 2)); // Prints nothing
    * ```
    */
-  inspect() {
+  inspect(_fn: (value: never) => void) {
     return this;
   }
 
@@ -404,16 +400,15 @@ export class Err<T> implements Result<never, T> {
   }
 
   /**
-   * Err.map performs no calculations and returns Err<T>. It cannot be given a
-   * `fn` function parameter like Ok.map.
+   * Err.map performs no calculations and returns Err<T>.
    *
    * @example
    * ```ts
    * Result.err(42)
-   *   .map((x) => x * 2); // Impossible state
+   *   .map((x) => x * 2); // Evaluates to Err 42
    * ```
    */
-  map() {
+  map<U>(_fn: (value: never) => U) {
     return this;
   }
 
@@ -450,7 +445,7 @@ export class Err<T> implements Result<never, T> {
    *
    * @example
    * ```ts
-   * Result.err(42).unwrap(); // ! Throws an exception
+   * Result.err(42).unwrap(); // Throws an exception!
    * ```
    */
   unwrap(): never {
@@ -581,7 +576,7 @@ export function fromThrowable<T, E>(
  * ```ts
  * Result.ok(42).unwrap(); // Evaluates to 42
  *
- * Result.err(42).unwrap(); // ! Throws an exception
+ * Result.err(42).unwrap(); // Throws an exception!
  * ```
  */
 export function unwrap<T, E>(result: Result<T, E>): T {
@@ -594,7 +589,7 @@ export function unwrap<T, E>(result: Result<T, E>): T {
  *
  * @example
  * ```ts
- * Result.ok(42).unwrapErr(); // ! Throws an exception
+ * Result.ok(42).unwrapErr(); // Throws an exception!
  *
  * Result.err(42).unwrapErr(); // Evaluates to 42
  * ```
@@ -627,7 +622,7 @@ export function unwrapOr<T, E, U>(
  * @example
  * ```ts
  * Result.err(42)
- *   .map((x) => x * 2); // Impossible state
+ *   .map((x) => x * 2); // Evaluates to Err 42
  *
  * Result.ok(42)
  *   .map((x) => x * 2); // Evaluates to Ok 84
@@ -649,7 +644,7 @@ export function map<T, E, U>(
  *   .mapErr((x) => x * 2); // Evaluates to Err 84
  *
  * Result.ok(42)
- *   .mapErr((x) => x * 2); // Impossible state
+ *   .mapErr((x) => x * 2); // Evaluates to Ok 42
  * ```
  */
 export function mapErr<T, E, F>(
@@ -665,7 +660,7 @@ export function mapErr<T, E, F>(
  * @example
  * ```ts
  * Result.err(42)
- *   .inspect((x) => console.log(x * 2)); // Impossible state
+ *   .inspect((x) => console.log(x * 2)); // Prints nothing
  *
  * Result.ok(42)
  *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
@@ -687,7 +682,7 @@ export function inspect<T, E>(
  *   .inspectErr((x) => console.log(x * 2)); // Evaluates to 84
  *
  * Result.ok(42)
- *   .inspectErr((x) => console.log(x * 2)); // Impossible state
+ *   .inspectErr((x) => console.log(x * 2)); // Prints nothing
  * ```
  */
 export function inspectErr<T, E>(
@@ -738,7 +733,7 @@ export function isErr<T, E>(result: Result<T, E>): result is Err<E> {
  * };
  *
  * Result.err("message")
- *   .flatMap(tryParse); // Impossible state
+ *   .flatMap(tryParse); // Evaluates to Err "message"
  *
  * Result.ok("42")
  *   .flatMap(tryParse); // Evaluates to Ok 42
