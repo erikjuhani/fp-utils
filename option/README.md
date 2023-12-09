@@ -48,7 +48,7 @@ const tryParse: TryParse = (input: string) => {
 };
 
 Option.none()
-  .flatMap(tryParse); // Impossible state
+  .flatMap(tryParse); // Evaluates to None
 
 Option.some("42")
   .flatMap(tryParse); // Evaluates to Some 42

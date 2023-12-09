@@ -10,7 +10,7 @@ export interface Type<T> {
    *
    * @example
    * ```ts
-   * type TryParse = (input: string) => Option.None | Option.Some<number>;
+   * type TryParse = (input: string) => Option.Type<number>;
    *
    * const tryParse: TryParse = (input: string) => {
    *   const value = parseInt(input);
@@ -18,7 +18,7 @@ export interface Type<T> {
    * };
    *
    * Option.none()
-   *   .flatMap(tryParse); // Impossible state
+   *   .flatMap(tryParse); // Evaluates to None
    *
    * Option.some("42")
    *   .flatMap(tryParse); // Evaluates to Some 42
@@ -82,7 +82,7 @@ export interface Type<T> {
    * ```ts
    * Option.some(42).unwrap(); // Evaluates to 42
    *
-   * Option.none().unwrap(); // ! Throws an exception
+   * Option.none().unwrap(); // Throws an exception!
    * ```
    */
   unwrap(): T;
@@ -177,7 +177,7 @@ export class Some<T> implements Option<T> {
    *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
    * ```
    */
-  inspect(fn: (value: T) => void): Option<T> {
+  inspect(fn: (value: T) => void) {
     fn(this.value);
     return this;
   }
@@ -277,19 +277,15 @@ export class None implements Option<never> {
    * };
    *
    * Option.none()
-   *   .flatMap(tryParse); // Impossible state
-   *
-   * Option.none()
-   *   .flatMap(); // Evaluates to None
+   *   .flatMap(tryParse); // Evaluates to None
    * ```
    */
-  flatMap() {
+  flatMap<U>(_fn: (value: never) => Option<U>) {
     return this;
   }
 
   /**
-   * None.inspect performs no calculations and returns None. It cannot be given
-   * a `fn` function parameter like in Some.inspect.
+   * None.inspect performs no calculations and returns None.
    *
    * @example
    * ```ts
@@ -297,24 +293,20 @@ export class None implements Option<never> {
    *   .inspect((x) => console.log(x * 2)); // Evaluates to None
    * ```
    */
-  inspect() {
+  inspect(_fn: (value: never) => void) {
     return this;
   }
 
   /**
-   * None.map performs no calculation and returns None. It cannot be given a
-   * `fn` function parameter like in Some.map.
+   * None.map performs no calculation and returns None.
    *
    * @example
    * ```ts
    * Option.none()
-   *   .map((x) => x * 2); // Impossible state
-   *
-   * Option.none()
-   *   .map(); // Evaluates to None
+   *   .map((x) => x * 2); // Evaluates to None
    * ```
    */
-  map() {
+  map<U>(_fn: (value: never) => NonNullable<U>) {
     return this;
   }
 
@@ -327,7 +319,7 @@ export class None implements Option<never> {
    *   .match(() => 99, (x) => x * 2); // Evaluates to 99
    * ```
    */
-  match<U>(onNone: () => U): U {
+  match<U>(onNone: () => U, _onSome: (value: never) => U): U {
     return onNone();
   }
 
@@ -336,7 +328,7 @@ export class None implements Option<never> {
    *
    * @example
    * ```ts
-   * Option.none().unwrap(); // ! Throws an exception
+   * Option.none().unwrap(); // Throws an exception!
    * ```
    */
   unwrap(): never {
@@ -387,9 +379,9 @@ const static_none = new None();
  *
  * @example
  * ```ts
- * Option.some(undefined); // ! Throws an exception or impossible state
+ * Option.some(undefined); // Throws an exception or compiler error!
  *
- * Option.some(null); // ! Throws an exception or impossible state
+ * Option.some(null); // Throws an exception or compiler error!
  *
  * Option.some(42); // Evaluates to Some 42
  * ```
@@ -435,7 +427,7 @@ export function fromNullable<T>(value: T | null | undefined): Option<T> {
  * ```ts
  * Option.some(42).unwrap(); // Evaluates to 42
  *
- * Option.none().unwrap(); // ! Throws an exception
+ * Option.none().unwrap(); // Throws an exception!
  * ```
  */
 export function unwrap<T>(option: Option<T>): T {
@@ -529,7 +521,7 @@ export function isNone<T>(option: Option<T>): option is None {
  *
  * @example
  * ```ts
- * type TryParse = (input: string) => Option.None | Option.Some<number>;
+ * type TryParse = (input: string) => Option.Type<number>;
  *
  * const tryParse: TryParse = (input: string) => {
  *   const value = parseInt(input);
@@ -537,7 +529,7 @@ export function isNone<T>(option: Option<T>): option is None {
  * };
  *
  * Option.none()
- *   .flatMap(tryParse); // Impossible state
+ *   .flatMap(tryParse); // Evaluates to None
  *
  * Option.some("42")
  *   .flatMap(tryParse); // Evaluates to Some 42
