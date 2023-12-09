@@ -33,8 +33,8 @@ const found = tryGet("1"); // Evaluates to Some { name: "deno" }
 
 Signature: `<U>(fn: (value: T) => Option<U>): Option<U>`
 
-Option.flatMap applies a function `fn` to the content of option `T` and transforms
-it into an option `U`.
+Option.flatMap applies a function `fn` to the content of option `T` and
+transforms it into an option `U`.
 
 <details>
   <summary>Example</summary>

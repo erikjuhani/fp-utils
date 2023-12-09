@@ -8,12 +8,12 @@ handling logic in a clean and concise way.
 
 When a computation succeeds, Result carries the successful value and allows you
 to continue chaining operations on it. If at any point an error occurs, the
-error value is propagated, and subsequent operations are bypassed until an
-error handler is encountered, which enables explicit handling of both the
-success and error cases making the code easier to reason about.
+error value is propagated, and subsequent operations are bypassed until an error
+handler is encountered, which enables explicit handling of both the success and
+error cases making the code easier to reason about.
 
-Result is similar to Option, the main difference is that it holds either a
-value or an error, and not value or none.
+Result is similar to Option, the main difference is that it holds either a value
+or an error, and not value or none.
 
 ```ts
 // deno
@@ -66,7 +66,7 @@ transforms it into a result containing value `U`.
 type TryParse = (input: string) => Result.Type<number, string>;
 
 const tryParse: TryParse = (input: string) => {
-const value = parseInt(input);
+  const value = parseInt(input);
   return isNaN(value) ? Result.err("could not parse") : Result.ok(value);
 };
 
@@ -146,8 +146,8 @@ Result.ok(42)
 
 Signature: `<U>(fn: (value: E) => U): Result<U, E>`
 
-Result.mapErr applies a function `fn` to result error value `E` and
-transforms it into value `F`.
+Result.mapErr applies a function `fn` to result error value `E` and transforms
+it into value `F`.
 
 <details>
   <summary>Example</summary>

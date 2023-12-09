@@ -13,8 +13,9 @@ const invalidJSON = parseJSON<JSONWithProperty>("");
 console.log(invalidJSON.unwrapErr());
 
 const validateJSON = (json: Record<string, unknown>) => {
-  const isJSONWithProperty = (value: any): value is JSONWithProperty =>
-    "property" in value;
+  const isJSONWithProperty = (
+    value: Record<string, unknown>,
+  ): value is JSONWithProperty => "property" in value;
 
   if (isJSONWithProperty(json)) return json;
 
