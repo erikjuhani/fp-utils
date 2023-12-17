@@ -133,7 +133,7 @@ export interface Type<T, E> {
 
   /**
    * Result.unwrapOr returns the value `T` from the associated result or
-   * returns the default value `U` if the result is `Err`.
+   * returns the default value if the result is `Err`.
    *
    * @example
    * ```ts
@@ -142,7 +142,7 @@ export interface Type<T, E> {
    * Result.err(42).unwrapOr(99); // Evaluates to 99
    * ```
    */
-  unwrapOr<U>(defaultValue: U): T | U;
+  unwrapOr(defaultValue: T): T;
 
   /**
    * Result.isOk returns `true` if the result is `Ok`.
@@ -600,7 +600,7 @@ export function unwrapErr<T, E>(result: Result<T, E>): E {
 
 /**
  * Result.unwrapOr returns the value `T` from the associated result or
- * returns the default value `U` if the result is `Err`.
+ * returns the default value if the result is `Err`.
  *
  * @example
  * ```ts
@@ -609,9 +609,9 @@ export function unwrapErr<T, E>(result: Result<T, E>): E {
  * Result.err(42).unwrapOr(99); // Evaluates to 99
  * ```
  */
-export function unwrapOr<T, E, U>(
-  defaultValue: U,
-): (result: Result<T, E>) => T | U {
+export function unwrapOr<T, E>(
+  defaultValue: T,
+): (result: Result<T, E>) => T {
   return (result) => result.unwrapOr(defaultValue);
 }
 

@@ -221,10 +221,10 @@ Result.err(42).unwrapErr(); // Evaluates to 42
 
 ### `Result.unwrapOr`
 
-Signature: `<U>(defaultValue: U): T | U`
+Signature: `(defaultValue: T): T`
 
 Result.unwrapOr returns the value `T` from the associated result or returns the
-default value `U` if the result is `Err`.
+default value if the result is `Err`.
 
 <details>
   <summary>Example</summary>

@@ -139,10 +139,10 @@ Option.none().unwrap(); // ! Throws an exception
 
 ### `Option.unwrapOr`
 
-Signature: `<U>(defaultValue: U): T | U`
+Signature: `(defaultValue: T): T`
 
 Option.unwrapOr returns the value `T` from the associated option or returns the
-default value `U` if the option is `None`.
+default value if the option is `None`.
 
 <details>
   <summary>Example</summary>

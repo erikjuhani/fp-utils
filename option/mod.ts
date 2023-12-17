@@ -89,7 +89,7 @@ export interface Type<T> {
 
   /**
    * Option.unwrapOr returns the value `T` from the associated option or
-   * returns the default value `U` if the option is `None`.
+   * returns the default value if the option is `None`.
    *
    * @example
    * ```ts
@@ -98,7 +98,7 @@ export interface Type<T> {
    * Option.none().unwrapOr(99); // Evaluates to 99
    * ```
    */
-  unwrapOr<U>(defaultValue: U): T | U;
+  unwrapOr(defaultValue: T): T;
 
   /**
    * Option.isSome returns `true` if the option is `Some`
@@ -436,7 +436,7 @@ export function unwrap<T>(option: Option<T>): T {
 
 /**
  * Option.unwrapOr returns the value `T` from the associated Option or returns the
- * default value `U` if the Option is None.
+ * default value if the Option is None.
  *
  * @example
  * ```ts
@@ -445,7 +445,7 @@ export function unwrap<T>(option: Option<T>): T {
  * Option.none().unwrapOr(99); // Evaluates to 99
  * ```
  */
-export function unwrapOr<T, U>(defaultValue: U): (option: Option<T>) => T | U {
+export function unwrapOr<T>(defaultValue: T): (option: Option<T>) => T {
   return (option) => option.unwrapOr(defaultValue);
 }
 
