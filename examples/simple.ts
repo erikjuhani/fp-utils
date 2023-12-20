@@ -40,29 +40,25 @@ namespace WithoutOption {
 
 // deno-lint-ignore no-namespace
 namespace WithOption {
-  const tryGetDenoInfoSuccess = () =>
-    fetchDenoInfoSuccess()
-      .then((response) => response.json())
-      .then(Option.some)
-      .catch(Option.none);
+  const tryGetDenoInfoSuccess = Option.fromPromise(fetchDenoInfoSuccess);
 
   export const formatDenoInfoSuccess = async () =>
-    (await tryGetDenoInfoSuccess()).match(
-      notFound,
-      formatDenoInfo,
-    );
+    (await tryGetDenoInfoSuccess)
+      .map((response) => response.json())
+      .match(
+        notFound,
+        formatDenoInfo,
+      );
 
-  const tryGetDenoInfoFailure = () =>
-    fetchDenoInfoFailure()
-      .then(Option.some)
-      .then(Option.map((response) => response.json()))
-      .catch(Option.none);
+  const tryGetDenoInfoFailure = Option.fromPromise(fetchDenoInfoFailure);
 
   export const formatDenoInfoFailure = async () =>
-    (await tryGetDenoInfoFailure()).match(
-      notFound,
-      formatDenoInfo,
-    );
+    (await tryGetDenoInfoFailure)
+      .map((response) => response.json())
+      .match(
+        notFound,
+        formatDenoInfo,
+      );
 }
 
 assert.assertEquals(

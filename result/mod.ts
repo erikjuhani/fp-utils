@@ -569,6 +569,42 @@ export function fromThrowable<T, E>(
 }
 
 /**
+ * Result.fromPromise converts a promise into a result. If promise is rejected
+ * the Err<E> is returned, otherwise Ok<T>.
+ *
+ * @example
+ * ```ts
+ * Result.fromPromise(Promise.reject(), "Rejected"); // Evaluates to Err "Rejected"
+ *
+ * Result.fromPromise(Promise.resolve(42), "Rejected"); // Evaluates to Ok 42
+ *
+ * Result.fromPromise(fetch("https://example.com"), "Rejected"); // Evaluates to Ok Response
+ *
+ * Result.fromPromise(fetch("https://localhost:9999"), "Rejected"); // Evaluates to Err "Rejected"
+ * ```
+ */
+export function fromPromise<T, E>(
+  promise: Promise<T>,
+  onReject: E,
+): Promise<Result<T, E>>;
+export function fromPromise<T, E>(
+  asyncFn: () => Promise<T>,
+  onReject: E,
+): Promise<Result<T, E>>;
+export function fromPromise<T, E>(
+  promiseOrFn: Promise<T> | (() => Promise<T>),
+  onReject: E,
+): Promise<Result<T, E>> {
+  const promise = typeof promiseOrFn === "function"
+    ? promiseOrFn()
+    : promiseOrFn;
+
+  const onRejected = () => err(onReject);
+
+  return promise.then(ok).catch(onRejected);
+}
+
+/**
  * Result.unwrap returns the value `T` from the associated result if it is
  * `Ok`; otherwise it will throw.
  *

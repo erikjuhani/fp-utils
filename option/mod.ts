@@ -420,6 +420,35 @@ export function fromNullable<T>(value: T | null | undefined): Option<T> {
 }
 
 /**
+ * Option.fromPromise converts a promise into an option. If promise is rejected
+ * None is returned, otherwise Some<T>.
+ *
+ * @example
+ * ```ts
+ * Option.fromPromise(Promise.reject()); // Evaluates to None
+ *
+ * Option.fromPromise(Promise.resolve(null)); // Evaluates to None
+ *
+ * Option.fromPromise(Promise.resolve(42)); // Evaluates to Some 42
+ *
+ * Option.fromPromise(() => Promise.reject()); // Evaluates to None
+ *
+ * Option.fromPromise(() => Promise.resolve(42)); // Evaluates to Some 42
+ * ```
+ */
+export function fromPromise<T>(promise: Promise<T>): Promise<Option<T>>;
+export function fromPromise<T>(fn: () => Promise<T>): Promise<Option<T>>;
+export function fromPromise<T>(
+  promiseOrFn: Promise<T> | (() => Promise<T>),
+): Promise<Option<T>> {
+  const promise = typeof promiseOrFn === "function"
+    ? promiseOrFn()
+    : promiseOrFn;
+
+  return promise.then(fromNullable).catch(none);
+}
+
+/**
  * Option.unwrap returns the value `T` from the associated option if it is
  * `Some`; otherwise it will throw.
  *
