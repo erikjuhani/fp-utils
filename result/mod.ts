@@ -142,7 +142,8 @@ export interface Type<T, E> {
    * Result.err(42).unwrapOr(99); // Evaluates to 99
    * ```
    */
-  unwrapOr(defaultValue: T): T;
+  unwrapOr<U>(defaultValue: U): U;
+  unwrapOr<U>(defaultValue: T | U): T | U;
 
   /**
    * Result.isOk returns `true` if the result is `Ok`.
@@ -311,7 +312,7 @@ export class Ok<T> implements Result<T, never> {
    * Result.ok(42).unwrapOr(99); // Evaluates to 42
    * ```
    */
-  unwrapOr() {
+  unwrapOr(_defaultValue: T) {
     return this.value;
   }
 

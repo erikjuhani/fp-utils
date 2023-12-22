@@ -98,7 +98,8 @@ export interface Type<T> {
    * Option.none().unwrapOr(99); // Evaluates to 99
    * ```
    */
-  unwrapOr(defaultValue: T): T;
+  unwrapOr<U>(defaultValue: U): U;
+  unwrapOr<U>(defaultValue: T | U): T | U;
 
   /**
    * Option.isSome returns `true` if the option is `Some`
@@ -230,7 +231,7 @@ export class Some<T> implements Option<T> {
    * Option.some(42).unwrapOr(99); // Evaluates to 42
    * ```
    */
-  unwrapOr() {
+  unwrapOr(_defaultValue: T) {
     return this.value;
   }
 
@@ -343,7 +344,7 @@ export class None implements Option<never> {
    * Option.none().unwrapOr(99); // Evaluates to 99
    * ```
    */
-  unwrapOr<U>(defaultValue: U) {
+  unwrapOr<U>(defaultValue: U): U {
     return defaultValue;
   }
 
