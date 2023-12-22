@@ -1,3 +1,13 @@
+## 0.4.0
+
+FEATURES:
+
+- [Add `fromPromise` function for Option and Result modules](https://github.com/erikjuhani/fp-utils/commit/875043737fbb266da246fe355a61c0c71efb123f)
+
+CHANGES:
+
+- [Make unwrapOr default value use contained type T](https://github.com/erikjuhani/fp-utils/commit/31f0cc25dcf4f2fc95d00ececbc012ab0a3b818b)
+
 ## 0.3.0
 
 FEATURES:
