@@ -128,3 +128,39 @@ test("Option.fromNullable", () => {
     assertEquals(actual, expected);
   });
 });
+
+test("Option.fromPromise", async () => {
+  type FromPromiseTableTests = [
+    Promise<unknown>,
+    Option.Type<unknown>,
+  ][];
+
+  const tests: FromPromiseTableTests = [
+    [Promise.resolve(0), Option.some(0)],
+    [Promise.resolve(), Option.none()],
+    [Promise.reject("error"), Option.none()],
+    [Promise.reject(), Option.none()],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = await Option.fromPromise(input);
+    assertEquals(actual, expected);
+  }
+
+  type FromPromiseFnTableTests = [
+    () => Promise<unknown>,
+    Option.Type<unknown>,
+  ][];
+
+  const testsFn: FromPromiseFnTableTests = [
+    [() => Promise.resolve(0), Option.some(0)],
+    [() => Promise.resolve(), Option.none()],
+    [() => Promise.reject("error"), Option.none()],
+    [() => Promise.reject(), Option.none()],
+  ];
+
+  for (const [input, expected] of testsFn) {
+    const actual = await Option.fromPromise(input);
+    assertEquals(actual, expected);
+  }
+});

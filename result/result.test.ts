@@ -137,14 +137,50 @@ test("Result.match Err", () => {
   assertEquals(actual, "error");
 });
 
-test("Option.fromThrowable when function does not throw return Ok<T>", () => {
+test("Result.fromThrowable when function does not throw return Ok<T>", () => {
   const actual = Result.fromThrowable(() => 0);
   assertEquals(actual, Result.ok(0));
 });
 
-test("Option.fromThrowable when function does throw return Err<T>", () => {
+test("Result.fromThrowable when function does throw return Err<T>", () => {
   const actual = Result.fromThrowable(() => {
     throw new Error("error");
   });
   assertEquals(actual, Result.err(new Error("error")));
+});
+
+test("Result.fromPromise", async () => {
+  type FromPromiseTableTests = [
+    Promise<unknown>,
+    Result.Type<unknown, unknown>,
+  ][];
+
+  const tests: FromPromiseTableTests = [
+    [Promise.resolve(0), Result.ok(0)],
+    [Promise.resolve(), Result.err("error")],
+    [Promise.reject("rejected"), Result.err("error")],
+    [Promise.reject(), Result.err("error")],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = await Result.fromPromise(input, "error");
+    assertEquals(actual, expected);
+  }
+
+  type FromPromiseFnTableTests = [
+    () => Promise<unknown>,
+    Result.Type<unknown, unknown>,
+  ][];
+
+  const testsFn: FromPromiseFnTableTests = [
+    [() => Promise.resolve(0), Result.ok(0)],
+    [() => Promise.resolve(), Result.err("error")],
+    [() => Promise.reject("error"), Result.err("error")],
+    [() => Promise.reject(), Result.err("error")],
+  ];
+
+  for (const [input, expected] of testsFn) {
+    const actual = await Result.fromPromise(input, "error");
+    assertEquals(actual, expected);
+  }
 });
