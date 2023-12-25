@@ -570,8 +570,9 @@ export function fromThrowable<T, E>(
 }
 
 /**
- * Result.fromPromise converts a promise into a result. If promise is rejected
- * the Err<E> is returned, otherwise Ok<T>.
+ * Result.fromPromise converts a promise into a Result. If the promise is
+ * rejected, it returns Err<E>. Otherwise, it returns Ok<T>. If a resolved
+ * promise has a nullable value, it also results in Err<E>.
  *
  * @example
  * ```ts
@@ -582,6 +583,8 @@ export function fromThrowable<T, E>(
  * Result.fromPromise(fetch("https://example.com"), "Rejected"); // Evaluates to Ok Response
  *
  * Result.fromPromise(fetch("https://localhost:9999"), "Rejected"); // Evaluates to Err "Rejected"
+ *
+ * Result.fromPromise(Promise.resolve(), "Rejected"); // Evaluates to Err "Rejected"
  * ```
  */
 export function fromPromise<T, E>(
@@ -602,7 +605,10 @@ export function fromPromise<T, E>(
 
   const onRejected = () => err(onReject);
 
-  return promise.then(ok).catch(onRejected);
+  return promise.then((value) => {
+    if (value === undefined || value === null) throw err;
+    else return ok(value);
+  }).catch(onRejected);
 }
 
 /**
