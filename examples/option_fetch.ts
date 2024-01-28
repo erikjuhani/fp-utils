@@ -5,59 +5,66 @@
 // We "fetch" the deno information from the "API" and then try to format the
 // deno information.
 //
-// The option example demonstrates how easy it is to attach options to existing
-// TypeScript functionality and how options can ultimately compress the lines
-// of code by making the logic into one sequence.
+// This option example demonstrates how easy it is to attach options to
+// existing TypeScript functionality and how options can ultimately compress
+// the lines of code by making the logic into one sequence.
 import * as Option from "../option/mod.ts";
 import { std } from "dev_deps";
+import {
+  fetchFailure,
+  fetchSuccess,
+  format,
+  InfoResponse,
+  notFound,
+} from "./fetch_common.ts";
 
 const { assert } = std;
 
 // deno-lint-ignore no-namespace
-namespace WithoutOption {
-  const tryGetDenoInfoSuccess = () =>
-    fetchDenoInfoSuccess()
+export namespace Native {
+  const tryGetInfo = (fetch: () => Promise<InfoResponse>) =>
+    fetch()
       .then((response) => response.json())
-      .catch(() => undefined);
+      .catch(() => {
+        throw Error("Unexpected error");
+      });
 
-  export const formatDenoInfoSuccess = async () => {
-    const denoInfo = await tryGetDenoInfoSuccess();
-    if (denoInfo) return formatDenoInfo(denoInfo);
+  export const infoSuccess = async () => {
+    const info = await tryGetInfo(fetchSuccess);
+    if (info) return format(info);
     else return notFound();
   };
 
-  const tryGetDenoInfoFailure = () =>
-    fetchDenoInfoFailure()
-      .then((response) => response.json())
-      .catch(() => undefined);
-
-  export const formatDenoInfoFailure = async () => {
-    const denoInfo = await tryGetDenoInfoFailure();
-    if (denoInfo) return formatDenoInfo(denoInfo);
-    else return notFound();
+  export const infoFailure = async () => {
+    try {
+      const denoInfo = await tryGetInfo(fetchFailure);
+      if (denoInfo) return format(denoInfo);
+      else return notFound();
+    } catch (_err) {
+      return notFound();
+    }
   };
 }
 
 // deno-lint-ignore no-namespace
-namespace WithOption {
-  const tryGetDenoInfoSuccess = Option.fromPromise(fetchDenoInfoSuccess);
+export namespace WithOption {
+  const tryGetInfo = (fetch: () => Promise<InfoResponse>) =>
+    Option.fromPromise(fetch);
 
-  export const formatDenoInfoSuccess = async () =>
-    (await tryGetDenoInfoSuccess)
+  export const infoSuccess = async () =>
+    (await tryGetInfo(fetchSuccess))
       .map((response) => response.json())
       .match(
         notFound,
-        formatDenoInfo,
+        format,
       );
 
-  const tryGetDenoInfoFailure = Option.fromPromise(fetchDenoInfoFailure);
-
-  export const formatDenoInfoFailure = async () =>
-    (await tryGetDenoInfoFailure)
+  export const infoFailure = async () =>
+    (await tryGetInfo(fetchFailure))
       .map((response) => response.json())
       .match(
         notFound,
-        formatDenoInfo,
+        format,
       );
 }
 
@@ -65,53 +72,22 @@ assert.assertEquals(
   `Deno
  | 2018
  | Deno is a runtime for JavaScript, TypeScript, and WebAssembly. Deno was co-created by Ryan Dahl, who also created Node.js.`,
-  await WithoutOption.formatDenoInfoSuccess(),
+  await Native.infoSuccess(),
 );
 
 assert.assertEquals(
   "No info found",
-  await WithoutOption.formatDenoInfoFailure(),
+  await Native.infoFailure(),
 );
 
 assert.assertEquals(
   `Deno
  | 2018
  | Deno is a runtime for JavaScript, TypeScript, and WebAssembly. Deno was co-created by Ryan Dahl, who also created Node.js.`,
-  await WithOption.formatDenoInfoSuccess(),
+  await WithOption.infoSuccess(),
 );
 
 assert.assertEquals(
   "No info found",
-  await WithOption.formatDenoInfoFailure(),
+  await WithOption.infoFailure(),
 );
-
-function notFound(): string {
-  return "No info found";
-}
-
-function formatDenoInfo(denoInfo: DenoInfo): string {
-  return `${denoInfo.name}\n | ${denoInfo.initialRelease}\n | ${denoInfo.description}`;
-}
-
-type DenoInfo = {
-  name: string;
-  initialRelease: number;
-  description: string;
-};
-
-function fetchDenoInfoSuccess(): Promise<{ json: () => DenoInfo }> {
-  const denoInfoResponse = {
-    json: () => ({
-      name: "Deno",
-      initialRelease: 2018,
-      description:
-        "Deno is a runtime for JavaScript, TypeScript, and WebAssembly. Deno was co-created by Ryan Dahl, who also created Node.js.",
-    }),
-  };
-
-  return Promise.resolve(denoInfoResponse);
-}
-
-function fetchDenoInfoFailure(): Promise<{ json: () => DenoInfo }> {
-  return Promise.reject();
-}
