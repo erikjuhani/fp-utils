@@ -132,17 +132,17 @@ test("Result.flatMap on Err does not execute", () => {
 });
 
 test("Result.match Ok", () => {
-  const actual = Result.match((err) => `${err}`, (ok) => `${ok}`)(
-    Result.ok(0),
+  const actual = Result.match((ok) => `${ok}-ok`, (err) => `${err}-error`)(
+    Result.ok("value"),
   );
-  assertEquals(actual, "0");
+  assertEquals(actual, "value-ok");
 });
 
 test("Result.match Err", () => {
-  const actual = Result.match(() => "error", (ok) => `${ok}`)(
-    Result.err("error"),
+  const actual = Result.match((ok) => `${ok}-ok`, (err) => `${err}-error`)(
+    Result.err("failed"),
   );
-  assertEquals(actual, "error");
+  assertEquals(actual, "failed-error");
 });
 
 test("Result.fromThrowable when function does not throw return Ok<T>", () => {

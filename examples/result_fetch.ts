@@ -51,8 +51,8 @@ namespace WithResult {
     (await tryGetDenoInfoSuccess)
       .map((response) => response.json())
       .match(
-        notFound,
         formatDenoInfo,
+        notFound,
       );
 
   const tryGetDenoInfoFailure = Result.fromPromise(
@@ -64,8 +64,8 @@ namespace WithResult {
     (await tryGetDenoInfoFailure)
       .map((response) => response.json())
       .match(
-        notFound,
         formatDenoInfo,
+        notFound,
       );
 }
 

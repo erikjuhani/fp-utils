@@ -103,7 +103,7 @@ export interface Type<T, TError> {
    *   .match((err) => err + 10, (x) => x * 2); // Evaluates to 84
    * ```
    */
-  match<U>(onErr: (value: TError) => U, onOk: (value: T) => U): U;
+  match<U>(onOk: (value: T) => U, onErr: (value: TError) => U): U;
 
   /**
    * Result.unwrap returns the value `T` from the associated result if it is
@@ -276,7 +276,7 @@ export class Ok<T> implements Result<T, never> {
    *   .match((err) => err + 10, (x) => x * 2); // Evaluates to 84
    * ```
    */
-  match<U>(_onErr: (_value: never) => U, onOk: (value: T) => U): U {
+  match<U>(onOk: (value: T) => U, _onErr: (_value: never) => U): U {
     return onOk(this.value);
   }
 
@@ -437,7 +437,7 @@ export class Err<T> implements Result<never, T> {
    *   .match((err) => err + 10); // Evaluates to 52
    * ```
    */
-  match<U>(onErr: (value: T) => U): U {
+  match<U>(_onOk: (value: never) => U, onErr: (value: T) => U): U {
     return onErr(this.value);
   }
 
@@ -814,15 +814,15 @@ export function flatMap<T, TError, U>(
  * @example
  * ```ts
  * Result.err(42)
- *   .match((err) => err + 10, (x) => x * 2); // Evaluates to 52
+ *   .match((ok) => ok * 2, (err) => err + 10); // Evaluates to 52
  *
  * Result.ok(42)
- *   .match((err) => err + 10, (x) => x * 2); // Evaluates to 84
+ *   .match((ok) => ok * 2, (err) => err + 10); // Evaluates to 84
  * ```
  */
 export function match<T, TError, U>(
-  onErr: (value: TError) => U,
   onOk: (value: T) => U,
+  onErr: (value: TError) => U,
 ): (result: Result<T, TError>) => U {
-  return (result: Result<T, TError>) => result.match(onErr, onOk);
+  return (result: Result<T, TError>) => result.match(onOk, onErr);
 }
