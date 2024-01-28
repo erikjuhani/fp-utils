@@ -54,7 +54,7 @@ const validJSONContent = parseJSON('{ "property": 42 }').flatMap((json) =>
 
 ### `Result.flatMap`
 
-Signature: `<U>(fn: (value: T) => Result<U, E>): Result<U, E>`
+Signature: `<U>(fn: (value: T) => Result<U, TError>): Result<U, TError>`
 
 Result.flatMap applies a function `fn` to the content of a result `T` and
 transforms it into a result containing value `U`.
@@ -84,7 +84,7 @@ Result.ok("Forty-two")
 
 ### `Result.inspect`
 
-Signature: `(fn: (value: T) => void): Result<T, E>`
+Signature: `(fn: (value: T) => void): Result<T, TError>`
 
 Result.inspect calls the provided function `fn` with a reference to the
 contained result value `T` if the result is ok.
@@ -104,10 +104,10 @@ Result.ok(42)
 
 ### `Result.inspectErr`
 
-Signature: `(fn: (value: E) => void): Result<T, E>`
+Signature: `(fn: (value: TError) => void): Result<T, TError>`
 
 Result.inspectErr calls the provided function `fn` with a reference to the
-contained result error value `E` if the result is err.
+contained result error value `TError` if the result is err.
 
 <details>
   <summary>Example</summary>
@@ -124,7 +124,7 @@ Result.ok(42)
 
 ### `Result.map`
 
-Signature: `<U>(fn: (value: T) => U): Result<U, E>`
+Signature: `<U>(fn: (value: T) => U): Result<U, TError>`
 
 Result.map applies a function `fn` to result value `T` and transforms it into
 value `U`.
@@ -144,10 +144,10 @@ Result.ok(42)
 
 ### `Result.mapErr`
 
-Signature: `<U>(fn: (value: E) => U): Result<U, E>`
+Signature: `<U>(fn: (value: TError) => U): Result<U, TError>`
 
-Result.mapErr applies a function `fn` to result error value `E` and transforms
-it into value `F`.
+Result.mapErr applies a function `fn` to result error value `TError` and
+transforms it into value `U`.
 
 <details>
   <summary>Example</summary>
@@ -164,11 +164,11 @@ Result.ok(42)
 
 ### `Result.match`
 
-Signature: `<U>(onErr: (value: E) => U, onOk: (value: T) => U): U`
+Signature: `<U>(onErr: (value: TError) => U, onOk: (value: T) => U): U`
 
 Result.match transforms the result value `T` into `U` using `onOk` and then
-returns `U`. If the result is Err, the error value `E` is transformed to `U`
-with `onErr` and then returns `U`.
+returns `U`. If the result is Err, the error value `TError` is transformed to
+`U` with `onErr` and then returns `U`.
 
 <details>
   <summary>Example</summary>
@@ -203,9 +203,9 @@ Result.err(42).unwrap(); // Throws an exception!
 
 ### `Result.unwrapErr`
 
-Signature: `(): E`
+Signature: `(): TError`
 
-Result.unwrapErr returns the value `E` from the associated result if it is
+Result.unwrapErr returns the value `TError` from the associated result if it is
 `Err`; otherwise it will throw.
 
 <details>
@@ -256,7 +256,7 @@ Result.ok(42).isOk(); // Evaluates to true
 
 ### `Result.isErr`
 
-Signature: `<T>(): this is Err<E>`
+Signature: `<T>(): this is Err<TError>`
 
 Result.isErr returns `true` if the result is `Err`.
 
