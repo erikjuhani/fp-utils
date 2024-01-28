@@ -3,7 +3,7 @@
  * computation `Err`. It is commonly used with computations known to either
  * succeed or fail.
  */
-export interface Type<T, E> {
+export interface Type<T, TError> {
   /**
    * Result.flatMap applies a function `fn` to the content of a result `T` and
    * transforms it into a result containing value `U`.
@@ -27,7 +27,7 @@ export interface Type<T, E> {
    *   .flatMap(tryParse); // Evaluates to Err "could not parse"
    * ```
    */
-  flatMap<U>(fn: (value: T) => Type<U, E>): Type<U, E>;
+  flatMap<U>(fn: (value: T) => Result<U, TError>): Result<U, TError>;
 
   /**
    * Result.inspect calls the provided function `fn` with a reference to the
@@ -42,11 +42,11 @@ export interface Type<T, E> {
    *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
    * ```
    */
-  inspect(fn: (value: T) => void): Type<T, E>;
+  inspect(fn: (value: T) => void): Result<T, TError>;
 
   /**
    * Result.inspectErr calls the provided function `fn` with a reference to the
-   * contained result error value `E` if the result is err.
+   * contained result error value `TError` if the result is err.
    *
    * @example
    * ```ts
@@ -57,7 +57,7 @@ export interface Type<T, E> {
    *   .inspectErr((x) => console.log(x * 2)); // Prints nothing
    * ```
    */
-  inspectErr(fn: (value: E) => void): Type<T, E>;
+  inspectErr(fn: (value: TError) => void): Result<T, TError>;
 
   /**
    * Result.map applies a function `fn` to result value `T` and transforms it
@@ -72,11 +72,11 @@ export interface Type<T, E> {
    *   .map((x) => x * 2); // Evaluates to Ok 84
    * ```
    */
-  map<U>(fn: (value: T) => U): Type<U, E>;
+  map<U>(fn: (value: T) => U): Result<U, TError>;
 
   /**
-   * Result.mapErr applies a function `fn` to result error value `E` and
-   * transforms it into value `F`.
+   * Result.mapErr applies a function `fn` to result error value `TError` and
+   * transforms it into value `U`.
    *
    * @example
    * ```ts
@@ -87,12 +87,12 @@ export interface Type<T, E> {
    *   .mapErr((x) => x * 2); // Evaluates to Ok 42
    * ```
    */
-  mapErr<F>(fn: (value: E) => F): Type<T, F>;
+  mapErr<U>(fn: (value: TError) => U): Result<T, U>;
 
   /**
    * Result.match transforms the result value `T` into `U` using `onOk` and
-   * then returns `U`. If the result is Err, the error value `E` is transformed
-   * to `U` with `onErr` and then returns `U`.
+   * then returns `U`. If the result is Err, the error value `TError` is
+   * transformed to `U` with `onErr` and then returns `U`.
    *
    * @example
    * ```ts
@@ -103,7 +103,7 @@ export interface Type<T, E> {
    *   .match((err) => err + 10, (x) => x * 2); // Evaluates to 84
    * ```
    */
-  match<U>(onErr: (value: E) => U, onOk: (value: T) => U): U;
+  match<U>(onErr: (value: TError) => U, onOk: (value: T) => U): U;
 
   /**
    * Result.unwrap returns the value `T` from the associated result if it is
@@ -119,8 +119,8 @@ export interface Type<T, E> {
   unwrap(): T;
 
   /**
-   * Result.unwrapErr returns the value `E` from the associated result if it is
-   * `Err`; otherwise it will throw.
+   * Result.unwrapErr returns the value `TError` from the associated result if
+   * it is `Err`; otherwise it will throw.
    *
    * @example
    * ```ts
@@ -129,7 +129,7 @@ export interface Type<T, E> {
    * Result.err(42).unwrapErr(); // Evaluates to 42
    * ```
    */
-  unwrapErr(): E;
+  unwrapErr(): TError;
 
   /**
    * Result.unwrapOr returns the value `T` from the associated result or
@@ -167,7 +167,7 @@ export interface Type<T, E> {
    * Result.ok(42).isOk(); // Evaluates to false
    * ```
    */
-  isErr<E>(): this is Err<E>;
+  isErr<TError>(): this is Err<TError>;
 }
 
 /**
@@ -368,7 +368,7 @@ export class Err<T> implements Result<never, T> {
    *   .flatMap(tryParse); // Evaluates to Err "message"
    * ```
    */
-  flatMap<U>(_fn: (value: never) => Type<U, T>) {
+  flatMap<U>(_fn: (value: never) => Result<U, T>) {
     return this;
   }
 
@@ -532,7 +532,7 @@ export function err<T>(value: T): Err<T> {
 
 /**
  * Result.fromThrowable converts a throwing function `fn` into a Result using
- * try catch. If error occurs the error is interpreted as Err<E> otherwise
+ * try catch. If error occurs the error is interpreted as Err<TError> otherwise
  * returns Ok<T>.
  *
  * @example
@@ -559,9 +559,9 @@ export function err<T>(value: T): Err<T> {
  * }); // Evaluates to type Result<JSONWithProperty, unknown>
  * ```
  */
-export function fromThrowable<T, E>(
+export function fromThrowable<T, TError>(
   fn: () => T,
-): Result<T, E> {
+): Result<T, TError> {
   try {
     return ok(fn());
   } catch (e) {
@@ -571,8 +571,8 @@ export function fromThrowable<T, E>(
 
 /**
  * Result.fromPromise converts a promise into a Result. If the promise is
- * rejected, it returns Err<E>. Otherwise, it returns Ok<T>. If a resolved
- * promise has a nullable value, it also results in Err<E>.
+ * rejected, it returns Err<TError>. Otherwise, it returns Ok<T>. Unit is
+ * returned if a resolved promise has a nullable value.
  *
  * @example
  * ```ts
@@ -587,18 +587,18 @@ export function fromThrowable<T, E>(
  * Result.fromPromise(Promise.resolve(), "Rejected"); // Evaluates to Err "Rejected"
  * ```
  */
-export function fromPromise<T, E>(
+export function fromPromise<T, TError>(
   promise: Promise<T>,
-  onReject: E,
-): Promise<Result<T, E>>;
-export function fromPromise<T, E>(
+  onReject: TError,
+): Promise<Result<T, TError>>;
+export function fromPromise<T, TError>(
   asyncFn: () => Promise<T>,
-  onReject: E,
-): Promise<Result<T, E>>;
-export function fromPromise<T, E>(
+  onReject: TError,
+): Promise<Result<T, TError>>;
+export function fromPromise<T, TError>(
   promiseOrFn: Promise<T> | (() => Promise<T>),
-  onReject: E,
-): Promise<Result<T, E>> {
+  onReject: TError,
+) {
   const promise = typeof promiseOrFn === "function"
     ? promiseOrFn()
     : promiseOrFn;
@@ -622,13 +622,13 @@ export function fromPromise<T, E>(
  * Result.err(42).unwrap(); // Throws an exception!
  * ```
  */
-export function unwrap<T, E>(result: Result<T, E>): T {
+export function unwrap<T, TError>(result: Result<T, TError>): T {
   return result.unwrap();
 }
 
 /**
- * Result.unwrapErr returns the value `E` from the associated result if it is
- * `Err`; otherwise it will throw.
+ * Result.unwrapErr returns the value `TError` from the associated result if it
+ * is `Err`; otherwise it will throw.
  *
  * @example
  * ```ts
@@ -637,7 +637,7 @@ export function unwrap<T, E>(result: Result<T, E>): T {
  * Result.err(42).unwrapErr(); // Evaluates to 42
  * ```
  */
-export function unwrapErr<T, E>(result: Result<T, E>): E {
+export function unwrapErr<T, TError>(result: Result<T, TError>): TError {
   return result.unwrapErr();
 }
 
@@ -652,9 +652,9 @@ export function unwrapErr<T, E>(result: Result<T, E>): E {
  * Result.err(42).unwrapOr(99); // Evaluates to 99
  * ```
  */
-export function unwrapOr<T, E>(
+export function unwrapOr<T, TError>(
   defaultValue: T,
-): (result: Result<T, E>) => T {
+): (result: Result<T, TError>) => T {
   return (result) => result.unwrapOr(defaultValue);
 }
 
@@ -671,15 +671,15 @@ export function unwrapOr<T, E>(
  *   .map((x) => x * 2); // Evaluates to Ok 84
  * ```
  */
-export function map<T, E, U>(
+export function map<T, TError, U>(
   fn: (value: T) => U,
-): (result: Result<T, E>) => Result<U, E> {
+): (result: Result<T, TError>) => Result<U, TError> {
   return (result) => result.map(fn);
 }
 
 /**
- * Result.mapErr applies a function `fn` to result error value `E` and
- * transforms it into value `F`.
+ * Result.mapErr applies a function `fn` to result error value `TError` and
+ * transforms it into value `U`.
  *
  * @example
  * ```ts
@@ -690,9 +690,9 @@ export function map<T, E, U>(
  *   .mapErr((x) => x * 2); // Evaluates to Ok 42
  * ```
  */
-export function mapErr<T, E, F>(
-  fn: (value: E) => F,
-): (result: Result<T, E>) => Result<T, F> {
+export function mapErr<T, TError, U>(
+  fn: (value: TError) => U,
+): (result: Result<T, TError>) => Result<T, U> {
   return (result) => result.mapErr(fn);
 }
 
@@ -709,15 +709,15 @@ export function mapErr<T, E, F>(
  *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
  * ```
  */
-export function inspect<T, E>(
+export function inspect<T, TError>(
   fn: (value: T) => void,
-): (result: Result<T, E>) => Result<T, E> {
+): (result: Result<T, TError>) => Result<T, TError> {
   return (result) => result.inspect(fn);
 }
 
 /**
  * Result.inspectErr calls the provided function `fn` with a reference to the
- * contained result error value `E` if the result is err.
+ * contained result error value `TError` if the result is err.
  *
  * @example
  * ```ts
@@ -728,9 +728,9 @@ export function inspect<T, E>(
  *   .inspectErr((x) => console.log(x * 2)); // Prints nothing
  * ```
  */
-export function inspectErr<T, E>(
-  fn: (value: E) => void,
-): (result: Result<T, E>) => Result<T, E> {
+export function inspectErr<T, TError>(
+  fn: (value: TError) => void,
+): (result: Result<T, TError>) => Result<T, TError> {
   return (result) => result.inspectErr(fn);
 }
 
@@ -744,7 +744,7 @@ export function inspectErr<T, E>(
  * Result.ok(42).isOk(); // Evaluates to true
  * ```
  */
-export function isOk<T, E>(result: Result<T, E>): result is Ok<T> {
+export function isOk<T, TError>(result: Result<T, TError>): result is Ok<T> {
   return result.isOk();
 }
 
@@ -758,7 +758,9 @@ export function isOk<T, E>(result: Result<T, E>): result is Ok<T> {
  * Result.ok(42).isOk(); // Evaluates to false
  * ```
  */
-export function isErr<T, E>(result: Result<T, E>): result is Err<E> {
+export function isErr<T, TError>(
+  result: Result<T, TError>,
+): result is Err<TError> {
   return result.isErr();
 }
 
@@ -785,15 +787,15 @@ export function isErr<T, E>(result: Result<T, E>): result is Err<E> {
  *   .flatMap(tryParse); // Evaluates to Err "could not parse"
  * ```
  */
-export function flatMap<T, E, U>(
-  fn: (value: T) => Result<U, E>,
-): (result: Result<T, E>) => Result<U, E> {
+export function flatMap<T, TError, U>(
+  fn: (value: T) => Result<U, TError>,
+): (result: Result<T, TError>) => Result<U, TError> {
   return (result) => result.flatMap(fn);
 }
 
 /**
  * Result.match transforms the result value `T` into `U` using `onOk` and
- * then returns `U`. If the result is Err, the error value `E` is transformed
+ * then returns `U`. If the result is Err, the error value `TError` is transformed
  * to `U` with `onErr` and then returns `U`.
  *
  * @example
@@ -805,9 +807,9 @@ export function flatMap<T, E, U>(
  *   .match((err) => err + 10, (x) => x * 2); // Evaluates to 84
  * ```
  */
-export function match<T, E, U>(
-  onErr: (value: E) => U,
+export function match<T, TError, U>(
+  onErr: (value: TError) => U,
   onOk: (value: T) => U,
-): (result: Result<T, E>) => U {
-  return (result: Result<T, E>) => result.match(onErr, onOk);
+): (result: Result<T, TError>) => U {
+  return (result: Result<T, TError>) => result.match(onErr, onOk);
 }
