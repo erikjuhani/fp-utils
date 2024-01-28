@@ -503,30 +503,44 @@ export class Err<T> implements Result<never, T> {
 }
 
 /**
- * Result.ok creates a result Ok with value `T`.
+ * Result.ok creates a result Ok with value `T`. If called without arguments
+ * Ok<void> is returned. Type `void` can be interpreted to have the same
+ * significance as the `unit` type. Unit type signifies the absence of a
+ * specific value and acts as a placeholder when no other value exits or is
+ * needed.
  *
- * @example
- * ```ts
- * Result.ok("message"); // Evaluates to Ok "message"
+ * @example ```ts Result.ok("message"); // Evaluates to Ok "message"
  *
  * Result.ok(42); // Evaluates to Ok 42
+ *
+ * Result.ok(); // Evaluates to Ok void
  * ```
  */
-export function ok<T>(value: T): Ok<T> {
-  return new Ok(value);
+export function ok(): Ok<void>;
+export function ok<T>(value: T): Ok<T>;
+export function ok<T>(value?: T): Ok<T> | Ok<void> {
+  if (value === undefined || value === null) return new Ok<void>(undefined);
+  else return new Ok(value);
 }
 
 /**
- * Result.err creates a result Err with error value `T`.
+ * Result.err creates a result Err with error value `T`. Type `void` can be
+ * interpreted to have the same significance as the `unit` type. Unit type
+ * signifies the absence of a specific value and acts as a placeholder when no
+ * other value exits or is needed.
  *
- * @example
- * ```ts
+ * @example ```ts
  * Result.err("message"); // Evaluates to Err "message"
  *
  * Result.err(42); // Evaluates to Err 42
+ *
+ * Result.err(); // Evaluates to Err void
  * ```
  */
-export function err<T>(value: T): Err<T> {
+export function err(): Err<void>;
+export function err<T>(value: T): Err<T>;
+export function err<T>(value?: T): Err<T> | Err<void> {
+  if (value === undefined || value === null) return new Err<void>(undefined);
   return new Err(value);
 }
 
@@ -571,12 +585,14 @@ export function fromThrowable<T, TError>(
 
 /**
  * Result.fromPromise converts a promise into a Result. If the promise is
- * rejected, it returns Err<TError>. Otherwise, it returns Ok<T>. Unit is
- * returned if a resolved promise has a nullable value.
+ * rejected, it returns Err<TError>. Otherwise, it returns Ok<T>. Type `void` is
+ * returned if a resolved promise has a nullable value. Type `void` can be
+ * interpreted to have the same significance as the `unit` type. Unit type
+ * signifies the absence of a specific value and acts as a placeholder when no
+ * other value exits or is needed.
  *
- * @example
- * ```ts
- * Result.fromPromise(Promise.reject(), "Rejected"); // Evaluates to Err "Rejected"
+ * @example ```ts Result.fromPromise(Promise.reject(), "Rejected"); //
+ * Evaluates to Err "Rejected"
  *
  * Result.fromPromise(Promise.resolve(42), "Rejected"); // Evaluates to Ok 42
  *
@@ -584,7 +600,7 @@ export function fromThrowable<T, TError>(
  *
  * Result.fromPromise(fetch("https://localhost:9999"), "Rejected"); // Evaluates to Err "Rejected"
  *
- * Result.fromPromise(Promise.resolve(), "Rejected"); // Evaluates to Err "Rejected"
+ * Result.fromPromise(Promise.resolve(), "Rejected"); // Evaluates to Ok void
  * ```
  */
 export function fromPromise<T, TError>(
@@ -605,10 +621,7 @@ export function fromPromise<T, TError>(
 
   const onRejected = () => err(onReject);
 
-  return promise.then((value) => {
-    if (value === undefined || value === null) throw err;
-    else return ok(value);
-  }).catch(onRejected);
+  return promise.then(ok).catch(onRejected);
 }
 
 /**

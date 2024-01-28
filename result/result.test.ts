@@ -7,8 +7,8 @@ const { test } = Deno;
 
 test("Result.isOk", () => {
   const tests: [Result.Type<unknown, unknown>, boolean][] = [
-    [Result.ok(0), true],
-    [Result.err(0), false],
+    [Result.ok(), true],
+    [Result.err(), false],
   ];
 
   tests.forEach(([input, expected]) => {
@@ -18,13 +18,21 @@ test("Result.isOk", () => {
 
 test("Result.isErr", () => {
   const tests: [Result.Type<unknown, unknown>, boolean][] = [
-    [Result.ok(0), false],
-    [Result.err(0), true],
+    [Result.ok(), false],
+    [Result.err(), true],
   ];
 
   tests.forEach(([input, expected]) => {
     assertEquals(Result.isErr(input), expected);
   });
+});
+
+test("Result.ok returns unit if no value is applied", () => {
+  assertEquals(Result.ok().unwrap(), undefined);
+});
+
+test("Result.err returns unit if no value is applied", () => {
+  assertEquals(Result.err().unwrapErr(), undefined);
 });
 
 test("Result.unwrap on Ok returns Ok value", () => {
@@ -157,7 +165,7 @@ test("Result.fromPromise", async () => {
 
   const tests: FromPromiseTableTests = [
     [Promise.resolve(0), Result.ok(0)],
-    [Promise.resolve(), Result.err("error")],
+    [Promise.resolve(), Result.ok()],
     [Promise.reject("rejected"), Result.err("error")],
     [Promise.reject(), Result.err("error")],
   ];
@@ -174,7 +182,7 @@ test("Result.fromPromise", async () => {
 
   const testsFn: FromPromiseFnTableTests = [
     [() => Promise.resolve(0), Result.ok(0)],
-    [() => Promise.resolve(), Result.err("error")],
+    [() => Promise.resolve(), Result.ok()],
     [() => Promise.reject("error"), Result.err("error")],
     [() => Promise.reject(), Result.err("error")],
   ];
