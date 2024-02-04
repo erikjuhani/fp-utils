@@ -17,6 +17,7 @@ import {
   notFound,
 } from "./fetch_common.ts";
 import { Option } from "../option/mod.ts";
+import { fetchJsonFailure } from "./fetch_common.ts";
 
 const { assert } = std;
 
@@ -38,6 +39,16 @@ export namespace Native {
   export const infoFailure = async () => {
     try {
       const denoInfo = await tryGetInfo(fetchFailure);
+      if (denoInfo) return format(denoInfo);
+      else return notFound();
+    } catch (_err) {
+      return notFound();
+    }
+  };
+
+  export const infoJsonFailure = async () => {
+    try {
+      const denoInfo = await tryGetInfo(fetchJsonFailure);
       if (denoInfo) return format(denoInfo);
       else return notFound();
     } catch (_err) {
@@ -66,6 +77,14 @@ export namespace WithOption {
         format,
         notFound,
       );
+
+  export const infoJsonFailure = async () =>
+    (await tryGetInfo(fetchJsonFailure))
+      .map((response) => response.json())
+      .match(
+        format,
+        notFound,
+      );
 }
 
 assert.assertEquals(
@@ -81,6 +100,11 @@ assert.assertEquals(
 );
 
 assert.assertEquals(
+  "No info found",
+  await Native.infoJsonFailure(),
+);
+
+assert.assertEquals(
   `Deno
  | 2018
  | Deno is a runtime for JavaScript, TypeScript, and WebAssembly. Deno was co-created by Ryan Dahl, who also created Node.js.`,
@@ -90,4 +114,9 @@ assert.assertEquals(
 assert.assertEquals(
   "No info found",
   await WithOption.infoFailure(),
+);
+
+assert.assertEquals(
+  "No info found",
+  await WithOption.infoJsonFailure(),
 );

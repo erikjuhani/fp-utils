@@ -5,7 +5,7 @@ export type Info = {
 };
 
 export type InfoResponse = {
-  json: () => Info;
+  json: () => Promise<Info>;
 };
 
 export function notFound(): string {
@@ -18,12 +18,13 @@ export function format(info: Info): string {
 
 export function fetchSuccess(): Promise<InfoResponse> {
   const infoResponse = {
-    json: () => ({
-      name: "Deno",
-      initialRelease: 2018,
-      description:
-        "Deno is a runtime for JavaScript, TypeScript, and WebAssembly. Deno was co-created by Ryan Dahl, who also created Node.js.",
-    }),
+    json: () =>
+      Promise.resolve({
+        name: "Deno",
+        initialRelease: 2018,
+        description:
+          "Deno is a runtime for JavaScript, TypeScript, and WebAssembly. Deno was co-created by Ryan Dahl, who also created Node.js.",
+      }),
   };
 
   return Promise.resolve(infoResponse);
@@ -31,4 +32,12 @@ export function fetchSuccess(): Promise<InfoResponse> {
 
 export function fetchFailure(): Promise<InfoResponse> {
   return Promise.reject();
+}
+
+export function fetchJsonFailure(): Promise<InfoResponse> {
+  const infoResponse = {
+    json: () => Promise.reject(),
+  };
+
+  return Promise.resolve(infoResponse);
 }

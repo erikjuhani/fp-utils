@@ -29,7 +29,15 @@ export namespace Option {
      *   .flatMap(tryParse); // Evaluates to None
      * ```
      */
-    flatMap<U>(fn: (value: T) => Option<U>): Option<U>;
+    flatMap<TOption extends Option<unknown>>(
+      fn: (value: T) => None,
+    ): None;
+    flatMap<TPromiseOption extends Promise<Option<unknown>>>(
+      fn: (value: T) => TPromiseOption,
+    ): TPromiseOption;
+    flatMap<TOption extends Option<unknown>>(
+      fn: (value: T) => TOption,
+    ): TOption;
 
     /**
      * Option.inspect calls the provided function `fn` with a reference to the
@@ -44,7 +52,7 @@ export namespace Option {
      *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
      * ```
      */
-    inspect(fn: (value: T) => void): Option<T>;
+    inspect(fn: (value: Awaited<T>) => void): this;
 
     /**
      * Option.map applies a function `fn` to option value `T` and transforms it
@@ -59,7 +67,13 @@ export namespace Option {
      *   .map((x) => x * 2); // Evaluates to Some 84
      * ```
      */
-    map<U>(fn: (value: T) => U): Option<U>;
+    map<U>(
+      fn: (value: Awaited<T>) => U,
+    ): this extends Option<Promise<Awaited<T>>> ? Option<Promise<U>>
+      : Option<U>;
+    map<U>(
+      fn: (value: Awaited<T>) => U,
+    ): Option<Promise<U>> | Option<U>;
 
     /**
      * Option.match transforms the option value `T` into `U` using `onSome` and
@@ -74,7 +88,11 @@ export namespace Option {
      *   .match((x) => x * 2, () => 99); // Evaluates to 84
      * ```
      */
-    match<U>(onSome: (value: T) => U, onNone: () => U): U;
+    match<U>(
+      onSome: (value: Awaited<T>) => U,
+      onNone: () => U,
+    ): this extends Option<Promise<Awaited<T>>> ? Promise<U> : U;
+    match<U>(onSome: (value: Awaited<T>) => U, onNone: () => U): U;
 
     /**
      * Option.unwrap returns the value `T` from the associated option if it is
@@ -100,8 +118,10 @@ export namespace Option {
      * Option.none().unwrapOr(99); // Evaluates to 99
      * ```
      */
-    unwrapOr<U>(defaultValue: U): U;
-    unwrapOr<U>(defaultValue: T | U): T | U;
+    unwrapOr<U>(
+      defaultValue: U,
+    ): this extends Some<Awaited<T>> ? T : U;
+    unwrapOr<U>(defaultValue: U): T | U;
 
     /**
      * Option.isSome returns `true` if the option is `Some`
@@ -126,6 +146,14 @@ export namespace Option {
      * ```
      */
     isNone(): this is None;
+  }
+
+  function isPromise<T>(value: unknown): value is Promise<T> {
+    return isNonNullable(value) && typeof value === "object" && "then" in value;
+  }
+
+  function isNonNullable<T>(value: T): value is NonNullable<T> {
+    return value !== null || value !== undefined;
   }
 
   /**
@@ -160,7 +188,15 @@ export namespace Option {
      *   .flatMap(tryParse); // Evaluates to None
      * ```
      */
-    flatMap<U>(fn: (value: T) => Option<U>) {
+    flatMap<TPromiseOption extends Promise<Option<unknown>>>(
+      fn: (value: T) => TPromiseOption,
+    ): TPromiseOption;
+    flatMap<TOption extends Option<unknown>>(
+      fn: (value: T) => TOption,
+    ): TOption;
+    flatMap<TOption extends Option<unknown>>(
+      fn: (value: T) => TOption,
+    ) {
       return fn(this.value);
     }
 
@@ -174,8 +210,9 @@ export namespace Option {
      *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
      * ```
      */
-    inspect(fn: (value: T) => void) {
-      fn(this.value);
+    inspect(fn: (value: Awaited<T>) => void) {
+      if (isPromise<Awaited<T>>(this.value)) this.value.then(fn);
+      else fn(this.value as Awaited<T>);
       return this;
     }
 
@@ -189,8 +226,14 @@ export namespace Option {
      *   .map((x) => x * 2); // Evaluates to Some 84
      * ```
      */
-    map<U>(fn: (value: T) => NonNullable<U>) {
-      return some(fn(this.value));
+    map<U>(
+      fn: (value: Awaited<T>) => U,
+    ): this extends Some<Promise<Awaited<T>>> ? Some<Promise<Awaited<U>>>
+      : Some<U>;
+    map<U>(fn: (value: Awaited<T>) => U) {
+      if (isPromise<Awaited<T>>(this.value)) {
+        return new Some(this.value.then(fn));
+      } else return new Some(fn(this.value as Awaited<T>));
     }
 
     /**
@@ -203,8 +246,14 @@ export namespace Option {
      *   .match((x) => x * 2, () => 99); // Evaluates to 84
      * ```
      */
-    match<U>(onSome: (value: T) => U, _onNone: () => U): U {
-      return onSome(this.value);
+    match<U>(
+      onSome: (value: Awaited<T>) => U,
+      onNone: () => U,
+    ): this extends Some<Promise<Awaited<T>>> ? Promise<U> : U;
+    match<U>(onSome: (value: Awaited<T>) => U, onNone: () => U) {
+      if (isPromise<Awaited<T>>(this.value)) {
+        return this.value.then(onSome).catch(onNone);
+      } else return onSome(this.value as Awaited<T>);
     }
 
     /**
@@ -227,7 +276,7 @@ export namespace Option {
      * Option.some(42).unwrapOr(99); // Evaluates to 42
      * ```
      */
-    unwrapOr(_defaultValue: T) {
+    unwrapOr<U>(_defaultValue: U) {
       return this.value;
     }
 
@@ -277,7 +326,7 @@ export namespace Option {
      *   .flatMap(tryParse); // Evaluates to None
      * ```
      */
-    flatMap<U>(_fn: (value: never) => Option<U>) {
+    flatMap(_fn: (value: never) => None) {
       return this;
     }
 
@@ -303,7 +352,7 @@ export namespace Option {
      *   .map((x) => x * 2); // Evaluates to None
      * ```
      */
-    map<U>(_fn: (value: never) => NonNullable<U>) {
+    map<U>(_fn: (value: never) => U) {
       return this;
     }
 
@@ -352,7 +401,7 @@ export namespace Option {
      * Option.none().isSome(); // Evaluates to false
      * ```
      */
-    isSome(): this is Some<never> {
+    isSome<T>(): this is Some<T> {
       return false;
     }
 
@@ -383,7 +432,7 @@ export namespace Option {
    * Option.some(42); // Evaluates to Some 42
    * ```
    */
-  export function some<T>(value: NonNullable<T>): Some<T> {
+  export function some<T>(value: NonNullable<T>): Some<NonNullable<T>> {
     return new Some(value);
   }
 
@@ -456,8 +505,10 @@ export namespace Option {
    * Option.none().unwrap(); // Throws an exception!
    * ```
    */
-  export function unwrap<T>(option: Option<T>): T {
-    return option.unwrap();
+  export function unwrap<TOption extends Option<unknown>>(
+    option: TOption,
+  ): TOption extends Some<infer Z> ? Z : never {
+    return option.unwrap() as TOption extends Some<infer Z> ? Z : never;
   }
 
   /**
@@ -471,7 +522,9 @@ export namespace Option {
    * Option.none().unwrapOr(99); // Evaluates to 99
    * ```
    */
-  export function unwrapOr<T>(defaultValue: T): (option: Option<T>) => T {
+  export function unwrapOr<U>(
+    defaultValue: U,
+  ): <TOption extends Option<unknown>>(option: TOption) => U {
     return (option) => option.unwrapOr(defaultValue);
   }
 
@@ -488,10 +541,13 @@ export namespace Option {
    *   .map((x) => x * 2); // Evaluates to Some 84
    * ```
    */
-  export function map<T, U = unknown>(
-    fn: (value: T) => U,
-  ): (option: Option<T>) => Option<U> {
-    return (option) => option.map(fn);
+  export function map<T, U>(fn: (value: Awaited<T>) => U) {
+    return <TOption extends Option<T | Promise<T>>>(
+      option: TOption,
+    ): TOption extends Some<Promise<Awaited<T>>> ? Some<Promise<U>> : Some<U> =>
+      option.map(fn) as TOption extends Some<Promise<Awaited<T>>>
+        ? Some<Promise<U>>
+        : Some<U>;
   }
 
   /**
@@ -508,9 +564,10 @@ export namespace Option {
    * ```
    */
   export function inspect<T>(
-    fn: (value: T) => void,
-  ): (option: Option<T>) => Option<T> {
-    return (option) => option.inspect(fn);
+    fn: (value: Awaited<T>) => void,
+  ) {
+    return <TOption extends Option<T | Promise<T>>>(option: TOption) =>
+      option.inspect(fn);
   }
 
   /**
@@ -564,10 +621,19 @@ export namespace Option {
    *   .flatMap(tryParse); // Evaluates to None
    * ```
    */
-  export function flatMap<T, U>(
-    fn: (value: T) => Option<U>,
-  ): (option: Option<T>) => Option<U> {
-    return (option) => option.flatMap(fn);
+  export function flatMap<T, UOption extends Option<unknown>>(
+    fn: (value: T) => UOption,
+  ): <TOption extends Option<T>>(option: TOption) => UOption;
+  export function flatMap<
+    T,
+    UPromiseOption extends Promise<Option<unknown>>,
+  >(
+    fn: (value: T) => UPromiseOption,
+  ): <TOption extends Option<T>>(option: TOption) => UPromiseOption;
+  export function flatMap<T, UOption extends Option<unknown>>(
+    fn: (value: T) => UOption,
+  ) {
+    return <TOption extends Option<T>>(option: TOption) => option.flatMap(fn);
   }
 
   /**
@@ -584,10 +650,16 @@ export namespace Option {
    * ```
    */
   export function match<T, U>(
-    onSome: (value: T) => U,
+    onSome: (value: Awaited<T>) => U,
     onNone: () => U,
-  ): (option: Option<T>) => U {
-    return (option: Option<T>) => option.match(onSome, onNone);
+  ) {
+    return <TOption extends Option<T | Promise<T>>>(
+      option: TOption,
+    ): TOption extends Some<Promise<Awaited<T>>> ? Promise<U> : U =>
+      option.match(onSome, onNone) as TOption extends Some<Promise<Awaited<T>>>
+        ? Promise<U>
+        : U;
   }
 }
+
 export type Option<T> = Option.Type<T>;

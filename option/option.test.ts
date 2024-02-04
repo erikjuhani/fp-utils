@@ -29,6 +29,7 @@ test("Option.isSome", () => {
 test("Option.isNone", () => {
   const tests: [Option<unknown>, boolean][] = [
     [Option.some(0), false],
+    [Option.some(Promise.resolve(0)), false],
     [Option.none(), true],
   ];
 
@@ -39,6 +40,10 @@ test("Option.isNone", () => {
 
 test("Option.unwrap on Some returns Option value", () => {
   assertEquals(Option.unwrap(Option.some(0)), 0);
+  assertEquals(
+    Option.unwrap(Option.some(Promise.resolve(0))),
+    Promise.resolve(0),
+  );
 });
 
 test("Option.unwrap on None throws", () => {
@@ -60,6 +65,14 @@ test("Option.inspect", () => {
   assertEquals(actual, Option.some(0));
 });
 
+test("Option.inspect promise value", async () => {
+  const mapSpy = mock.spy((value: number) => value + 1);
+  const actual = Option.inspect(mapSpy)(Option.some(Promise.resolve(0)));
+  mock.assertSpyCalls(mapSpy, 0);
+  assertEquals(await actual.unwrap(), 0);
+  mock.assertSpyCalls(mapSpy, 1);
+});
+
 test("Option.inspect on None does not execute", () => {
   const mapSpy = mock.spy((value: number) => value + 1);
   const actual = Option.inspect(mapSpy)(Option.none());
@@ -74,12 +87,21 @@ test("Option.map", () => {
   assertEquals(actual, Option.some(1));
 });
 
+test("Option.map promise value", async () => {
+  const mapSpy = mock.spy((value: number) => value + 1);
+  const actual = Option.map(mapSpy)(Option.some(Promise.resolve(0)));
+  // Lazy evaluation
+  mock.assertSpyCalls(mapSpy, 0);
+  assertEquals(await actual.unwrap(), 1);
+  mock.assertSpyCalls(mapSpy, 1);
+});
+
 test("Option.map on None does not execute", () => {
   const mapSpy = mock.spy((value: number) => value + 1);
   const actual = Option.map(mapSpy)(Option.none());
 
   mock.assertSpyCalls(mapSpy, 0);
-  assertEquals(actual, Option.none());
+  assertEquals<Option<number>>(actual, Option.none());
 });
 
 test("Option.flatMap", () => {
@@ -89,11 +111,29 @@ test("Option.flatMap", () => {
   assertEquals(actual, Option.some(1));
 });
 
+test("Option.flatMap with promise value to promise chain", async () => {
+  const flatMapPromiseSpy = mock.spy((value: number) =>
+    Promise.resolve(Option.some(value + 1))
+  );
+
+  const flatMapPromiseChainSpy = mock.spy((value: number) =>
+    Promise.resolve(Option.some(`${value}`))
+  );
+
+  const actual = Option.flatMap(flatMapPromiseSpy)(Option.some(0))
+    .then(Option.flatMap(flatMapPromiseChainSpy));
+
+  mock.assertSpyCalls(flatMapPromiseSpy, 1);
+  mock.assertSpyCalls(flatMapPromiseChainSpy, 0);
+  assertEquals(await actual, Option.some("1"));
+  mock.assertSpyCalls(flatMapPromiseChainSpy, 1);
+});
+
 test("Option.flatMap on None does not execute", () => {
   const mapSpy = mock.spy((value: number) => Option.some(value + 1));
   const actual = Option.flatMap(mapSpy)(Option.none());
   mock.assertSpyCalls(mapSpy, 0);
-  assertEquals(actual, Option.none());
+  assertEquals<Option<number>>(actual, Option.none());
 });
 
 test("Option.flatMap example", () => {
@@ -113,6 +153,20 @@ test("Option.flatMap example", () => {
   tests.forEach(([input, expected]) => {
     assertEquals(input.flatMap(tryParse), expected);
   });
+});
+
+test("Option.match promise resolve value", async () => {
+  const actual = Option.match((some) => `${some}`, () => "No value")(
+    Option.some(Promise.resolve(0)),
+  );
+  assertEquals(await actual, "0");
+});
+
+test("Option.match promise reject value", async () => {
+  const actual = Option.match((some) => `${some}`, () => "No value")(
+    Option.some(Promise.reject()),
+  );
+  assertEquals(await actual, "No value");
 });
 
 test("Option.match Some", () => {

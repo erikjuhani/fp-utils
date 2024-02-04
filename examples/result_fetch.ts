@@ -58,6 +58,7 @@ export namespace WithResult {
     (await tryGetInfo(fetchSuccess))
       .map((response) => response.json())
       .match(
+        // @ts-ignore
         format,
         notFound,
       );
@@ -66,6 +67,7 @@ export namespace WithResult {
     (await tryGetInfo(fetchFailure))
       .map((response) => response.json())
       .match(
+        // @ts-ignore
         format,
         notFound,
       );
