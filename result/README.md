@@ -17,10 +17,10 @@ or an error, and not value or none.
 
 ```ts
 // deno
-import * as Result from "https://deno.land/x/fp_utils@0.1.0/result/mod.ts";
+import { Result } from "https://deno.land/x/fp_utils@0.1.0/result/mod.ts";
 
 // node
-import * as Result from "@fp-utils/result";
+import { Result } from "@fp-utils/result";
 
 const parseJSON = <R extends Record<string, unknown>>(rawJson: string) =>
   Result.fromThrowable<R, SyntaxError>(() => JSON.parse(rawJson))
@@ -63,7 +63,7 @@ transforms it into a result containing value `U`.
 <summary>Example</summary>
 
 ```ts
-type TryParse = (input: string) => Result.Type<number, string>;
+type TryParse = (input: string) => Result<number, string>;
 
 const tryParse: TryParse = (input: string) => {
   const value = parseInt(input);

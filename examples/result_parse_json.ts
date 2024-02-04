@@ -1,7 +1,7 @@
 // Demonstrates how the Result type can be used with existing JSON.parse
 // functionality.
-import * as Result from "../result/mod.ts";
 import { std } from "dev_deps";
+import { Result } from "../result/mod.ts";
 
 const { assert } = std;
 

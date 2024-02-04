@@ -8,7 +8,6 @@
 // This result example demonstrates how easy it is to attach options to
 // existing TypeScript functionality and how options can ultimately compress
 // the lines of code by making the logic into one sequence.
-import * as Result from "../result/mod.ts";
 import { std } from "dev_deps";
 import {
   fetchFailure,
@@ -17,6 +16,7 @@ import {
   InfoResponse,
   notFound,
 } from "./fetch_common.ts";
+import { Result } from "../result/mod.ts";
 
 const { assert } = std;
 

@@ -1,12 +1,12 @@
 import { std } from "dev_deps";
-import * as Result from "./mod.ts";
+import { Result } from "./mod.ts";
 
 const { assertThrows, assertEquals } = std.assert;
 const { mock } = std.testing;
 const { test } = Deno;
 
 test("Result.isOk", () => {
-  const tests: [Result.Type<unknown, unknown>, boolean][] = [
+  const tests: [Result<unknown, unknown>, boolean][] = [
     [Result.ok(), true],
     [Result.err(), false],
   ];
@@ -17,7 +17,7 @@ test("Result.isOk", () => {
 });
 
 test("Result.isErr", () => {
-  const tests: [Result.Type<unknown, unknown>, boolean][] = [
+  const tests: [Result<unknown, unknown>, boolean][] = [
     [Result.ok(), false],
     [Result.err(), true],
   ];
@@ -160,7 +160,7 @@ test("Result.fromThrowable when function does throw return Err<T>", () => {
 test("Result.fromPromise", async () => {
   type FromPromiseTableTests = [
     Promise<unknown>,
-    Result.Type<unknown, unknown>,
+    Result<unknown, unknown>,
   ][];
 
   const tests: FromPromiseTableTests = [
@@ -177,7 +177,7 @@ test("Result.fromPromise", async () => {
 
   type FromPromiseFnTableTests = [
     () => Promise<unknown>,
-    Result.Type<unknown, unknown>,
+    Result<unknown, unknown>,
   ][];
 
   const testsFn: FromPromiseFnTableTests = [
