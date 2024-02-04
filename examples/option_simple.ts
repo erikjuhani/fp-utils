@@ -1,6 +1,7 @@
 // Demonstrates how the Option type can be used with existing Map get
 // functionality.
-import * as Option from "../option/mod.ts";
+
+import { Option } from "../option/mod.ts";
 
 const map = new Map([["1", { name: "deno" }]]);
 

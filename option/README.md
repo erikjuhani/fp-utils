@@ -15,9 +15,9 @@ the 'happy path'.
 
 ```ts
 // deno
-import * as Option from "https://deno.land/x/fp_utils@0.1.0/option/mod.ts";
+import { Option } from "https://deno.land/x/fp_utils@0.1.0/option/mod.ts";
 // node
-import * as Option from "@fp-utils/option";
+import { Option } from "@fp-utils/option";
 
 const map = new Map([["1", { name: "deno" }]]);
 
@@ -40,7 +40,7 @@ transforms it into an option `U`.
   <summary>Example</summary>
 
 ```ts
-type TryParse = (input: string) => Option.Type<number>;
+type TryParse = (input: string) => Option<number>;
 
 const tryParse: TryParse = (input: string) => {
   const value = parseInt(input);

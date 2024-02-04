@@ -1,5 +1,5 @@
 import { std } from "dev_deps";
-import * as Option from "./mod.ts";
+import { Option } from "./mod.ts";
 
 const { assertThrows, assertEquals } = std.assert;
 const { mock } = std.testing;
@@ -16,7 +16,7 @@ test("Option.some passing null or undefined throws", () => {
 });
 
 test("Option.isSome", () => {
-  const tests: [Option.Type<unknown>, boolean][] = [
+  const tests: [Option<unknown>, boolean][] = [
     [Option.some(0), true],
     [Option.none(), false],
   ];
@@ -27,7 +27,7 @@ test("Option.isSome", () => {
 });
 
 test("Option.isNone", () => {
-  const tests: [Option.Type<unknown>, boolean][] = [
+  const tests: [Option<unknown>, boolean][] = [
     [Option.some(0), false],
     [Option.none(), true],
   ];
@@ -113,7 +113,7 @@ test("Option.match None", () => {
 test("Option.fromNullable", () => {
   type FromNullableTableTests = [
     number | string | null | undefined,
-    Option.Type<unknown>,
+    Option<unknown>,
   ][];
 
   const tests: FromNullableTableTests = [
@@ -132,7 +132,7 @@ test("Option.fromNullable", () => {
 test("Option.fromPromise", async () => {
   type FromPromiseTableTests = [
     Promise<unknown>,
-    Option.Type<unknown>,
+    Option<unknown>,
   ][];
 
   const tests: FromPromiseTableTests = [
@@ -149,7 +149,7 @@ test("Option.fromPromise", async () => {
 
   type FromPromiseFnTableTests = [
     () => Promise<unknown>,
-    Option.Type<unknown>,
+    Option<unknown>,
   ][];
 
   const testsFn: FromPromiseFnTableTests = [

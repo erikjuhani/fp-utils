@@ -2,8 +2,8 @@
 // a library with borrowing and return system. When books are borrowed they are
 // transferred to the patron Map and deleted from the Books Map. Returning
 // books does the opposite.
-import * as Option from "../option/mod.ts";
 import { std } from "dev_deps";
+import { Option } from "../option/mod.ts";
 
 const { assert } = std;
 
