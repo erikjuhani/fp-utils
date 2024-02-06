@@ -1,3 +1,17 @@
+## 0.5.0
+
+BREAKING CHANGES:
+
+- [Export `Result` as a namespace](https://github.com/erikjuhani/fp-utils/commit/1f5efa949fe30dbece13f178a24022bd52eff20b)
+- [Export `Option` as a namespace](https://github.com/erikjuhani/fp-utils/commit/1b6d1d47cfcaa1497fe31021417333b1a5dad1ba)
+- [Change the order of arguments in match function](https://github.com/erikjuhani/fp-utils/commit/e2e12d57e0733195ec747f52afc59ea34d1c19cf)
+- [Add void type for Result.ok and Result.err](https://github.com/erikjuhani/fp-utils/commit/9ebde8d494af0ec6db79246a86f6f16ee1275d80)
+
+CHANGES:
+
+- [Reflect the Result type signature name change in README](https://github.com/erikjuhani/fp-utils/commit/3313436dde27a6723b17a122ca3e83baf63e6522)
+- [Make result error type name more verbose](https://github.com/erikjuhani/fp-utils/commit/e4ce48488e5ba84ed018db9c19fcd74297d77b6a)
+
 ## 0.4.0
 
 FEATURES:
