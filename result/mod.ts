@@ -19,14 +19,14 @@ export namespace Result {
      *   return isNaN(value) ? Result.err("could not parse") : Result.ok(value);
      * };
      *
-     * Result.err("message")
-     *   .flatMap(tryParse); // Evaluates to Err "message"
-     *
      * Result.ok("42")
      *   .flatMap(tryParse); // Evaluates to Ok 42
      *
      * Result.ok("Forty-two")
      *   .flatMap(tryParse); // Evaluates to Err "could not parse"
+     *
+     * Result.err("error")
+     *   .flatMap(tryParse); // Evaluates to Err "error"
      * ```
      */
     flatMap<U>(fn: (value: T) => Result<U, TError>): Result<U, TError>;
@@ -37,11 +37,11 @@ export namespace Result {
      *
      * @example
      * ```ts
-     * Result.err(42)
-     *   .inspect((x) => console.log(x * 2)); // Prints nothing
-     *
      * Result.ok(42)
      *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
+     *
+     * Result.err(42)
+     *   .inspect((x) => console.log(x * 2)); // Prints nothing
      * ```
      */
     inspect(fn: (value: T) => void): Result<T, TError>;
@@ -52,11 +52,12 @@ export namespace Result {
      *
      * @example
      * ```ts
+     * Result.ok(42)
+     *   .inspectErr((x) => console.log(x * 2)); // Prints nothing
+     *
      * Result.err(42)
      *   .inspectErr((x) => console.log(x * 2)); // Evaluates to 84
      *
-     * Result.ok(42)
-     *   .inspectErr((x) => console.log(x * 2)); // Prints nothing
      * ```
      */
     inspectErr(fn: (value: TError) => void): Result<T, TError>;
@@ -67,11 +68,12 @@ export namespace Result {
      *
      * @example
      * ```ts
+     * Result.ok(42)
+     *   .map((x) => x * 2); // Evaluates to Ok 84
+     *
      * Result.err(42)
      *   .map((x) => x * 2); // Evaluates to Err 42
      *
-     * Result.ok(42)
-     *   .map((x) => x * 2); // Evaluates to Ok 84
      * ```
      */
     map<U>(fn: (value: T) => U): Result<U, TError>;
@@ -98,11 +100,12 @@ export namespace Result {
      *
      * @example
      * ```ts
-     * Result.err(42)
-     *   .match((err) => err + 10, (x) => x * 2); // Evaluates to 52
-     *
      * Result.ok(42)
-     *   .match((err) => err + 10, (x) => x * 2); // Evaluates to 84
+     *   .match((x) => x * 2, (err) => err + 10); // Evaluates to 84
+     *
+     * Result.err(42)
+     *   .match((x) => x * 2, (err) => err + 10); // Evaluates to 52
+     *
      * ```
      */
     match<U>(onOk: (value: T) => U, onErr: (value: TError) => U): U;
@@ -126,9 +129,9 @@ export namespace Result {
      *
      * @example
      * ```ts
-     * Result.ok(42).unwrapErr(); // Throws an exception!
-     *
      * Result.err(42).unwrapErr(); // Evaluates to 42
+     *
+     * Result.ok(42).unwrapErr(); // Throws an exception!
      * ```
      */
     unwrapErr(): TError;
@@ -152,9 +155,9 @@ export namespace Result {
      *
      * @example
      * ```ts
-     * Result.err(42).isOk(); // Evaluates to false
-     *
      * Result.ok(42).isOk(); // Evaluates to true
+     *
+     * Result.err(42).isOk(); // Evaluates to false
      * ```
      */
     isOk<T>(): this is Ok<T>;
@@ -164,9 +167,9 @@ export namespace Result {
      *
      * @example
      * ```ts
-     * Result.err(42).isErr(); // Evaluates to true
-     *
      * Result.ok(42).isOk(); // Evaluates to false
+     *
+     * Result.err(42).isErr(); // Evaluates to true
      * ```
      */
     isErr<TError>(): this is Err<TError>;
@@ -203,7 +206,7 @@ export namespace Result {
      *   .flatMap(tryParse); // Evaluates to Err "could not parse"
      * ```
      */
-    flatMap<U, E>(fn: (value: T) => Result<U, E>) {
+    flatMap<U, TError>(fn: (value: T) => Result<U, TError>) {
       return fn(this.value);
     }
 
@@ -269,7 +272,7 @@ export namespace Result {
      * @example
      * ```ts
      * Result.ok(42)
-     *   .match((err) => err + 10, (x) => x * 2); // Evaluates to 84
+     *   .match((x) => x * 2, (err) => err + 10); // Evaluates to 84
      * ```
      */
     match<U>(onOk: (value: T) => U, _onErr: (_value: never) => U): U {
@@ -360,8 +363,8 @@ export namespace Result {
      *   return isNaN(value) ? Result.err("could not parse") : Result.ok(value);
      * };
      *
-     * Result.err("message")
-     *   .flatMap(tryParse); // Evaluates to Err "message"
+     * Result.err("error")
+     *   .flatMap(tryParse); // Evaluates to Err "error"
      * ```
      */
     flatMap<U>(_fn: (value: never) => Result<U, T>) {
@@ -430,7 +433,7 @@ export namespace Result {
      * @example
      * ```ts
      * Result.err(42)
-     *   .match((err) => err + 10); // Evaluates to 52
+     *   .match((x) => x * 2, (err) => err + 10); // Evaluates to 52
      * ```
      */
     match<U>(_onOk: (value: never) => U, onErr: (value: T) => U): U {
@@ -505,7 +508,10 @@ export namespace Result {
    * specific value and acts as a placeholder when no other value exits or is
    * needed.
    *
-   * @example ```ts Result.ok("message"); // Evaluates to Ok "message"
+   * @example
+   *
+   * ```ts
+   * Result.ok("value"); // Evaluates to Ok "value"
    *
    * Result.ok(42); // Evaluates to Ok 42
    *
@@ -526,7 +532,7 @@ export namespace Result {
    * other value exits or is needed.
    *
    * @example ```ts
-   * Result.err("message"); // Evaluates to Err "message"
+   * Result.err("error"); // Evaluates to Err "error"
    *
    * Result.err(42); // Evaluates to Err 42
    *
@@ -587,16 +593,17 @@ export namespace Result {
    * signifies the absence of a specific value and acts as a placeholder when no
    * other value exits or is needed.
    *
-   * @example ```ts Result.fromPromise(Promise.reject(), "Rejected"); //
-   * Evaluates to Err "Rejected"
-   *
+   * @example
+   * ```ts
    * Result.fromPromise(Promise.resolve(42), "Rejected"); // Evaluates to Ok 42
    *
    * Result.fromPromise(fetch("https://example.com"), "Rejected"); // Evaluates to Ok Response
    *
-   * Result.fromPromise(fetch("https://localhost:9999"), "Rejected"); // Evaluates to Err "Rejected"
-   *
    * Result.fromPromise(Promise.resolve(), "Rejected"); // Evaluates to Ok void
+   *
+   * Result.fromPromise(Promise.reject(), "Rejected"); // Evaluates to Err "Rejected"
+   *
+   * Result.fromPromise(fetch("https://localhost:9999"), "Rejected"); // Evaluates to Err "Rejected"
    * ```
    */
   export function fromPromise<T, TError>(
@@ -673,11 +680,11 @@ export namespace Result {
    *
    * @example
    * ```ts
-   * Result.err(42)
-   *   .map((x) => x * 2); // Evaluates to Err 42
-   *
    * Result.ok(42)
    *   .map((x) => x * 2); // Evaluates to Ok 84
+   *
+   * Result.err(42)
+   *   .map((x) => x * 2); // Evaluates to Err 42
    * ```
    */
   export function map<T, TError, U>(
@@ -692,11 +699,11 @@ export namespace Result {
    *
    * @example
    * ```ts
-   * Result.err(42)
-   *   .mapErr((x) => x * 2); // Evaluates to Err 84
-   *
    * Result.ok(42)
    *   .mapErr((x) => x * 2); // Evaluates to Ok 42
+   *
+   * Result.err(42)
+   *   .mapErr((x) => x * 2); // Evaluates to Err 84
    * ```
    */
   export function mapErr<T, TError, U>(
@@ -711,11 +718,11 @@ export namespace Result {
    *
    * @example
    * ```ts
-   * Result.err(42)
-   *   .inspect((x) => console.log(x * 2)); // Prints nothing
-   *
    * Result.ok(42)
    *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
+   *
+   * Result.err(42)
+   *   .inspect((x) => console.log(x * 2)); // Prints nothing
    * ```
    */
   export function inspect<T, TError>(
@@ -730,11 +737,11 @@ export namespace Result {
    *
    * @example
    * ```ts
-   * Result.err(42)
-   *   .inspectErr((x) => console.log(x * 2)); // Evaluates to 84
-   *
    * Result.ok(42)
    *   .inspectErr((x) => console.log(x * 2)); // Prints nothing
+   *
+   * Result.err(42)
+   *   .inspectErr((x) => console.log(x * 2)); // Evaluates to 84
    * ```
    */
   export function inspectErr<T, TError>(
@@ -748,9 +755,9 @@ export namespace Result {
    *
    * @example
    * ```ts
-   * Result.err(42).isOk(); // Evaluates to false
-   *
    * Result.ok(42).isOk(); // Evaluates to true
+   *
+   * Result.err(42).isOk(); // Evaluates to false
    * ```
    */
   export function isOk<T, TError>(result: Result<T, TError>): result is Ok<T> {
@@ -762,9 +769,9 @@ export namespace Result {
    *
    * @example
    * ```ts
-   * Result.err(42).isErr(); // Evaluates to true
-   *
    * Result.ok(42).isOk(); // Evaluates to false
+   *
+   * Result.err(42).isErr(); // Evaluates to true
    * ```
    */
   export function isErr<T, TError>(
@@ -786,14 +793,14 @@ export namespace Result {
    *   return isNaN(value) ? Result.err("could not parse") : Result.ok(value);
    * };
    *
-   * Result.err("message")
-   *   .flatMap(tryParse); // Evaluates to Err "message"
-   *
    * Result.ok("42")
    *   .flatMap(tryParse); // Evaluates to Ok 42
    *
    * Result.ok("Forty-two")
    *   .flatMap(tryParse); // Evaluates to Err "could not parse"
+   *
+   * Result.err("error")
+   *   .flatMap(tryParse); // Evaluates to Err "error"
    * ```
    */
   export function flatMap<T, TError, U>(
@@ -809,11 +816,11 @@ export namespace Result {
    *
    * @example
    * ```ts
-   * Result.err(42)
-   *   .match((ok) => ok * 2, (err) => err + 10); // Evaluates to 52
-   *
    * Result.ok(42)
    *   .match((ok) => ok * 2, (err) => err + 10); // Evaluates to 84
+   *
+   * Result.err(42)
+   *   .match((ok) => ok * 2, (err) => err + 10); // Evaluates to 52
    * ```
    */
   export function match<T, TError, U>(
