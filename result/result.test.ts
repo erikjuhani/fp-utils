@@ -124,6 +124,25 @@ test("Result.flatMap", () => {
   assertEquals(actual, Result.ok(1));
 });
 
+test("Result.flatMap example", () => {
+  type TryParse = (input: string) => Result<number, string>;
+
+  const tryParse: TryParse = (input: string) => {
+    const value = parseInt(input);
+    return isNaN(value) ? Result.err("could not parse") : Result.ok(value);
+  };
+
+  const tests: [Result<string, string>, Result<number, string>][] = [
+    [Result.ok("42"), Result.ok(42)],
+    [Result.err("error"), Result.err("error")],
+    [Result.ok("Forty-two"), Result.err("could not parse")],
+  ];
+
+  tests.forEach(([input, expected]) => {
+    assertEquals(input.flatMap(tryParse), expected);
+  });
+});
+
 test("Result.flatMap on Err does not execute", () => {
   const mapSpy = mock.spy((value: number) => Result.ok(value + 1));
   const actual = Result.flatMap(mapSpy)(Result.err(0));

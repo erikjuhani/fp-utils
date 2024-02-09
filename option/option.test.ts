@@ -8,7 +8,7 @@ const { test } = Deno;
 test("Option.some passing null or undefined throws", () => {
   [null, undefined].forEach((value) => {
     assertThrows(
-      // @ts-expect-error testing purposes
+      // @ts-expect-error doesn't actually allow to pass a null or undefined to Option.some in compile time
       () => Option.some(value),
       "Trying to pass nullable value to Some",
     );
@@ -94,6 +94,25 @@ test("Option.flatMap on None does not execute", () => {
   const actual = Option.flatMap(mapSpy)(Option.none());
   mock.assertSpyCalls(mapSpy, 0);
   assertEquals(actual, Option.none());
+});
+
+test("Option.flatMap example", () => {
+  type TryParse = (input: string) => Option<number>;
+
+  const tryParse: TryParse = (input: string) => {
+    const value = parseInt(input);
+    return isNaN(value) ? Option.none() : Option.some(value);
+  };
+
+  const tests: [Option<string>, Option<number>][] = [
+    [Option.some("42"), Option.some(42)],
+    [Option.none(), Option.none()],
+    [Option.some("Forty-two"), Option.none()],
+  ];
+
+  tests.forEach(([input, expected]) => {
+    assertEquals(input.flatMap(tryParse), expected);
+  });
 });
 
 test("Option.match Some", () => {
