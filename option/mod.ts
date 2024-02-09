@@ -68,13 +68,13 @@ export namespace Option {
      * @example
      * ```ts
      * Option.none()
-     *   .match(() => 99, (x) => x * 2); // Evaluates to 99
+     *   .match((x) => x * 2, () => 99); // Evaluates to 99
      *
      * Option.some(42)
-     *   .match(() => 99, (x) => x * 2); // Evaluates to 84
+     *   .match((x) => x * 2, () => 99); // Evaluates to 84
      * ```
      */
-    match<U>(onNone: () => U, onSome: (value: T) => U): U;
+    match<U>(onSome: (value: T) => U, onNone: () => U): U;
 
     /**
      * Option.unwrap returns the value `T` from the associated option if it is
@@ -200,10 +200,10 @@ export namespace Option {
      * @example
      * ```ts
      * Option.some(42)
-     *   .match(() => 99, (x) => x * 2); // Evaluates to 84
+     *   .match((x) => x * 2, () => 99); // Evaluates to 84
      * ```
      */
-    match<U>(_onNone: () => U, onSome: (value: T) => U): U {
+    match<U>(onSome: (value: T) => U, _onNone: () => U): U {
       return onSome(this.value);
     }
 
@@ -313,10 +313,10 @@ export namespace Option {
      * @example
      * ```ts
      * Option.none()
-     *   .match(() => 99, (x) => x * 2); // Evaluates to 99
+     *   .match((x) => x * 2, () => 99); // Evaluates to 99
      * ```
      */
-    match<U>(onNone: () => U, _onSome: (value: never) => U): U {
+    match<U>(_onSome: (value: never) => U, onNone: () => U): U {
       return onNone();
     }
 
@@ -577,17 +577,17 @@ export namespace Option {
    * @example
    * ```ts
    * Option.none()
-   *   .match(() => 99, (x) => x * 2); // Evaluates to 99
+   *   .match((x) => x * 2, () => 99); // Evaluates to 99
    *
    * Option.some(42)
-   *   .match(() => 99, (x) => x * 2); // Evaluates to 84
+   *   .match((x) => x * 2, () => 99); // Evaluates to 84
    * ```
    */
   export function match<T, U>(
-    onNone: () => U,
     onSome: (value: T) => U,
+    onNone: () => U,
   ): (option: Option<T>) => U {
-    return (option: Option<T>) => option.match(onNone, onSome);
+    return (option: Option<T>) => option.match(onSome, onNone);
   }
 }
 export type Option<T> = Option.Type<T>;

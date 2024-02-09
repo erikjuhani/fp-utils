@@ -55,16 +55,16 @@ export namespace WithOption {
     (await tryGetInfo(fetchSuccess))
       .map((response) => response.json())
       .match(
-        notFound,
         format,
+        notFound,
       );
 
   export const infoFailure = async () =>
     (await tryGetInfo(fetchFailure))
       .map((response) => response.json())
       .match(
-        notFound,
         format,
+        notFound,
       );
 }
 

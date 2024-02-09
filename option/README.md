@@ -101,7 +101,7 @@ Option.some(42)
 
 ### `Option.match`
 
-Signature: `<U>(onNone: () => U, onSome: (value: T) => U): U`
+Signature: `<U>(onSome: (value: T) => U, onNone: () => U): U`
 
 Option.match transforms the option value `T` into `U` using `onSome` and then
 returns `U`. If the option is None, it uses `onNone` and returns `U`.
@@ -111,10 +111,10 @@ returns `U`. If the option is None, it uses `onNone` and returns `U`.
 
 ```ts
 Option.none()
-  .match(() => 99, (x) => x * 2); // Evaluates to 99
+  .match((x) => x * 2, () => 99); // Evaluates to 99
 
 Option.some(42)
-  .match(() => 99, (x) => x * 2); // Evaluates to 84
+  .match((x) => x * 2, () => 99); // Evaluates to 84
 ```
 
 </details>

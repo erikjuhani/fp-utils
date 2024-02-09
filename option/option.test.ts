@@ -116,14 +116,14 @@ test("Option.flatMap example", () => {
 });
 
 test("Option.match Some", () => {
-  const actual = Option.match(() => "No value", (some) => `${some}`)(
+  const actual = Option.match((some) => `${some}`, () => "No value")(
     Option.some(0),
   );
   assertEquals(actual, "0");
 });
 
 test("Option.match None", () => {
-  const actual = Option.match(() => "No value", (some) => `${some}`)(
+  const actual = Option.match((some) => `${some}`, () => "No value")(
     Option.none(),
   );
   assertEquals(actual, "No value");
