@@ -4,6 +4,8 @@ type Args = { version?: string; mod?: string };
 
 const { version: parsedVersion, mod } = std.flags.parse<Args>(Deno.args);
 
+const commentsRegex = /\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm;
+
 if (!mod || typeof mod !== "string") {
   throw Error(
     "No mod provided, please provide a module directory using `--mod <module_name>`",
@@ -23,9 +25,21 @@ const version = parsedVersion ??
 async function build() {
   const outDir = `./${mod}/dist`;
 
-  const copyReadmeAndLicense = (dir: string) => () => {
-    Deno.copyFileSync("LICENSE", `${dir}/LICENSE`);
-    Deno.copyFileSync(`${mod}/README.md`, `${dir}/README.md`);
+  const copyReadme = () => Deno.copyFileSync("LICENSE", `${outDir}/LICENSE`);
+
+  const copyLicense = () =>
+    Deno.copyFileSync(`./${mod}/README.md`, `${outDir}/README.md`);
+
+  const stripCommentsFromJSFiles = (...filepaths: string[]) => {
+    const decoder = new TextDecoder("utf-8");
+
+    filepaths.forEach((filepath) => {
+      const file = decoder.decode(Deno.readFileSync(filepath));
+      Deno.writeTextFileSync(
+        filepath,
+        file.replace(commentsRegex, ""),
+      );
+    });
   };
 
   await dnt.emptyDir(outDir);
@@ -39,7 +53,14 @@ async function build() {
     // Do not include test files in the artifact
     test: false,
     package: { ...packageJson, version },
-    postBuild: copyReadmeAndLicense(outDir),
+    postBuild: () => {
+      copyLicense();
+      copyReadme();
+      stripCommentsFromJSFiles(
+        `${outDir}/esm/mod.js`,
+        `${outDir}/script/mod.js`,
+      );
+    },
   });
 }
 
