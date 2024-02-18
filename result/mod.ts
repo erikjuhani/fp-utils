@@ -29,7 +29,13 @@ export namespace Result {
      *   .flatMap(tryParse); // Evaluates to Err "error"
      * ```
      */
-    flatMap<U>(fn: (value: T) => Result<U, TError>): Result<U, TError>;
+    flatMap<TResult extends Result<unknown, TError>>(
+      fn: (value: T) => TResult,
+    ): TResult;
+    flatMap<TPromiseResult extends Promise<Result<unknown, TError>>>(
+      fn: (value: T) => TPromiseResult,
+    ): TPromiseResult;
+    flatMap(fn: (value: T) => Err<TError>): Err<TError>;
 
     /**
      * Result.inspect calls the provided function `fn` with a reference to the
@@ -44,7 +50,7 @@ export namespace Result {
      *   .inspect((x) => console.log(x * 2)); // Prints nothing
      * ```
      */
-    inspect(fn: (value: T) => void): Result<T, TError>;
+    inspect(fn: (value: Awaited<T>) => void): this;
 
     /**
      * Result.inspectErr calls the provided function `fn` with a reference to the
@@ -60,7 +66,7 @@ export namespace Result {
      *
      * ```
      */
-    inspectErr(fn: (value: TError) => void): Result<T, TError>;
+    inspectErr(fn: (value: TError) => void): this;
 
     /**
      * Result.map applies a function `fn` to result value `T` and transforms it
@@ -76,7 +82,14 @@ export namespace Result {
      *
      * ```
      */
-    map<U>(fn: (value: T) => U): Result<U, TError>;
+    map<U>(
+      fn: (value: Awaited<T>) => U,
+    ): this extends Result<Promise<Awaited<T>>, TError>
+      ? Result<Promise<U>, TError>
+      : Result<U, TError>;
+    map<U>(
+      fn: (value: Awaited<T>) => U,
+    ): Result<Promise<U>, TError> | Result<U, TError>;
 
     /**
      * Result.mapErr applies a function `fn` to result error value `TError` and
@@ -108,7 +121,14 @@ export namespace Result {
      *
      * ```
      */
-    match<U>(onOk: (value: T) => U, onErr: (value: TError) => U): U;
+    match<U, TError>(
+      onOk: (value: Awaited<T>) => U,
+      onErr: (value: TError) => U,
+    ): this extends Result<Promise<Awaited<T>>, TError> ? Promise<U> : U;
+    match<U, TError>(
+      onOk: (value: Awaited<T>) => U,
+      onErr: (value: TError) => U,
+    ): Promise<U> | U;
 
     /**
      * Result.unwrap returns the value `T` from the associated result if it is
@@ -147,8 +167,8 @@ export namespace Result {
      * Result.err(42).unwrapOr(99); // Evaluates to 99
      * ```
      */
-    unwrapOr<U>(defaultValue: U): U;
-    unwrapOr<U>(defaultValue: T | U): T | U;
+    unwrapOr<U>(defaultValue: U): this extends Ok<T> ? T : U;
+    unwrapOr<U>(defaultValue: U): T | U;
 
     /**
      * Result.isOk returns `true` if the result is `Ok`.
@@ -173,6 +193,14 @@ export namespace Result {
      * ```
      */
     isErr<TError>(): this is Err<TError>;
+  }
+
+  function isPromise<T>(value: unknown): value is Promise<T> {
+    return isNonNullable(value) && typeof value === "object" && "then" in value;
+  }
+
+  function isNonNullable<T>(value: T): value is NonNullable<T> {
+    return value !== null || value !== undefined;
   }
 
   /**
@@ -206,7 +234,15 @@ export namespace Result {
      *   .flatMap(tryParse); // Evaluates to Err "could not parse"
      * ```
      */
-    flatMap<U, TError>(fn: (value: T) => Result<U, TError>) {
+    flatMap<TResult extends Result<unknown, unknown>>(
+      fn: (value: T) => TResult,
+    ): TResult;
+    flatMap<TPromiseResult extends Promise<Result<unknown, unknown>>>(
+      fn: (value: T) => TPromiseResult,
+    ): TPromiseResult;
+    flatMap<TResult extends Result<unknown, unknown>>(
+      fn: (value: T) => TResult,
+    ) {
       return fn(this.value);
     }
 
@@ -220,8 +256,9 @@ export namespace Result {
      *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
      * ```
      */
-    inspect(fn: (value: T) => void) {
-      fn(this.value);
+    inspect(fn: (value: Awaited<T>) => void) {
+      if (isPromise<Awaited<T>>(this.value)) this.value.then(fn);
+      else fn(this.value as Awaited<T>);
       return this;
     }
 
@@ -248,8 +285,12 @@ export namespace Result {
      *   .map((x) => x * 2); // Evaluates to Ok 84
      * ```
      */
-    map<U>(fn: (value: T) => U) {
-      return ok(fn(this.value));
+    map<U>(
+      fn: (value: Awaited<T>) => U,
+    ): this extends Ok<Promise<Awaited<T>>> ? Ok<Promise<Awaited<U>>> : Ok<U>;
+    map<U>(fn: (value: Awaited<T>) => U) {
+      if (isPromise<Awaited<T>>(this.value)) return ok(this.value.then(fn));
+      else return ok(fn(this.value as Awaited<T>));
     }
 
     /**
@@ -261,7 +302,7 @@ export namespace Result {
      *   .mapErr((x) => x * 2); // Evaluates to Ok 42
      * ```
      */
-    mapErr<F>(_fn: (value: never) => F) {
+    mapErr<U>(_fn: (value: never) => U) {
       return this;
     }
 
@@ -275,8 +316,17 @@ export namespace Result {
      *   .match((x) => x * 2, (err) => err + 10); // Evaluates to 84
      * ```
      */
-    match<U>(onOk: (value: T) => U, _onErr: (_value: never) => U): U {
-      return onOk(this.value);
+    match<U, TError>(
+      onOk: (value: Awaited<T>) => U,
+      onErr: (value: TError) => U,
+    ): this extends Ok<Promise<Awaited<T>>> ? Promise<U> : U;
+    match<U, TError>(
+      onOk: (value: Awaited<T>) => U,
+      onErr: (value: TError) => U,
+    ) {
+      if (isPromise<Awaited<T>>(this.value)) {
+        return this.value.then(onOk).catch(onErr);
+      } else return onOk(this.value as Awaited<T>);
     }
 
     /**
@@ -367,7 +417,7 @@ export namespace Result {
      *   .flatMap(tryParse); // Evaluates to Err "error"
      * ```
      */
-    flatMap<U>(_fn: (value: never) => Result<U, T>) {
+    flatMap(_fn: (value: never) => Err<T>) {
       return this;
     }
 
@@ -394,7 +444,7 @@ export namespace Result {
      *   .inspectErr((x) => console.log(x * 2)); // Evaluates to 84
      * ```
      */
-    inspectErr(fn: (value: T) => void): Result<never, T> {
+    inspectErr(fn: (value: T) => void) {
       fn(this.value);
       return this;
     }
@@ -422,7 +472,7 @@ export namespace Result {
      *   .mapErr((x) => x * 2); // Evaluates to Err 84
      * ```
      */
-    mapErr<F>(fn: (value: T) => F) {
+    mapErr<U>(fn: (value: T) => U) {
       return err(fn(this.value));
     }
 
@@ -638,8 +688,11 @@ export namespace Result {
    * Result.err(42).unwrap(); // Throws an exception!
    * ```
    */
-  export function unwrap<T, TError>(result: Result<T, TError>): T {
-    return result.unwrap();
+  export function unwrap<TError, TResult extends Result<unknown, TError>>(
+    result: TResult,
+  ): TResult extends Result<infer Z, TError> ? Z : never {
+    return result.unwrap() as TResult extends Result<infer Z, TError> ? Z
+      : never;
   }
 
   /**
@@ -670,8 +723,9 @@ export namespace Result {
    */
   export function unwrapOr<T, TError>(
     defaultValue: T,
-  ): (result: Result<T, TError>) => T {
-    return (result) => result.unwrapOr(defaultValue);
+  ) {
+    return <TResult extends Result<T, TError>>(result: TResult) =>
+      result.unwrapOr(defaultValue);
   }
 
   /**
@@ -687,10 +741,15 @@ export namespace Result {
    *   .map((x) => x * 2); // Evaluates to Err 42
    * ```
    */
-  export function map<T, TError, U>(
-    fn: (value: T) => U,
-  ): (result: Result<T, TError>) => Result<U, TError> {
-    return (result) => result.map(fn);
+  export function map<T, TError, U = T>(
+    fn: (value: Awaited<T>) => U,
+  ) {
+    return <TResult extends Result<T | Promise<T>, TError>>(
+      result: TResult,
+    ) =>
+      result.map(fn) as TResult extends Ok<Promise<Awaited<T>>>
+        ? Result<Promise<U>, TError>
+        : Result<U, TError>;
   }
 
   /**
@@ -708,8 +767,9 @@ export namespace Result {
    */
   export function mapErr<T, TError, U>(
     fn: (value: TError) => U,
-  ): (result: Result<T, TError>) => Result<T, U> {
-    return (result) => result.mapErr(fn);
+  ) {
+    return <TResult extends Result<T, TError>>(result: TResult) =>
+      result.mapErr(fn);
   }
 
   /**
@@ -726,9 +786,10 @@ export namespace Result {
    * ```
    */
   export function inspect<T, TError>(
-    fn: (value: T) => void,
-  ): (result: Result<T, TError>) => Result<T, TError> {
-    return (result) => result.inspect(fn);
+    fn: (value: Awaited<T>) => void,
+  ) {
+    return <TResult extends Result<T, TError>>(result: TResult) =>
+      result.inspect(fn);
   }
 
   /**
@@ -746,8 +807,9 @@ export namespace Result {
    */
   export function inspectErr<T, TError>(
     fn: (value: TError) => void,
-  ): (result: Result<T, TError>) => Result<T, TError> {
-    return (result) => result.inspectErr(fn);
+  ) {
+    return <TResult extends Result<T, TError>>(result: TResult) =>
+      result.inspectErr(fn);
   }
 
   /**
@@ -803,10 +865,21 @@ export namespace Result {
    *   .flatMap(tryParse); // Evaluates to Err "error"
    * ```
    */
-  export function flatMap<T, TError, U>(
-    fn: (value: T) => Result<U, TError>,
-  ): (result: Result<T, TError>) => Result<U, TError> {
-    return (result) => result.flatMap(fn);
+  export function flatMap<T, TError, UResult extends Result<unknown, TError>>(
+    fn: (value: T) => UResult,
+  ): <TResult extends Result<T, TError>>(result: TResult) => UResult;
+  export function flatMap<
+    T,
+    TError,
+    UPromiseResult extends Promise<Result<unknown, TError>>,
+  >(
+    fn: (value: T) => UPromiseResult,
+  ): <TResult extends Result<T, TError>>(result: TResult) => UPromiseResult;
+  export function flatMap<T, TError, UResult extends Result<unknown, TError>>(
+    fn: (value: T) => UResult,
+  ) {
+    return <TResult extends Result<T, TError>>(result: TResult) =>
+      result.flatMap(fn);
   }
 
   /**
@@ -824,10 +897,14 @@ export namespace Result {
    * ```
    */
   export function match<T, TError, U>(
-    onOk: (value: T) => U,
+    onOk: (value: Awaited<T>) => U,
     onErr: (value: TError) => U,
-  ): (result: Result<T, TError>) => U {
-    return (result: Result<T, TError>) => result.match(onOk, onErr);
+  ) {
+    return <TResult extends Result<T | Promise<T>, TError>>(result: TResult) =>
+      result.match(onOk, onErr) as TResult extends Ok<Promise<Awaited<T>>>
+        ? Promise<U>
+        : U;
   }
 }
+
 export type Result<T, TError> = Result.Type<T, TError>;

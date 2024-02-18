@@ -17,6 +17,7 @@ import {
   notFound,
 } from "./fetch_common.ts";
 import { Result } from "../result/mod.ts";
+import { fetchJsonFailure } from "./fetch_common.ts";
 
 const { assert } = std;
 
@@ -44,6 +45,16 @@ export namespace Native {
       return notFound();
     }
   };
+
+  export const infoJsonFailure = async () => {
+    try {
+      const denoInfo = await tryGetInfo(fetchJsonFailure);
+      if (denoInfo) return format(denoInfo);
+      else return notFound();
+    } catch (_err) {
+      return notFound();
+    }
+  };
 }
 
 // deno-lint-ignore no-namespace
@@ -58,7 +69,6 @@ export namespace WithResult {
     (await tryGetInfo(fetchSuccess))
       .map((response) => response.json())
       .match(
-        // @ts-ignore
         format,
         notFound,
       );
@@ -67,7 +77,14 @@ export namespace WithResult {
     (await tryGetInfo(fetchFailure))
       .map((response) => response.json())
       .match(
-        // @ts-ignore
+        format,
+        notFound,
+      );
+
+  export const infoJsonFailure = async () =>
+    (await tryGetInfo(fetchJsonFailure))
+      .map((response) => response.json())
+      .match(
         format,
         notFound,
       );
@@ -86,6 +103,11 @@ assert.assertEquals(
 );
 
 assert.assertEquals(
+  "No info found",
+  await Native.infoJsonFailure(),
+);
+
+assert.assertEquals(
   `Deno
  | 2018
  | Deno is a runtime for JavaScript, TypeScript, and WebAssembly. Deno was co-created by Ryan Dahl, who also created Node.js.`,
@@ -95,4 +117,9 @@ assert.assertEquals(
 assert.assertEquals(
   "No info found",
   await WithResult.infoFailure(),
+);
+
+assert.assertEquals(
+  "No info found",
+  await WithResult.infoJsonFailure(),
 );

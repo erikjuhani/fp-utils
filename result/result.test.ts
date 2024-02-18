@@ -102,6 +102,14 @@ test("Result.map on Err does not execute", () => {
   assertEquals(actual, Result.err(0));
 });
 
+test("Result.map with promise value", async () => {
+  const mapSpy = mock.spy((value: number) => value + 1);
+  const actual = Result.map(mapSpy)(Result.ok(Promise.resolve(0)));
+  mock.assertSpyCalls(mapSpy, 0);
+  assertEquals(await actual.unwrap(), 1);
+  mock.assertSpyCalls(mapSpy, 1);
+});
+
 test("Result.mapErr", () => {
   const mapSpy = mock.spy((value: number) => value + 1);
   const actual = Result.mapErr(mapSpy)(Result.err(0));
@@ -118,10 +126,28 @@ test("Result.mapErr on Ok does not execute", () => {
 });
 
 test("Result.flatMap", () => {
-  const mapSpy = mock.spy((value: number) => Result.ok(value + 1));
-  const actual = Result.flatMap(mapSpy)(Result.ok(0));
-  mock.assertSpyCalls(mapSpy, 1);
+  const flatMapSpy = mock.spy((value: number) => Result.ok(value + 1));
+  const actual = Result.flatMap(flatMapSpy)(Result.ok(0));
+  mock.assertSpyCalls(flatMapSpy, 1);
   assertEquals(actual, Result.ok(1));
+});
+
+test("Result.flatMap with promise value to promise chain", async () => {
+  const flatMapPromiseSpy = mock.spy((value: number) =>
+    Promise.resolve(Result.ok(value + 1))
+  );
+
+  const flatMapPromiseChainSpy = mock.spy((value: number) =>
+    Promise.resolve(Result.ok(`${value}`))
+  );
+
+  const actual = Result.flatMap(flatMapPromiseSpy)(Result.ok(0))
+    .then(Result.flatMap(flatMapPromiseChainSpy));
+
+  mock.assertSpyCalls(flatMapPromiseSpy, 1);
+  mock.assertSpyCalls(flatMapPromiseChainSpy, 0);
+  assertEquals(await actual, Result.ok("1"));
+  mock.assertSpyCalls(flatMapPromiseChainSpy, 1);
 });
 
 test("Result.flatMap example", () => {
@@ -147,7 +173,21 @@ test("Result.flatMap on Err does not execute", () => {
   const mapSpy = mock.spy((value: number) => Result.ok(value + 1));
   const actual = Result.flatMap(mapSpy)(Result.err(0));
   mock.assertSpyCalls(mapSpy, 0);
-  assertEquals(actual, Result.err(0));
+  assertEquals<Result<number, number>>(actual, Result.err(0));
+});
+
+test("Result.match promise resolve", async () => {
+  const actual = Result.match((ok) => `${ok}-ok`, (err) => `${err}-error`)(
+    Result.ok(Promise.resolve("value")),
+  );
+  assertEquals(await actual, "value-ok");
+});
+
+test("Result.match promise reject", async () => {
+  const actual = Result.match((ok) => `${ok}-ok`, (err) => `${err}-error`)(
+    Result.ok(Promise.reject("failed")),
+  );
+  assertEquals(await actual, "failed-error");
 });
 
 test("Result.match Ok", () => {

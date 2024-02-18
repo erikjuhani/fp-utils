@@ -70,13 +70,17 @@ export namespace WithResult {
 
   export const invalidJSONContent = () =>
     parseJSON('{ "prop": 42 }')
-      .flatMap((json) => Result.fromThrowable(() => validateJSON(json)))
+      .flatMap((json) =>
+        Result.fromThrowable<JSONWithProperty, Error>(() => validateJSON(json))
+      )
       .mapErr((err) => err.message)
       .map(JSON.stringify);
 
   export const validJSONContent = () =>
     parseJSON('{ "property": 42 }')
-      .flatMap((json) => Result.fromThrowable(() => validateJSON(json)))
+      .flatMap((json) =>
+        Result.fromThrowable<JSONWithProperty, Error>(() => validateJSON(json))
+      )
       .mapErr((err) => err.message)
       .map(JSON.stringify);
 }
