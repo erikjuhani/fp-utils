@@ -566,12 +566,14 @@ export namespace Result {
    * Result.ok(42); // Evaluates to Ok 42
    *
    * Result.ok(); // Evaluates to Ok void
+   *
+   * Result.ok(null); // Evaluates to Ok null
    * ```
    */
   export function ok(): Ok<void>;
   export function ok<T>(value: T): Ok<T>;
   export function ok<T>(value?: T): Ok<T> | Ok<void> {
-    if (value === undefined || value === null) return new Ok<void>(undefined);
+    if (value === undefined) return new Ok<void>(undefined);
     else return new Ok(value);
   }
 
@@ -587,12 +589,14 @@ export namespace Result {
    * Result.err(42); // Evaluates to Err 42
    *
    * Result.err(); // Evaluates to Err void
+   *
+   * Result.err(null); // Evaluates to Err null
    * ```
    */
   export function err(): Err<void>;
   export function err<T>(value: T): Err<T>;
   export function err<T>(value?: T): Err<T> | Err<void> {
-    if (value === undefined || value === null) return new Err<void>(undefined);
+    if (value === undefined) return new Err<void>(undefined);
     return new Err(value);
   }
 
