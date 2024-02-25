@@ -102,11 +102,10 @@ const updateBorrowedBook = (bookName: string) => (patron: Patron) =>
       )
     );
 
-const borrowBook = (patronId: number, bookName: string) => {
+const borrowBook = (patronId: number, bookName: string) =>
   tryGetPatronById(patronId)
     .inspect((patron) => {
       console.log(`${patron.name} wants to borrow '${bookName}'`);
-
       patron.borrowedBooks.length >= 2 &&
         console.log(`${patron.name} has already two books borrowed`);
     })
@@ -115,12 +114,11 @@ const borrowBook = (patronId: number, bookName: string) => {
       patron.borrowedBooks.length < 3 ? Option.some(patron) : Option.none()
     )
     .match(
-      () => console.log(`'${bookName}' could not be borrowed`),
       updateBorrowedBook(bookName),
+      () => console.log(`'${bookName}' could not be borrowed`),
     );
-};
 
-const returnBook = (patronId: number, bookId: number) => {
+const returnBook = (patronId: number, bookId: number) =>
   tryGetPatronById(patronId)
     .inspect((patron) =>
       !patron.borrowedBooks.find((b) => b.id === bookId) &&
@@ -143,7 +141,6 @@ const returnBook = (patronId: number, bookId: number) => {
     )
     .map(([_, book]) => book)
     .map(updateBookAvailability(true));
-};
 
 // Trying to borrow an unavailable book
 borrowBook(101, "The fellowship of the ring");
