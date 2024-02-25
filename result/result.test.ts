@@ -176,6 +176,31 @@ test("Result.fromThrowable when function does throw return Err<T>", () => {
   assertEquals(actual, Result.err(new Error("error")));
 });
 
+test("Result.flatMap union Ok<void> | Ok<ConcreteType> | Err<string>", async () => {
+  // deno-lint-ignore require-await
+  const asyncGetUnionResult = async (flag: 0 | 1 | 2) => {
+    if (flag === 1) return Result.ok();
+    return flag === 2 ? Result.ok(42) : Result.err("Got zero value");
+  };
+
+  const tests: [flag: 0 | 1 | 2, expected: Result<void, string>][] = [
+    [0, Result.err("Got zero value")],
+    [1, Result.err("Got unit value")],
+    [2, Result.ok()],
+  ];
+
+  await Promise.all(tests.map(async ([input, expected]) => {
+    const actual = await asyncGetUnionResult(input).then(
+      Result.flatMap((value) => {
+        // TODO: expectType<number | void>(value);
+        if (value) return Result.ok();
+        else return Result.err("Got unit value");
+      }),
+    );
+    assertEquals(actual, expected);
+  }));
+});
+
 test("Result.fromPromise", async () => {
   type FromPromiseTableTests = [
     Promise<unknown>,
