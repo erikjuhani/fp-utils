@@ -166,9 +166,9 @@ Result.ok(42)
 
 Signature: `<U>(onErr: (value: TError) => U, onOk: (value: T) => U): U`
 
-Result.match transforms the result value `T` into `U` using `onOk` and then
-returns `U`. If the result is Err, the error value `TError` is transformed to
-`U` with `onErr` and then returns `U`.
+Result.match transforms the result value `T` into `U1` using `onOk` and then
+returns `U1`. If the result is Err, the error value `TError` is transformed to
+`U2` with `onErr` and then returns `U2`.
 
 <details>
   <summary>Example</summary>

@@ -144,9 +144,9 @@ test("Result.flatMap example", () => {
 });
 
 test("Result.flatMap on Err does not execute", () => {
-  const mapSpy = mock.spy((value: number) => Result.ok(value + 1));
-  const actual = Result.flatMap(mapSpy)(Result.err(0));
-  mock.assertSpyCalls(mapSpy, 0);
+  const flatMapSpy = mock.spy((value: number) => Result.ok(value + 1));
+  const actual = Result.flatMap(flatMapSpy)(Result.err(0));
+  mock.assertSpyCalls(flatMapSpy, 0);
   assertEquals(actual, Result.err(0));
 });
 

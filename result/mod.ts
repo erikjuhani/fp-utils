@@ -29,7 +29,9 @@ export namespace Result {
      *   .flatMap(tryParse); // Evaluates to Err "error"
      * ```
      */
-    flatMap<U>(fn: (value: T) => Result<U, TError>): Result<U, TError>;
+    flatMap<U, UError>(
+      fn: (value: T) => Result<U, UError>,
+    ): Result<U, UError>;
 
     /**
      * Result.inspect calls the provided function `fn` with a reference to the
@@ -44,7 +46,7 @@ export namespace Result {
      *   .inspect((x) => console.log(x * 2)); // Prints nothing
      * ```
      */
-    inspect(fn: (value: T) => void): Result<T, TError>;
+    inspect(fn: (value: T) => void): this;
 
     /**
      * Result.inspectErr calls the provided function `fn` with a reference to the
@@ -60,7 +62,7 @@ export namespace Result {
      *
      * ```
      */
-    inspectErr(fn: (value: TError) => void): Result<T, TError>;
+    inspectErr(fn: (value: TError) => void): this;
 
     /**
      * Result.map applies a function `fn` to result value `T` and transforms it
@@ -94,9 +96,9 @@ export namespace Result {
     mapErr<U>(fn: (value: TError) => U): Result<T, U>;
 
     /**
-     * Result.match transforms the result value `T` into `U` using `onOk` and
-     * then returns `U`. If the result is Err, the error value `TError` is
-     * transformed to `U` with `onErr` and then returns `U`.
+     * Result.match transforms the result value `T` into `U1` using `onOk` and
+     * then returns `U1`. If the result is Err, the error value `TError` is
+     * transformed to `U2` with `onErr` and then returns `U2`.
      *
      * @example
      * ```ts
@@ -108,7 +110,14 @@ export namespace Result {
      *
      * ```
      */
-    match<U>(onOk: (value: T) => U, onErr: (value: TError) => U): U;
+    match<U1, U2>(
+      onOk: (value: T) => U1,
+      onErr: (value: TError) => U2,
+    ): this extends Ok<T> ? U1 : U2;
+    match<U1, U2>(
+      onOk: (value: T) => U1,
+      onErr: (value: TError) => U2,
+    ): U1 | U2;
 
     /**
      * Result.unwrap returns the value `T` from the associated result if it is
@@ -121,7 +130,7 @@ export namespace Result {
      * Result.err(42).unwrap(); // Throws an exception!
      * ```
      */
-    unwrap(): T;
+    unwrap<U extends T>(): T | U;
 
     /**
      * Result.unwrapErr returns the value `TError` from the associated result if
@@ -206,7 +215,7 @@ export namespace Result {
      *   .flatMap(tryParse); // Evaluates to Err "could not parse"
      * ```
      */
-    flatMap<U, TError>(fn: (value: T) => Result<U, TError>) {
+    flatMap<U, UError>(fn: (value: T) => Result<U, UError>) {
       return fn(this.value);
     }
 
@@ -266,8 +275,8 @@ export namespace Result {
     }
 
     /**
-     * Ok.match calls `onOk` to transform result value `T` into `U` and then
-     * returns `U`.
+     * Ok.match calls `onOk` to transform result value `T` into `U1` and then
+     * returns `U1`.
      *
      * @example
      * ```ts
@@ -275,7 +284,11 @@ export namespace Result {
      *   .match((x) => x * 2, (err) => err + 10); // Evaluates to 84
      * ```
      */
-    match<U>(onOk: (value: T) => U, _onErr: (_value: never) => U): U {
+    match<U1, U2>(
+      onOk: (value: T) => U1,
+      _onErr: (value: never) => U2,
+    ): this extends Ok<T> ? U1 : U2;
+    match<U1, U2>(onOk: (value: T) => U1, _onErr: (value: never) => U2) {
       return onOk(this.value);
     }
 
@@ -367,8 +380,11 @@ export namespace Result {
      *   .flatMap(tryParse); // Evaluates to Err "error"
      * ```
      */
-    flatMap<U>(_fn: (value: never) => Result<U, T>) {
-      return this;
+    flatMap<U, UError>(
+      _fn: (value: never) => Result<U, UError>,
+    ): Result<U, UError> {
+      // Hacky fix to make type inference behave as expected
+      return this as unknown as Result<U, UError>;
     }
 
     /**
@@ -394,7 +410,7 @@ export namespace Result {
      *   .inspectErr((x) => console.log(x * 2)); // Evaluates to 84
      * ```
      */
-    inspectErr(fn: (value: T) => void): Result<never, T> {
+    inspectErr(fn: (value: T) => void) {
       fn(this.value);
       return this;
     }
@@ -427,8 +443,8 @@ export namespace Result {
     }
 
     /**
-     * Err.match calls `onErr` to transform result error value `T` into `U` and
-     * then returns `U`.
+     * Err.match calls `onErr` to transform result error value `T` into `U2` and
+     * then returns `U2`.
      *
      * @example
      * ```ts
@@ -436,7 +452,7 @@ export namespace Result {
      *   .match((x) => x * 2, (err) => err + 10); // Evaluates to 52
      * ```
      */
-    match<U>(_onOk: (value: never) => U, onErr: (value: T) => U): U {
+    match<U1, U2>(_onOk: (value: never) => U1, onErr: (value: T) => U2) {
       return onErr(this.value);
     }
 
@@ -803,16 +819,16 @@ export namespace Result {
    *   .flatMap(tryParse); // Evaluates to Err "error"
    * ```
    */
-  export function flatMap<T, TError, U>(
-    fn: (value: T) => Result<U, TError>,
-  ): (result: Result<T, TError>) => Result<U, TError> {
-    return (result) => result.flatMap(fn);
+  export function flatMap<T, TError, U, UError>(
+    fn: (value: T) => Ok<U> | Err<UError>,
+  ) {
+    return (result: Result<T, TError>) => result.flatMap(fn);
   }
 
   /**
-   * Result.match transforms the result value `T` into `U` using `onOk` and
-   * then returns `U`. If the result is Err, the error value `TError` is transformed
-   * to `U` with `onErr` and then returns `U`.
+   * Result.match transforms the result value `T` into `U1` using `onOk` and
+   * then returns `U1`. If the result is Err, the error value `TError` is
+   * transformed to `U2` with `onErr` and then returns `U2`.
    *
    * @example
    * ```ts
@@ -823,11 +839,15 @@ export namespace Result {
    *   .match((ok) => ok * 2, (err) => err + 10); // Evaluates to 52
    * ```
    */
-  export function match<T, TError, U>(
-    onOk: (value: T) => U,
-    onErr: (value: TError) => U,
-  ): (result: Result<T, TError>) => U {
-    return (result: Result<T, TError>) => result.match(onOk, onErr);
+  export function match<T, TError, U1, U2>(
+    onOk: (value: T) => U1,
+    onErr: (value: TError) => U2,
+  ): (result: Result<T, TError>) => U1 | U2;
+  export function match<T, TError, U1, U2>(
+    onOk: (value: T) => U1,
+    onErr: (value: TError) => U2,
+  ) {
+    return (result: Ok<T> | Err<TError>) => result.match(onOk, onErr);
   }
 }
 export type Result<T, TError> = Result.Type<T, TError>;
