@@ -101,10 +101,10 @@ Option.some(42)
 
 ### `Option.match`
 
-Signature: `<U>(onSome: (value: T) => U, onNone: () => U): U`
+Signature: `<U1, U2>(onSome: (value: T) => U1, onNone: () => U2): U1 | U2`
 
-Option.match transforms the option value `T` into `U` using `onSome` and then
-returns `U`. If the option is None, it uses `onNone` and returns `U`.
+Option.match transforms the option value `T` into `U1` using `onSome` and then
+returns `U1`. If the option is None, `onNone` is called and `U2` returned.
 
 <details>
   <summary>Example</summary>

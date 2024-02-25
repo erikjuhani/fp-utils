@@ -62,8 +62,9 @@ export namespace Option {
     map<U>(fn: (value: T) => U): Option<U>;
 
     /**
-     * Option.match transforms the option value `T` into `U` using `onSome` and
-     * then returns `U`. If the option is None, it uses `onNone` and returns `U`.
+     * Option.match transforms the option value `T` into `U1` using `onSome`
+     * and then returns `U1`. If the option is None, `onNone` is called and `U2`
+     * returned.
      *
      * @example
      * ```ts
@@ -74,7 +75,10 @@ export namespace Option {
      *   .match((x) => x * 2, () => 99); // Evaluates to 84
      * ```
      */
-    match<U>(onSome: (value: T) => U, onNone: () => U): U;
+    match<U1, U2>(
+      onSome: (value: T) => U1,
+      onNone: () => U2,
+    ): U1 | U2;
 
     /**
      * Option.unwrap returns the value `T` from the associated option if it is
@@ -160,6 +164,7 @@ export namespace Option {
      *   .flatMap(tryParse); // Evaluates to None
      * ```
      */
+    flatMap<U>(fn: (value: T) => Option<U>): Some<U>;
     flatMap<U>(fn: (value: T) => Option<U>) {
       return fn(this.value);
     }
@@ -194,8 +199,8 @@ export namespace Option {
     }
 
     /**
-     * Option.match transforms the option value `T` into `U` using `onSome` and
-     * then returns `U`.
+     * Option.match transforms the option value `T` into `U1` using `onSome` and
+     * then returns `U1`.
      *
      * @example
      * ```ts
@@ -203,7 +208,11 @@ export namespace Option {
      *   .match((x) => x * 2, () => 99); // Evaluates to 84
      * ```
      */
-    match<U>(onSome: (value: T) => U, _onNone: () => U): U {
+    match<U1, U2>(
+      onSome: (value: T) => U1,
+      _onNone: () => U2,
+    ): this extends Some<T> ? U1 : U2;
+    match<U1, U2>(onSome: (value: T) => U1, _onNone: () => U2) {
       return onSome(this.value);
     }
 
@@ -316,7 +325,7 @@ export namespace Option {
      *   .match((x) => x * 2, () => 99); // Evaluates to 99
      * ```
      */
-    match<U>(_onSome: (value: never) => U, onNone: () => U): U {
+    match<U1, U2>(_onSome: (value: never) => U1, onNone: () => U2) {
       return onNone();
     }
 
@@ -565,14 +574,15 @@ export namespace Option {
    * ```
    */
   export function flatMap<T, U>(
-    fn: (value: T) => Option<U>,
-  ): (option: Option<T>) => Option<U> {
-    return (option) => option.flatMap(fn);
+    fn: (value: T) => Some<U> | None,
+  ) {
+    return (option: Option<T>) => option.flatMap(fn);
   }
 
   /**
-   * Option.match transforms the option value `T` into `U` using `onSome` and
-   * then returns `U`. If the option is None, it uses `onNone` and returns `U`.
+   * Option.match transforms the option value `T` into `U1` using `onSome`
+   * and then returns `U1`. If the option is None, `onNone` is called and `U2`
+   * returned.
    *
    * @example
    * ```ts
@@ -583,11 +593,15 @@ export namespace Option {
    *   .match((x) => x * 2, () => 99); // Evaluates to 84
    * ```
    */
-  export function match<T, U>(
-    onSome: (value: T) => U,
-    onNone: () => U,
-  ): (option: Option<T>) => U {
-    return (option: Option<T>) => option.match(onSome, onNone);
+  export function match<T, U1, U2>(
+    onSome: (value: T) => U1,
+    onNone: () => U2,
+  ): (option: Option<T>) => U1 | U2;
+  export function match<T, U1, U2>(
+    onSome: (value: T) => U1,
+    onNone: () => U2,
+  ) {
+    return (option: Some<T> | None) => option.match(onSome, onNone);
   }
 }
 export type Option<T> = Option.Type<T>;
