@@ -826,7 +826,7 @@ export namespace Result {
   export function flatMap<T, TError, U, UError>(
     fn: (value: T) => Ok<U> | Err<UError>,
   ) {
-    return (result: Result<T, TError>) => result.flatMap(fn);
+    return (result: Result<T, TError>): Result<U, UError> => result.flatMap(fn);
   }
 
   /**
