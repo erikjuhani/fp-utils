@@ -1,3 +1,21 @@
+## 0.6.0
+
+BREAKING CHANGES:
+
+- [Change the order of arguments in Option match function](https://github.com/erikjuhani/fp-utils/commit/c2a49e63b9d2595cfcf33468f604fdaa8260e025)
+
+CHANGES:
+
+- [Remove comments from transpiled js files](https://github.com/erikjuhani/fp-utils/commit/e5747f15ff04c11ff85c3595bc3f0e234d5ae59b)
+- [Add return type for Result.flatMap instead of relying on inference](https://github.com/erikjuhani/fp-utils/commit/87d303392fc379d62f7f96609b20582b819bed06)
+- [Allow null values with Result.ok and Result.err](https://github.com/erikjuhani/fp-utils/commit/c26229b61ace28e26d228935fa0b7bc289c770bb)
+
+FIXES:
+
+- [Fix type inference for match and flatMap in Option](https://github.com/erikjuhani/fp-utils/commit/5c44c344bcad59d4bb74a4461178c1a77bde5a9a)
+- [Fix type inference for match and flatMap in Result](https://github.com/erikjuhani/fp-utils/commit/a019ce313a7c3b80a3faa35837785a6e04caacb5)
+- [Fix documentation in Result](https://github.com/erikjuhani/fp-utils/commit/6c1c1eebe6f53eb2ebcd57df2ed757193810b8b6)
+
 ## 0.5.0
 
 BREAKING CHANGES:
