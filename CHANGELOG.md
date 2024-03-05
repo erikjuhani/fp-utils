@@ -1,3 +1,10 @@
+## 0.7.0
+
+FIXES:
+
+- [Fix "slow types" in Option](https://github.com/erikjuhani/fp-utils/commit/17023841fe6e8379095a35b7cfb03ef08d7ce49d)
+- [Fix "slow types" in Result](https://github.com/erikjuhani/fp-utils/commit/7b69d5b42093b02677d1061b760ff1201c1ed34f)
+
 ## 0.6.0
 
 BREAKING CHANGES:
