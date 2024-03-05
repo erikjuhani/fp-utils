@@ -179,7 +179,7 @@ export namespace Option {
      *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
      * ```
      */
-    inspect(fn: (value: T) => void) {
+    inspect(fn: (value: T) => void): this {
       fn(this.value);
       return this;
     }
@@ -194,7 +194,7 @@ export namespace Option {
      *   .map((x) => x * 2); // Evaluates to Some 84
      * ```
      */
-    map<U>(fn: (value: T) => NonNullable<U>) {
+    map<U>(fn: (value: T) => NonNullable<U>): Option<U> {
       return some(fn(this.value));
     }
 
@@ -224,7 +224,7 @@ export namespace Option {
      * Option.some(42).unwrap(); // Evaluates to 42
      * ```
      */
-    unwrap() {
+    unwrap(): T {
       return this.value;
     }
 
@@ -236,7 +236,7 @@ export namespace Option {
      * Option.some(42).unwrapOr(99); // Evaluates to 42
      * ```
      */
-    unwrapOr(_defaultValue: T) {
+    unwrapOr(_defaultValue: T): T {
       return this.value;
     }
 
@@ -286,7 +286,7 @@ export namespace Option {
      *   .flatMap(tryParse); // Evaluates to None
      * ```
      */
-    flatMap<U>(_fn: (value: never) => Option<U>) {
+    flatMap<U>(_fn: (value: never) => Option<U>): this {
       return this;
     }
 
@@ -299,7 +299,7 @@ export namespace Option {
      *   .inspect((x) => console.log(x * 2)); // Evaluates to None
      * ```
      */
-    inspect(_fn: (value: never) => void) {
+    inspect(_fn: (value: never) => void): this {
       return this;
     }
 
@@ -312,7 +312,7 @@ export namespace Option {
      *   .map((x) => x * 2); // Evaluates to None
      * ```
      */
-    map<U>(_fn: (value: never) => NonNullable<U>) {
+    map<U>(_fn: (value: never) => NonNullable<U>): this {
       return this;
     }
 
@@ -325,7 +325,7 @@ export namespace Option {
      *   .match((x) => x * 2, () => 99); // Evaluates to 99
      * ```
      */
-    match<U1, U2>(_onSome: (value: never) => U1, onNone: () => U2) {
+    match<U1, U2>(_onSome: (value: never) => U1, onNone: () => U2): U2 {
       return onNone();
     }
 
@@ -575,7 +575,7 @@ export namespace Option {
    */
   export function flatMap<T, U>(
     fn: (value: T) => Some<U> | None,
-  ) {
+  ): (option: Option<T>) => Option<U> {
     return (option: Option<T>) => option.flatMap(fn);
   }
 
