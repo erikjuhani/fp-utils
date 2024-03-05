@@ -1,34 +1,49 @@
 import { dnt, std } from "dev_deps";
 
-type Args = { version?: string; mod?: string };
+type Args = { mod?: string };
 
-const { version: parsedVersion, mod } = std.flags.parse<Args>(Deno.args);
+type DenoJSON = {
+  name: string;
+  version: string;
+  description: string;
+  keywords: string[];
+  homepage: string;
+  publishConfig: { access: string };
+  bugs: { url: string };
+  license: string;
+  author: string;
+  repository: { type: string; url: string };
+};
+
+const parseArgs = () => {
+  const { mod } = std.flags.parse<Args>(Deno.args);
+  if (!mod || typeof mod !== "string") {
+    throw Error(
+      "No module directory provided, please provide a module directory using `--mod <module_name>`",
+    );
+  }
+
+  return { mod };
+};
+
+const loadDenoJSON = async (mod: string): Promise<DenoJSON> => {
+  const { default: { exports: _exports, exclude: _exclude, ...denoJson } } =
+    await import(`./${mod}/deno.json`, { with: { type: "json" } });
+  return denoJson;
+};
 
 const commentsRegex = /\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm;
 
-if (!mod || typeof mod !== "string") {
-  throw Error(
-    "No mod provided, please provide a module directory using `--mod <module_name>`",
-  );
-}
+const { mod } = parseArgs();
+const denoJson = await loadDenoJSON(mod);
 
-const { default: packageJson } = await import(`./${mod}/pkg.json`, {
-  with: { type: "json" },
-});
-
-const git = new Deno.Command("git", { args: ["rev-parse", "HEAD"] })
-  .outputSync();
-
-const version = parsedVersion ??
-  `0.0.0-${new TextDecoder().decode(git.stdout).slice(0, 7)}`;
-
-async function build() {
-  const outDir = `./${mod}/dist`;
+async function build(module: string) {
+  const outDir = `./${module}/dist`;
 
   const copyReadme = () => Deno.copyFileSync("LICENSE", `${outDir}/LICENSE`);
 
   const copyLicense = () =>
-    Deno.copyFileSync(`./${mod}/README.md`, `${outDir}/README.md`);
+    Deno.copyFileSync(`./${module}/README.md`, `${outDir}/README.md`);
 
   const stripCommentsFromJSFiles = (...filepaths: string[]) => {
     const decoder = new TextDecoder("utf-8");
@@ -45,14 +60,14 @@ async function build() {
   await dnt.emptyDir(outDir);
 
   await dnt.build({
-    entryPoints: [`./${mod}/mod.ts`],
+    entryPoints: [`./${module}/mod.ts`],
     outDir,
     shims: {},
     // Separate type declarations
     declaration: "separate",
     // Do not include test files in the artifact
     test: false,
-    package: { ...packageJson, version },
+    package: denoJson,
     postBuild: () => {
       copyLicense();
       copyReadme();
@@ -64,4 +79,4 @@ async function build() {
   });
 }
 
-build();
+build(mod);
