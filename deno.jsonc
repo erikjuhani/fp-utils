@@ -6,6 +6,8 @@
     "bench": "deno bench --allow-env --allow-read"
   },
   "imports": {
-    "dev_deps": "./dev_deps.ts"
+    "dev_deps": "./dev_deps.ts",
+    "@fp-utils/option": "./option/mod.ts",
+    "@fp-utils/result": "./result/mod.ts"
   }
 }
