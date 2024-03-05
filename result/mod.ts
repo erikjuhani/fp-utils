@@ -215,7 +215,7 @@ export namespace Result {
      *   .flatMap(tryParse); // Evaluates to Err "could not parse"
      * ```
      */
-    flatMap<U, UError>(fn: (value: T) => Result<U, UError>) {
+    flatMap<U, UError>(fn: (value: T) => Result<U, UError>): Result<U, UError> {
       return fn(this.value);
     }
 
@@ -229,7 +229,7 @@ export namespace Result {
      *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
      * ```
      */
-    inspect(fn: (value: T) => void) {
+    inspect(fn: (value: T) => void): this {
       fn(this.value);
       return this;
     }
@@ -243,7 +243,7 @@ export namespace Result {
      *   .inspectErr((x) => console.log(x * 2)); // Prints nothing
      * ```
      */
-    inspectErr(_fn: (value: never) => void) {
+    inspectErr(_fn: (value: never) => void): this {
       return this;
     }
 
@@ -257,7 +257,7 @@ export namespace Result {
      *   .map((x) => x * 2); // Evaluates to Ok 84
      * ```
      */
-    map<U>(fn: (value: T) => U) {
+    map<U>(fn: (value: T) => U): Ok<U> {
       return ok(fn(this.value));
     }
 
@@ -270,7 +270,7 @@ export namespace Result {
      *   .mapErr((x) => x * 2); // Evaluates to Ok 42
      * ```
      */
-    mapErr<F>(_fn: (value: never) => F) {
+    mapErr<U>(_fn: (value: never) => U): this {
       return this;
     }
 
@@ -300,7 +300,7 @@ export namespace Result {
      * Result.ok(42).unwrap(); // Evaluates to 42
      * ```
      */
-    unwrap() {
+    unwrap(): T {
       return this.value;
     }
 
@@ -324,7 +324,7 @@ export namespace Result {
      * Result.ok(42).unwrapOr(99); // Evaluates to 42
      * ```
      */
-    unwrapOr(_defaultValue: T) {
+    unwrapOr(_defaultValue: T): T {
       return this.value;
     }
 
@@ -396,7 +396,7 @@ export namespace Result {
      *   .inspect((x) => console.log(x * 2)); // Prints nothing
      * ```
      */
-    inspect(_fn: (value: never) => void) {
+    inspect(_fn: (value: never) => void): this {
       return this;
     }
 
@@ -410,7 +410,7 @@ export namespace Result {
      *   .inspectErr((x) => console.log(x * 2)); // Evaluates to 84
      * ```
      */
-    inspectErr(fn: (value: T) => void) {
+    inspectErr(fn: (value: T) => void): this {
       fn(this.value);
       return this;
     }
@@ -424,7 +424,7 @@ export namespace Result {
      *   .map((x) => x * 2); // Evaluates to Err 42
      * ```
      */
-    map<U>(_fn: (value: never) => U) {
+    map<U>(_fn: (value: never) => U): this {
       return this;
     }
 
@@ -438,7 +438,7 @@ export namespace Result {
      *   .mapErr((x) => x * 2); // Evaluates to Err 84
      * ```
      */
-    mapErr<F>(fn: (value: T) => F) {
+    mapErr<U>(fn: (value: T) => U): Err<U> {
       return err(fn(this.value));
     }
 
@@ -452,7 +452,7 @@ export namespace Result {
      *   .match((x) => x * 2, (err) => err + 10); // Evaluates to 52
      * ```
      */
-    match<U1, U2>(_onOk: (value: never) => U1, onErr: (value: T) => U2) {
+    match<U1, U2>(_onOk: (value: never) => U1, onErr: (value: T) => U2): U2 {
       return onErr(this.value);
     }
 
@@ -476,7 +476,7 @@ export namespace Result {
      * Result.err(42).unwrapErr(); // Evaluates to 42
      * ```
      */
-    unwrapErr() {
+    unwrapErr(): T {
       return this.value;
     }
 
@@ -488,7 +488,7 @@ export namespace Result {
      * Result.err(42).unwrapOr(99); // Evaluates to 99
      * ```
      */
-    unwrapOr<U>(defaultValue: U) {
+    unwrapOr<U>(defaultValue: U): U {
       return defaultValue;
     }
 
@@ -825,7 +825,7 @@ export namespace Result {
    */
   export function flatMap<T, TError, U, UError>(
     fn: (value: T) => Ok<U> | Err<UError>,
-  ) {
+  ): (result: Result<T, TError>) => Result<U, UError> {
     return (result: Result<T, TError>): Result<U, UError> => result.flatMap(fn);
   }
 
