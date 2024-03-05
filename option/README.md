@@ -14,17 +14,24 @@ essential domain logic. Essentially, the Option enables to focus primarily on
 the 'happy path'.
 
 ```ts
-// deno
-import { Option } from "https://deno.land/x/fp_utils@0.1.0/option/mod.ts";
-// node
 import { Option } from "@fp-utils/option";
 
-const map = new Map([["1", { name: "deno" }]]);
+type BookId = number;
+type BookName = string;
 
-const tryGet = (id: string) => Option.fromNullable(map.get(id));
+const books = new Map<BookId, BookName>([
+  [1, "The Hobbit"],
+  [2, "The Fellowship of the Ring"],
+]);
 
-const notFound = tryGet("0"); // Evaluates to None
-const found = tryGet("1"); // Evaluates to Some { name: "deno" }
+const tryGetBook = (id: BookId): Option<BookName> =>
+  Option.fromNullable(books.get(id));
+
+// Evaluates to None
+const bookNotFound = tryGetBook(0);
+
+// Evaluates to Some "The Hobbit"
+const bookFound = tryGetBook(1);
 ```
 
 ## Usage

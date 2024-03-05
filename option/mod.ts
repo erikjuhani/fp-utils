@@ -1,10 +1,49 @@
 /**
+ * @module
+ *
+ * Option represents the presence of a value `Some` or the absence of a value
+ * `None`. It's commonly utilized to manage computations that might or might not
+ * yield a result, or those that could potentially fail.
+ *
+ * Option is particularly useful, when dealing with operations that may return
+ * `null` or `undefined` values, providing a structured and safe approach to
+ * manage such scenarios.
+ *
+ * By using option, the need for imperative and explicit `null` or `undefined`
+ * checks diminishes, reducing code noise and allowing for clearer focus on
+ * essential domain logic. Essentially, the Option enables to focus primarily
+ * on the 'happy path'.
+ *
+ * ```ts
+ * import { Option } from "@fp-utils/option";
+ *
+ * type BookId = number;
+ * type BookName = string;
+ *
+ * const books = new Map<BookId, BookName>([
+ *   [1, "The Hobbit"],
+ *   [2, "The Fellowship of the Ring"],
+ * ]);
+ *
+ * const tryGetBook = (id: BookId): Option<BookName> =>
+ *   Option.fromNullable(books.get(id));
+ *
+ * // Evaluates to None
+ * const bookNotFound = tryGetBook(0);
+ *
+ * // Evaluates to Some "The Hobbit"
+ * const bookFound = tryGetBook(1);
+ * ```
+ */
+
+/**
  * Option represents the presence of a value `Some` or the absence of a value
  * `None`. It's commonly utilized to manage computations that might or might not
  * yield a result, or those that could potentially fail.
  */
 // deno-lint-ignore no-namespace
 export namespace Option {
+  /** {@link Option} */
   export interface Type<T> {
     /**
      * Option.flatMap applies a function `fn` to the content of option `T` and
@@ -604,4 +643,5 @@ export namespace Option {
     return (option: Some<T> | None) => option.match(onSome, onNone);
   }
 }
+/** {@link Option} */
 export type Option<T> = Option.Type<T>;
