@@ -1,0 +1,25 @@
+{
+  "name": "@fp-utils/result",
+  "version": "0.7.0",
+  "exports": "./mod.ts",
+  "exclude": ["*test*", "*bench*"],
+  "description": "Result type utility for functional programming in TypeScript",
+  "keywords": [
+    "typescript",
+    "functional-programming",
+    "result"
+  ],
+  "homepage": "https://github.com/erikjuhani/fp-utils",
+  "publishConfig": {
+    "access": "public"
+  },
+  "bugs": {
+    "url": "https://github.com/erikjuhani/fp-utils/issues"
+  },
+  "license": "MIT",
+  "author": "Erik Kinnunen <erik.kinn@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erikjuhani/fp-utils.git"
+  }
+}
