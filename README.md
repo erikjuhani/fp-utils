@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/assets/fp-utils.png">
+  <img src="assets/fp-utils.png">
 </p>
 
 <p align="center"><b>fp-utils</b> - Functional utility library for Deno / Node</p>
