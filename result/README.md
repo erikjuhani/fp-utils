@@ -16,38 +16,23 @@ Result is similar to Option, the main difference is that it holds either a value
 or an error, and not value or none.
 
 ```ts
-// deno
-import { Result } from "https://deno.land/x/fp_utils@0.1.0/result/mod.ts";
-
-// node
 import { Result } from "@fp-utils/result";
 
-const parseJSON = <R extends Record<string, unknown>>(rawJson: string) =>
-  Result.fromThrowable<R, SyntaxError>(() => JSON.parse(rawJson))
-    .mapErr((err) => err.message);
+type BookIndex = number;
+type BookName = string;
 
-type JSONWithProperty = { property: number };
+const books = ["The Hobbit", "The Fellowship of the Ring"];
 
-const invalidJSON = parseJSON<JSONWithProperty>(""); // SyntaxError
+const tryGetBook = (index: BookIndex): Result<BookName, string> =>
+  books[index]
+    ? Result.ok(books[index])
+    : Result.err(`Cannot find a book with index ${index}`);
 
-const validateJSON = (json: Record<string, unknown>) => {
-  const isJSONWithProperty = (value: any): value is JSONWithProperty =>
-    "property" in value;
+// Evaluates to Ok "The Fellowship of the Ring"
+const bookFound = tryGetBook(1);
 
-  if (isJSONWithProperty(json)) return json;
-
-  throw new Error(
-    `Wrong type of json, expected "property" field, got "${Object.keys(json)}"`,
-  );
-};
-
-const invalidJSONContent = parseJSON('{ "prop": 42 }').flatMap((json) =>
-  Result.fromThrowable(() => validateJSON(json))
-); // Err Wrong type of json, expected "property" got "prop"
-
-const validJSONContent = parseJSON('{ "property": 42 }').flatMap((json) =>
-  Result.fromThrowable(() => validateJSON(json))
-); // Ok { property: 42 }
+// Evaluates to Err "Cannot find a book with index 2"
+const bookNotFound = tryGetBook(2);
 ```
 
 ## Usage

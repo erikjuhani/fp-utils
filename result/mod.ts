@@ -1,10 +1,50 @@
 /**
+ * @module
+ *
+ * Result encapsulates two possible values: a successful result `Ok` or an
+ * error `Err`. Result allows to chain together a series of operations that can
+ * potentially fail and propagate the error through the computations. This
+ * enables to write code that is more focused on the 'happy path' and separate
+ * the error handling logic in a clean and concise way.
+ *
+ * When a computation succeeds, Result carries the successful value and allows
+ * you to continue chaining operations on it. If at any point an error occurs,
+ * the error value is propagated, and subsequent operations are bypassed
+ * until an error handler is encountered, which enables explicit handling of
+ * both the success and error cases making the code easier to reason about.
+ *
+ * Result is similar to Option, the main difference is that it holds either a
+ * value or an error, and not value or none.
+ *
+ * ```ts
+ * import { Result } from "@fp-utils/result";
+ *
+ * type BookIndex = number;
+ * type BookName = string;
+ *
+ * const books = ["The Hobbit", "The Fellowship of the Ring"];
+ *
+ * const tryGetBook = (index: BookIndex): Result<BookName, string> =>
+ *  books[index]
+ *    ? Result.ok(books[index])
+ *    : Result.err(`Cannot find a book with index ${index}`);
+ *
+ * // Evaluates to Ok "The Fellowship of the Ring"
+ * const bookFound = tryGetBook(1);
+ *
+ * // Evaluates to Err "Cannot find a book with index 2"
+ * const bookNotFound = tryGetBook(2);
+ * ```
+ */
+
+/**
  * Result represents the success of a computation `Ok` or the failure of a
  * computation `Err`. It is commonly used with computations known to either
  * succeed or fail.
  */
 // deno-lint-ignore no-namespace
 export namespace Result {
+  /** {@link Result} */
   export interface Type<T, TError> {
     /**
      * Result.flatMap applies a function `fn` to the content of a result `T` and
@@ -854,4 +894,5 @@ export namespace Result {
     return (result: Ok<T> | Err<TError>) => result.match(onOk, onErr);
   }
 }
+/** {@link Result} */
 export type Result<T, TError> = Result.Type<T, TError>;
