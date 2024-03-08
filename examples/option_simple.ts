@@ -5,7 +5,7 @@ import { Option } from "../option/mod.ts";
 
 const map = new Map([["1", { name: "deno" }]]);
 
-const tryGet = (id: string) => Option.fromNullable(map.get(id));
+const tryGet = (id: string) => Option.from(map.get(id));
 
 const notFound = tryGet("0"); // Evaluates to None
 

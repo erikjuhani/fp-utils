@@ -37,17 +37,17 @@ const patrons = new Map<ID, Patron>([
       books.get(1),
       books.get(2),
     ]
-      .map(Option.fromNullable)
+      .map(Option.from)
       .filter(Option.isSome)
       .map(Option.unwrap),
   }],
 ]);
 
 const tryGetPatronById = (patronId: number) =>
-  Option.fromNullable(patrons.get(patronId));
+  Option.from(patrons.get(patronId));
 
 const tryFindBook = (title: string) =>
-  Option.fromNullable(
+  Option.from(
     Array.from(books.values())
       .find((book) => book.title.toLowerCase() === title.toLowerCase()),
   );
@@ -131,7 +131,7 @@ const returnBook = (patronId: number, bookId: number) =>
         : Option.none()
     )
     .flatMap((patron) =>
-      Option.fromNullable(
+      Option.from(
         patron.borrowedBooks.find((book) => bookId === book.id),
       ).map((book) => [patron, book] as const)
     )

@@ -48,8 +48,7 @@ export namespace Native {
 
 // deno-lint-ignore no-namespace
 export namespace WithOption {
-  const tryGetInfo = (fetch: () => Promise<InfoResponse>) =>
-    Option.fromPromise(fetch);
+  const tryGetInfo = (fetch: () => Promise<InfoResponse>) => Option.from(fetch);
 
   export const infoSuccess = async () =>
     (await tryGetInfo(fetchSuccess))

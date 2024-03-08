@@ -11,8 +11,7 @@ const books = new Map<BookId, BookName>([
   [2, "The Fellowship of the Ring"],
 ]);
 
-const tryGetBook = (id: BookId): Option<BookName> =>
-  Option.fromNullable(books.get(id));
+const tryGetBook = (id: BookId): Option<BookName> => Option.from(books.get(id));
 
 const bookFound = tryGetBook(1);
 

@@ -1,4 +1,4 @@
-import { std } from "dev_deps";
+import { std } from "../dev_deps.ts";
 import { Option } from "./mod.ts";
 
 const { assertThrows, assertEquals } = std.assert;
@@ -129,57 +129,28 @@ test("Option.match None", () => {
   assertEquals(actual, "No value");
 });
 
-test("Option.fromNullable", () => {
-  type FromNullableTableTests = [
-    number | string | null | undefined,
-    Option<unknown>,
-  ][];
-
-  const tests: FromNullableTableTests = [
-    [0, Option.some(0)],
-    [null, Option.none()],
-    ["", Option.some("")],
-    [undefined, Option.none()],
-  ];
-
-  tests.forEach(([input, expected]) => {
-    const actual = Option.fromNullable(input);
-    assertEquals(actual, expected);
-  });
-});
-
-test("Option.fromPromise", async () => {
-  type FromPromiseTableTests = [
-    Promise<unknown>,
-    Option<unknown>,
-  ][];
-
-  const tests: FromPromiseTableTests = [
+test("Option.from", async () => {
+  const tests: [input: unknown, expected: Option<unknown>][] = [
     [Promise.resolve(0), Option.some(0)],
     [Promise.resolve(), Option.none()],
     [Promise.reject("error"), Option.none()],
     [Promise.reject(), Option.none()],
-  ];
-
-  for (const [input, expected] of tests) {
-    const actual = await Option.fromPromise(input);
-    assertEquals(actual, expected);
-  }
-
-  type FromPromiseFnTableTests = [
-    () => Promise<unknown>,
-    Option<unknown>,
-  ][];
-
-  const testsFn: FromPromiseFnTableTests = [
     [() => Promise.resolve(0), Option.some(0)],
     [() => Promise.resolve(), Option.none()],
     [() => Promise.reject("error"), Option.none()],
     [() => Promise.reject(), Option.none()],
+    [null, Option.none()],
+    [undefined, Option.none()],
+    [0, Option.some(0)],
+    ["", Option.some("")],
+    [() => 0, Option.some(0)],
+    [() => null, Option.none()],
+    [() => {}, Option.none()],
+    [() => () => 0, Option.some(0)],
   ];
 
-  for (const [input, expected] of testsFn) {
-    const actual = await Option.fromPromise(input);
+  for (const [input, expected] of tests) {
+    const actual = await Option.from(input);
     assertEquals(actual, expected);
   }
 });

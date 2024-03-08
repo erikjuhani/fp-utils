@@ -26,7 +26,7 @@
  * ]);
  *
  * const tryGetBook = (id: BookId): Option<BookName> =>
- *   Option.fromNullable(books.get(id));
+ *   Option.from(books.get(id));
  *
  * // Evaluates to None
  * const bookNotFound = tryGetBook(0);
@@ -43,6 +43,31 @@
  */
 // deno-lint-ignore no-namespace
 export namespace Option {
+  /**
+   * Recursive type helper for the Option.from function return type. The type
+   * is recursively traversed to find the correct type depending on the given
+   * value. The recursion happens if the type is a function.
+   */
+  type From<T> = T extends () => unknown ? From<ReturnType<T>>
+    : T extends null | undefined ? None
+    : T extends Promise<never | undefined | null> ? Promise<None>
+    : T extends Promise<unknown> ? Promise<Option<Awaited<T>>>
+    : Some<T>;
+
+  /**
+   * Type helper to determine if the value is a Promise.
+   */
+  function isPromise<T>(value: unknown): value is Promise<T> {
+    return isNonNullable(value) && typeof value === "object" && "then" in value;
+  }
+
+  /**
+   * Type helper to determine if the value is NonNullable.
+   */
+  function isNonNullable<T>(value: T): value is NonNullable<T> {
+    return value !== null && value !== undefined;
+  }
+
   /** {@link Option} */
   export interface Type<T> {
     /**
@@ -448,49 +473,51 @@ export namespace Option {
   }
 
   /**
-   * Option.fromNullable converts a nullable value to an option.
+   * Option.from converts a nullable value, non-nullable value, a function or a
+   * promise to an option.
    *
    * @example
    * ```ts
-   * Option.fromNullable(undefined); // Evaluates to None
+   * Option.from(undefined); // Evaluates to None
    *
-   * Option.fromNullable(null); // Evaluates to None
+   * Option.from(null); // Evaluates to None
    *
-   * Option.fromNullable(42); // Evaluates to Some 42
+   * Option.from(42); // Evaluates to Some 42
+   *
+   * Option.from(() => 42); // Evaluates to Some 42
+   *
+   * Option.from(() => Promise.resolve(42)); // Evaluates to Promise<Some 42>
+   *
+   * Option.from(() => Promise.reject()); // Evaluates to Promise<None>
+   *
+   * Option.from(Promise.resolve(42)); // Evaluates to Promise<Some 42>
+   *
+   * Option.from(Promise.resolve(undefined)); // Evaluates to Promise<None>
+   *
+   * Option.from(Promise.reject()); // Evaluates to Promise<None>
    * ```
    */
-  export function fromNullable<T>(value: T | null | undefined): Option<T> {
-    if (value === null || value === undefined) return none();
-    else return new Some(value);
-  }
+  export function from<T>(
+    value: T | (() => T),
+  ): From<typeof value> {
+    type Value = typeof value;
 
-  /**
-   * Option.fromPromise converts a promise into an option. If promise is rejected
-   * None is returned, otherwise Some<T>.
-   *
-   * @example
-   * ```ts
-   * Option.fromPromise(Promise.reject()); // Evaluates to None
-   *
-   * Option.fromPromise(Promise.resolve(null)); // Evaluates to None
-   *
-   * Option.fromPromise(Promise.resolve(42)); // Evaluates to Some 42
-   *
-   * Option.fromPromise(() => Promise.reject()); // Evaluates to None
-   *
-   * Option.fromPromise(() => Promise.resolve(42)); // Evaluates to Some 42
-   * ```
-   */
-  export function fromPromise<T>(promise: Promise<T>): Promise<Option<T>>;
-  export function fromPromise<T>(fn: () => Promise<T>): Promise<Option<T>>;
-  export function fromPromise<T>(
-    promiseOrFn: Promise<T> | (() => Promise<T>),
-  ): Promise<Option<T>> {
-    const promise = typeof promiseOrFn === "function"
-      ? promiseOrFn()
-      : promiseOrFn;
-
-    return promise.then(fromNullable).catch(none);
+    if (value === null || value === undefined) {
+      return Option.none() as From<Value>;
+    }
+    if (value instanceof Function) {
+      return Option.from<T>(value()) as From<Value>;
+    }
+    if (isPromise<T>(value)) {
+      return value.then((value) =>
+        value === null || value === undefined
+          ? Option.none()
+          : Option.some(value)
+      ).catch(
+        Option.none,
+      ) as From<Value>;
+    }
+    return Option.some(value) as From<Value>;
   }
 
   /**
