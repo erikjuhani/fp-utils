@@ -1,3 +1,19 @@
+## 0.8.0
+
+BREAKING CHANGES:
+
+Functions `Option.fromNullable`, `Option.fromPromise`, `Result.fromThrowable`
+and `Result.fromPromise` were removed in favor of using `Option.from` or
+`Result.from` instead.
+
+- [Add Result.from function](https://github.com/erikjuhani/fp-utils/commit/0cee6743007ba340f9ddc951811a89cc7e30a423)
+- [Add Option.from function](https://github.com/erikjuhani/fp-utils/commit/0dcb11658fbdac2457c73219b3cdb05b81a35c30)
+
+CHANGES:
+
+- [Add @module documentation for Result](https://github.com/erikjuhani/fp-utils/commit/54cf8c6d5deeac325157e146a2403c2a26d6b3cd)
+- [Add @module documentation for Option](https://github.com/erikjuhani/fp-utils/commit/a22aa43f6b1d7cab77ba13f2ecc80d2bfbfe8112)
+
 ## 0.7.0
 
 FIXES:
