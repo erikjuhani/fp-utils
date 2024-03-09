@@ -1,6 +1,6 @@
 {
   "name": "@fp-utils/option",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "exports": "./mod.ts",
   "exclude": ["*test*", "*bench*"],
   "description": "Option type utility for functional programming in TypeScript",
