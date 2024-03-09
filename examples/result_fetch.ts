@@ -49,7 +49,7 @@ export namespace Native {
 // deno-lint-ignore no-namespace
 export namespace WithResult {
   const tryGetInfo = (fetch: () => Promise<InfoResponse>) =>
-    Result.fromPromise(
+    Result.from(
       fetch,
       "Unexpected error",
     );

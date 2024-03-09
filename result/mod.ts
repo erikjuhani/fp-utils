@@ -44,6 +44,31 @@
  */
 // deno-lint-ignore no-namespace
 export namespace Result {
+  /**
+   * Recursive type helper for the Option.from function return type. The type
+   * is recursively traversed to find the correct type depending on the given
+   * value. The recursion happens if the type is a function.
+   */
+  type From<T, TError> = T extends () => unknown
+    ? ReturnType<T> extends never ? Err<TError> : From<ReturnType<T>, TError>
+    : T extends undefined ? Ok<void>
+    : T extends Promise<never> ? Promise<Err<TError>>
+    : T extends Promise<unknown> ? Promise<Result<Awaited<T>, TError>>
+    : Result<T, TError>;
+
+  /**
+   * Type helper to determine if the value is a Promise.
+   */
+  function isPromise<T>(value: unknown): value is Promise<T> {
+    return isNonNullable(value) && typeof value === "object" && "then" in value;
+  }
+
+  /**
+   * Type helper to determine if the value is NonNullable.
+   */
+  function isNonNullable<T>(value: T): value is NonNullable<T> {
+    return value !== null && value !== undefined;
+  }
   /** {@link Result} */
   export interface Type<T, TError> {
     /**
@@ -607,84 +632,57 @@ export namespace Result {
   }
 
   /**
-   * Result.fromThrowable converts a throwing function `fn` into a Result using
-   * try catch. If error occurs the error is interpreted as Err<TError> otherwise
-   * returns Ok<T>.
+   * Result.from converts a value, a throwing function, or a promise to a
+   * Result type. A function is recursively evaluated until another value than
+   * function is returned. If the function throws `Err<TError>` will be
+   * returned.
+   *
+   * The `Err<TError>` return value can be controlled by the expected optional
+   * parameter. If the parameter is not given the function returns type
+   * `Result<T, unknown>`.
+   *
+   * When the function receives undefined value Ok<void> will be returned.
    *
    * @example
    * ```ts
-   * Result.fromThrowable(() => JSON.parse("")); // Evaluates to Err<any, unknown>
+   * Result.from(42); // Evaluates to Ok 42
    *
-   * type JSONWithProperty = { property: number };
+   * Result.from(undefined); // Evaluates to Ok void
    *
-   * Result.fromThrowable<JSONWithProperty, SyntaxError>(() => JSON.parse("")); // Evaluates to Err<SyntaxError>
+   * Result.from(Promise.resolve(42), "Rejected"); // Evaluates to Ok 42
    *
-   * Result.fromThrowable<JSONWithProperty, SyntaxError>(() => JSON.parse('{ "property": 42 }')); // Evaluates to Ok<JSONWithProperty>
+   * Result.from(Promise.resolve(), "Rejected"); // Evaluates to Promise Ok void
    *
-   * Result.fromThrowable(() => {
-   *   const json = JSON.parse('{ "prop": 42 }');
+   * Result.from(fetch("https://example.com"), "Rejected"); // Evaluates to Promise Result<Response, "Rejected">
    *
-   *   const isJSONWithProperty = (value: any): value is JSONWithProperty =>
-   *     "property" in value;
+   * Result.from(Promise.reject(), "Rejected"); // Evaluates to Promise Err "Rejected"
    *
-   *   if (isJSONWithProperty(json)) return json;
-   *
-   *   throw new Error(
-   *     `Wrong type of json, expected "property" field, got "${Object.keys(json)}"`,
-   *   );
-   * }); // Evaluates to type Result<JSONWithProperty, unknown>
+   * // Function that throws
+   * Result.from<R, SyntaxError>(() => JSON.parse(rawJson)); // Evaluates to Result<R, SyntaxError>
    * ```
    */
-  export function fromThrowable<T, TError>(
-    fn: () => T,
-  ): Result<T, TError> {
-    try {
-      return ok(fn());
-    } catch (e) {
-      return err(e);
+  export function from<T, TError = unknown>(
+    value: T | (() => T),
+    expected?: TError,
+  ): From<typeof value, TError> {
+    type Value = typeof value;
+
+    if (value instanceof Function) {
+      try {
+        return Result.from<T, TError>(value(), expected);
+      } catch (e) {
+        return Result.err(expected ? expected : e) as From<never, TError>;
+      }
     }
-  }
-
-  /**
-   * Result.fromPromise converts a promise into a Result. If the promise is
-   * rejected, it returns Err<TError>. Otherwise, it returns Ok<T>. Type `void` is
-   * returned if a resolved promise has a nullable value. Type `void` can be
-   * interpreted to have the same significance as the `unit` type. Unit type
-   * signifies the absence of a specific value and acts as a placeholder when no
-   * other value exits or is needed.
-   *
-   * @example
-   * ```ts
-   * Result.fromPromise(Promise.resolve(42), "Rejected"); // Evaluates to Ok 42
-   *
-   * Result.fromPromise(fetch("https://example.com"), "Rejected"); // Evaluates to Ok Response
-   *
-   * Result.fromPromise(Promise.resolve(), "Rejected"); // Evaluates to Ok void
-   *
-   * Result.fromPromise(Promise.reject(), "Rejected"); // Evaluates to Err "Rejected"
-   *
-   * Result.fromPromise(fetch("https://localhost:9999"), "Rejected"); // Evaluates to Err "Rejected"
-   * ```
-   */
-  export function fromPromise<T, TError>(
-    promise: Promise<T>,
-    onReject: TError,
-  ): Promise<Result<T, TError>>;
-  export function fromPromise<T, TError>(
-    asyncFn: () => Promise<T>,
-    onReject: TError,
-  ): Promise<Result<T, TError>>;
-  export function fromPromise<T, TError>(
-    promiseOrFn: Promise<T> | (() => Promise<T>),
-    onReject: TError,
-  ) {
-    const promise = typeof promiseOrFn === "function"
-      ? promiseOrFn()
-      : promiseOrFn;
-
-    const onRejected = () => err(onReject);
-
-    return promise.then(ok).catch(onRejected);
+    if (isPromise<T>(value)) {
+      return value.then(Result.ok<T>).catch((e) =>
+        expected ? Result.err(expected) : Result.err(e)
+      ) as From<
+        Value,
+        TError
+      >;
+    }
+    return Result.ok(value) as From<Value, TError>;
   }
 
   /**

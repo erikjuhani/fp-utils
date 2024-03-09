@@ -1,4 +1,4 @@
-import { std } from "dev_deps";
+import { std } from "../dev_deps.ts";
 import { Result } from "./mod.ts";
 
 const { assertThrows, assertEquals } = std.assert;
@@ -164,18 +164,6 @@ test("Result.match Err", () => {
   assertEquals(actual, "failed-error");
 });
 
-test("Result.fromThrowable when function does not throw return Ok<T>", () => {
-  const actual = Result.fromThrowable(() => 0);
-  assertEquals(actual, Result.ok(0));
-});
-
-test("Result.fromThrowable when function does throw return Err<T>", () => {
-  const actual = Result.fromThrowable(() => {
-    throw new Error("error");
-  });
-  assertEquals(actual, Result.err(new Error("error")));
-});
-
 test("Result.flatMap union Ok<void> | Ok<ConcreteType> | Err<string>", async () => {
   // deno-lint-ignore require-await
   const asyncGetUnionResult = async (flag: 0 | 1 | 2) => {
@@ -201,38 +189,31 @@ test("Result.flatMap union Ok<void> | Ok<ConcreteType> | Err<string>", async () 
   }));
 });
 
-test("Result.fromPromise", async () => {
-  type FromPromiseTableTests = [
-    Promise<unknown>,
-    Result<unknown, unknown>,
-  ][];
-
-  const tests: FromPromiseTableTests = [
+test("Result.from", async () => {
+  const tests: [unknown, Result<unknown, unknown>][] = [
     [Promise.resolve(0), Result.ok(0)],
     [Promise.resolve(), Result.ok()],
     [Promise.reject("rejected"), Result.err("error")],
     [Promise.reject(), Result.err("error")],
-  ];
-
-  for (const [input, expected] of tests) {
-    const actual = await Result.fromPromise(input, "error");
-    assertEquals(actual, expected);
-  }
-
-  type FromPromiseFnTableTests = [
-    () => Promise<unknown>,
-    Result<unknown, unknown>,
-  ][];
-
-  const testsFn: FromPromiseFnTableTests = [
     [() => Promise.resolve(0), Result.ok(0)],
     [() => Promise.resolve(), Result.ok()],
     [() => Promise.reject("error"), Result.err("error")],
     [() => Promise.reject(), Result.err("error")],
+    [0, Result.ok(0)],
+    [null, Result.ok(null)],
+    ["", Result.ok("")],
+    [undefined, Result.ok()],
+    [() => 0, Result.ok(0)],
+    [() => null, Result.ok(null)],
+    [() => {}, Result.ok()],
+    [() => () => 0, Result.ok(0)],
+    [() => {
+      throw Error("error");
+    }, Result.err("error")],
   ];
 
-  for (const [input, expected] of testsFn) {
-    const actual = await Result.fromPromise(input, "error");
+  for (const [input, expected] of tests) {
+    const actual = await Result.from(input, "error");
     assertEquals(actual, expected);
   }
 });

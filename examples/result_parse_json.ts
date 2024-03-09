@@ -62,7 +62,7 @@ export namespace Native {
 export namespace WithResult {
   export const parseJSON = <R extends Record<string, unknown>>(
     rawJson: string,
-  ) => Result.fromThrowable<R, SyntaxError>(() => JSON.parse(rawJson));
+  ) => Result.from<R, SyntaxError>(() => JSON.parse(rawJson));
 
   export const invalidJSON = () =>
     parseJSON("")
@@ -71,7 +71,7 @@ export namespace WithResult {
   export const invalidJSONContent = () =>
     parseJSON('{ "prop": 42 }')
       .flatMap((json) =>
-        Result.fromThrowable<JSONWithProperty, Error>(() => validateJSON(json))
+        Result.from<JSONWithProperty, Error>(() => validateJSON(json))
       )
       .mapErr((err) => err.message)
       .map(JSON.stringify);
@@ -79,7 +79,7 @@ export namespace WithResult {
   export const validJSONContent = () =>
     parseJSON('{ "property": 42 }')
       .flatMap((json) =>
-        Result.fromThrowable<JSONWithProperty, Error>(() => validateJSON(json))
+        Result.from<JSONWithProperty, Error>(() => validateJSON(json))
       )
       .mapErr((err) => err.message)
       .map(JSON.stringify);
