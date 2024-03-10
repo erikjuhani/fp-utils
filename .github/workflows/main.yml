@@ -1,0 +1,91 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    outputs:
+      option: ${{ steps.module.outputs.option }}
+      result: ${{ steps.module.outputs.result }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: module
+        with:
+          filters: |
+            option:
+              - 'option/deno.json'
+            result:
+              - 'result/deno.json'
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Check formatting
+        run: deno fmt --check
+
+      - name: Run linter
+        run: deno lint
+
+      - name: Run tests
+        run: deno task test
+
+  release_option:
+    needs: verify
+    if: ${{ needs.verify.outputs.option == 'true' }}
+    outputs:
+      release: ${{ steps.release.outputs.release }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for version changes 
+        id: release
+        run: git diff 'deno.json' | grep -q '+  "version":' && echo 'release=true' || echo 'release=false' >> $GITHUB_OUTPUT
+        working-directory: option
+
+  release_result:
+    needs: verify
+    if: ${{ needs.verify.outputs.result == 'true' }}
+    outputs:
+      release: ${{ steps.release.outputs.release }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for version changes 
+        id: release
+        run: git diff 'deno.json' | grep -q '+  "version":' && echo 'release=true' || echo 'release=false' >> $GITHUB_OUTPUT
+        working-directory: result
+
+  publish_option:
+    needs: release_option
+    if: ${{ needs.release_option.outputs.release == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # The OIDC ID token is used for authentication with JSR.
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish @fp-utils/option to jsr.io
+        working-directory: option
+        run: npx jsr publish
+
+  publish_result:
+    needs: release_result
+    if: ${{ needs.release_result.outputs.release == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # The OIDC ID token is used for authentication with JSR.
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish @fp-utils/result to jsr.io
+        working-directory: result
+        run: npx jsr publish
