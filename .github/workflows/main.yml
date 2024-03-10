@@ -64,7 +64,8 @@ jobs:
         run: git diff 'deno.json' | grep -q '+  "version":' && echo 'release=true' || echo 'release=false' >> $GITHUB_OUTPUT
         working-directory: result
 
-  publish_option:
+
+  publish_option_npm:
     needs: release_option
     if: ${{ needs.release_option.outputs.release == 'true' }}
     runs-on: ubuntu-latest
@@ -73,11 +74,59 @@ jobs:
       id-token: write # The OIDC ID token is used for authentication with JSR.
     steps:
       - uses: actions/checkout@v4
-      - name: Publish @fp-utils/option to jsr.io
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - name: Build @fp-utils/option npm package
+        run: deno task build --mod option
+      - name: Publish @fp-utils/option to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: option
         run: npx jsr publish
 
-  publish_result:
+  publish_option_jsr:
+    needs: release_option
+    if: ${{ needs.release_option.outputs.release == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # The OIDC ID token is used for authentication with JSR.
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish @fp-utils/option to jsr
+        working-directory: option
+        run: npx jsr publish
+
+  publish_result_npm:
+    needs: release_result
+    if: ${{ needs.release_option.outputs.release == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # The OIDC ID token is used for authentication with JSR.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - name: Build @fp-utils/result npm package
+        run: deno task build --mod result
+      - name: Publish @fp-utils/result to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: result
+        run: npx jsr publish
+
+  publish_result_jsr:
     needs: release_result
     if: ${{ needs.release_result.outputs.release == 'true' }}
     runs-on: ubuntu-latest
@@ -86,6 +135,6 @@ jobs:
       id-token: write # The OIDC ID token is used for authentication with JSR.
     steps:
       - uses: actions/checkout@v4
-      - name: Publish @fp-utils/result to jsr.io
+      - name: Publish @fp-utils/result to jsr
         working-directory: result
         run: npx jsr publish
