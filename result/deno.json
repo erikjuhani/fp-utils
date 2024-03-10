@@ -2,7 +2,9 @@
   "name": "@fp-utils/result",
   "version": "0.8.0",
   "exports": "./mod.ts",
-  "exclude": ["*test*", "*bench*"],
+  "publish": {
+    "exclude": ["*test*", "*bench*"]
+  },
   "description": "Result type utility for functional programming in TypeScript",
   "keywords": [
     "typescript",
