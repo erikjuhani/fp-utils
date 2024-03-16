@@ -48,11 +48,13 @@ export namespace Option {
    * is recursively traversed to find the correct type depending on the given
    * value. The recursion happens if the type is a function.
    */
-  type From<T> = T extends () => unknown ? From<ReturnType<T>>
-    : T extends null | undefined ? None
-    : T extends Promise<never | undefined | null> ? Promise<None>
-    : T extends Promise<unknown> ? Promise<Option<Awaited<T>>>
-    : Some<T>;
+
+  type From<T> = T extends () => unknown
+    ? ReturnType<T> extends never ? None : From<ReturnType<T>>
+    : T extends undefined ? never
+    : T extends Promise<never> ? Promise<None>
+    : T extends Promise<unknown> ? Promise<From<Awaited<T>>>
+    : Option<T>;
 
   /**
    * Type helper to determine if the value is a Promise.
