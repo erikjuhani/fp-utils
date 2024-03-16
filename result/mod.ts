@@ -51,7 +51,7 @@ export namespace Result {
    */
   type From<T, TError> = T extends () => unknown
     ? ReturnType<T> extends never ? Err<TError> : From<ReturnType<T>, TError>
-    : T extends undefined ? Ok<void>
+    : T extends undefined ? Result<undefined, TError>
     : T extends Promise<never> ? Promise<Err<TError>>
     : T extends Promise<unknown> ? Promise<Result<Awaited<T>, TError>>
     : Result<T, TError>;
@@ -94,9 +94,7 @@ export namespace Result {
      *   .flatMap(tryParse); // Evaluates to Err "error"
      * ```
      */
-    flatMap<U, UError>(
-      fn: (value: T) => Result<U, UError>,
-    ): Result<U, UError>;
+    flatMap<U, UError>(fn: (value: T) => Result<U, UError>): Result<U, UError>;
 
     /**
      * Result.inspect calls the provided function `fn` with a reference to the
@@ -178,10 +176,6 @@ export namespace Result {
     match<U1, U2>(
       onOk: (value: T) => U1,
       onErr: (value: TError) => U2,
-    ): this extends Ok<T> ? U1 : U2;
-    match<U1, U2>(
-      onOk: (value: T) => U1,
-      onErr: (value: TError) => U2,
     ): U1 | U2;
 
     /**
@@ -234,7 +228,7 @@ export namespace Result {
      * Result.err(42).isOk(); // Evaluates to false
      * ```
      */
-    isOk<T>(): this is Ok<T>;
+    isOk<U extends T>(): this is Ok<U>;
 
     /**
      * Result.isErr returns `true` if the result is `Err`.
@@ -246,7 +240,7 @@ export namespace Result {
      * Result.err(42).isErr(); // Evaluates to true
      * ```
      */
-    isErr<TError>(): this is Err<TError>;
+    isErr(): this is Err<TError>;
   }
 
   /**
@@ -565,7 +559,7 @@ export namespace Result {
      * Result.err(42).isOk(); // Evaluates to false
      * ```
      */
-    isOk(): this is Ok<never> {
+    isOk<T>(): this is Ok<T> {
       return false;
     }
 
@@ -863,7 +857,7 @@ export namespace Result {
   export function flatMap<T, TError, U, UError>(
     fn: (value: T) => Ok<U> | Err<UError>,
   ): (result: Result<T, TError>) => Result<U, UError> {
-    return (result: Result<T, TError>): Result<U, UError> => result.flatMap(fn);
+    return (result) => result.flatMap(fn);
   }
 
   /**

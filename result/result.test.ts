@@ -180,7 +180,6 @@ test("Result.flatMap union Ok<undefined> | Ok<ConcreteType> | Err<string>", asyn
   await Promise.all(tests.map(async ([input, expected]) => {
     const actual = await asyncGetUnionResult(input).then(
       Result.flatMap((value) => {
-        // TODO: expectType<number | void>(value);
         if (value) return Result.ok();
         else return Result.err("Got unit value");
       }),
