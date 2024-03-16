@@ -95,7 +95,7 @@ export namespace Option {
      *   .flatMap(tryParse); // Evaluates to None
      * ```
      */
-    flatMap<U>(fn: (value: T) => Option<U>): Option<U>;
+    flatMap<U extends Option<unknown>>(fn: (value: T) => U): U;
 
     /**
      * Option.inspect calls the provided function `fn` with a reference to the
@@ -110,7 +110,7 @@ export namespace Option {
      *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
      * ```
      */
-    inspect(fn: (value: T) => void): Option<T>;
+    inspect(fn: (value: T) => void): this;
 
     /**
      * Option.map applies a function `fn` to option value `T` and transforms it
@@ -157,7 +157,7 @@ export namespace Option {
      * Option.none().unwrap(); // Throws an exception!
      * ```
      */
-    unwrap(): T;
+    unwrap<U extends T>(): T | U;
 
     /**
      * Option.unwrapOr returns the value `T` from the associated option or
@@ -183,7 +183,7 @@ export namespace Option {
      * Option.some(42).isSome(); // Evaluates to true
      * ```
      */
-    isSome<T>(): this is Some<T>;
+    isSome<U extends T>(): this is Some<U>;
 
     /**
      * Option.isNone returns `true` if the option is `None`
@@ -230,8 +230,7 @@ export namespace Option {
      *   .flatMap(tryParse); // Evaluates to None
      * ```
      */
-    flatMap<U>(fn: (value: T) => Option<U>): Some<U>;
-    flatMap<U>(fn: (value: T) => Option<U>) {
+    flatMap<U extends Option<unknown>>(fn: (value: T) => U): U {
       return fn(this.value);
     }
 
@@ -274,11 +273,7 @@ export namespace Option {
      *   .match((x) => x * 2, () => 99); // Evaluates to 84
      * ```
      */
-    match<U1, U2>(
-      onSome: (value: T) => U1,
-      _onNone: () => U2,
-    ): this extends Some<T> ? U1 : U2;
-    match<U1, U2>(onSome: (value: T) => U1, _onNone: () => U2) {
+    match<U1, U2>(onSome: (value: T) => U1, _onNone: () => U2): U1 {
       return onSome(this.value);
     }
 
@@ -352,8 +347,9 @@ export namespace Option {
      *   .flatMap(tryParse); // Evaluates to None
      * ```
      */
-    flatMap<U>(_fn: (value: never) => Option<U>): this {
-      return this;
+    flatMap<U extends Option<unknown>>(_fn: (value: never) => U): U {
+      // Hacky fix to make type inference behave as expected
+      return this as unknown as U;
     }
 
     /**
@@ -584,10 +580,15 @@ export namespace Option {
    *   .inspect((x) => console.log(x * 2)); // Evaluates to 84
    * ```
    */
-  export function inspect<T>(
-    fn: (value: T) => void,
-  ): (option: Option<T>) => Option<T> {
-    return (option) => option.inspect(fn);
+  // Any is used to make type inference work
+  // deno-lint-ignore no-explicit-any
+  export function inspect<T extends Option<any>>(
+    fn: (value: T extends Option<infer U> ? U : never) => void,
+  ): (option: T) => T {
+    return (option) =>
+      option.inspect(
+        fn as (value: T extends Option<infer U> ? U : never) => void,
+      );
   }
 
   /**
@@ -641,10 +642,11 @@ export namespace Option {
    *   .flatMap(tryParse); // Evaluates to None
    * ```
    */
-  export function flatMap<T, U>(
-    fn: (value: T) => Some<U> | None,
-  ): (option: Option<T>) => Option<U> {
-    return (option: Option<T>) => option.flatMap(fn);
+  export function flatMap<T, U extends Option<unknown>>(
+    fn: (value: T) => U,
+  ): (option: Option<T>) => Option<U extends Option<infer Z> ? Z : never> {
+    return (option) =>
+      option.flatMap(fn) as Option<U extends Option<infer Z> ? Z : never>;
   }
 
   /**
