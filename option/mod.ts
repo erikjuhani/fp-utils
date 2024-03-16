@@ -202,10 +202,10 @@ export namespace Option {
    * Some represents the presence of a value `T` contained in the option.
    */
   export class Some<T> implements Option<T> {
-    private value: T;
+    private value: NonNullable<T>;
 
     constructor(value: T) {
-      if (value === null || value === undefined) {
+      if (!isNonNullable(value)) {
         throw Error("Trying to pass nullable value to Some");
       }
       this.value = value;
@@ -260,7 +260,7 @@ export namespace Option {
      *   .map((x) => x * 2); // Evaluates to Some 84
      * ```
      */
-    map<U>(fn: (value: T) => NonNullable<U>): Option<U> {
+    map<U>(fn: (value: T) => NonNullable<U>): Option<NonNullable<U>> {
       return some(fn(this.value));
     }
 
@@ -458,7 +458,7 @@ export namespace Option {
    * Option.some(42); // Evaluates to Some 42
    * ```
    */
-  export function some<T>(value: NonNullable<T>): Some<T> {
+  export function some<T>(value: NonNullable<T>): Some<NonNullable<T>> {
     return new Some(value);
   }
 
