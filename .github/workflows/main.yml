@@ -32,6 +32,9 @@ jobs:
       - name: Check formatting
         run: deno fmt --check
 
+      - name: Run type checker
+        run: deno task check
+
       - name: Run linter
         run: deno lint
 

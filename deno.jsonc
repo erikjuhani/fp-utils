@@ -2,6 +2,7 @@
   "tasks": {
     "build": "deno run --allow-run --allow-write --allow-env --allow-read ./build_npm.ts",
     "test": "deno test --allow-env --allow-read",
+    "check": "deno check ./option/mod.ts ./option/option_test_types.ts ./result/mod.ts ./result/result_test_types.ts",
     "coverage": "deno task test --coverage=.coverage && deno coverage .coverage && rm -r .coverage",
     "bench": "deno bench --allow-env --allow-read"
   },
