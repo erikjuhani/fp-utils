@@ -164,7 +164,7 @@ test("Result.match Err", () => {
   assertEquals(actual, "failed-error");
 });
 
-test("Result.flatMap union Ok<void> | Ok<ConcreteType> | Err<string>", async () => {
+test("Result.flatMap union Ok<undefined> | Ok<ConcreteType> | Err<string>", async () => {
   // deno-lint-ignore require-await
   const asyncGetUnionResult = async (flag: 0 | 1 | 2) => {
     if (flag === 1) return Result.ok();

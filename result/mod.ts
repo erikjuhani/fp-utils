@@ -577,15 +577,15 @@ export namespace Result {
      * Result.err(42).isErr(); // Evaluates to true
      * ```
      */
-    isErr<T>(): this is Err<T> {
+    isErr(): this is Err<T> {
       return true;
     }
   }
 
   /**
    * Result.ok creates a result Ok with value `T`. If called without arguments
-   * Ok<void> is returned. Type `void` can be interpreted to have the same
-   * significance as the `unit` type. Unit type signifies the absence of a
+   * Ok<undefined> is returned. Type `undefined` can be interpreted to have the
+   * same significance as the `unit` type. Unit type signifies the absence of a
    * specific value and acts as a placeholder when no other value exits or is
    * needed.
    *
@@ -596,21 +596,20 @@ export namespace Result {
    *
    * Result.ok(42); // Evaluates to Ok 42
    *
-   * Result.ok(); // Evaluates to Ok void
+   * Result.ok(); // Evaluates to Ok undefined
    *
    * Result.ok(null); // Evaluates to Ok null
    * ```
    */
-  export function ok(): Ok<void>;
+  export function ok(): Ok<undefined>;
   export function ok<T>(value: T): Ok<T>;
-  export function ok<T>(value?: T): Ok<T> | Ok<void> {
-    if (value === undefined) return new Ok<void>(undefined);
-    else return new Ok(value);
+  export function ok<T>(value?: T): Ok<T> | Ok<undefined> {
+    return value !== undefined ? new Ok(value) : new Ok<undefined>(undefined);
   }
 
   /**
-   * Result.err creates a result Err with error value `T`. Type `void` can be
-   * interpreted to have the same significance as the `unit` type. Unit type
+   * Result.err creates a result Err with error value `T`. Type `undefined` can
+   * be interpreted to have the same significance as the `unit` type. Unit type
    * signifies the absence of a specific value and acts as a placeholder when no
    * other value exits or is needed.
    *
@@ -619,15 +618,15 @@ export namespace Result {
    *
    * Result.err(42); // Evaluates to Err 42
    *
-   * Result.err(); // Evaluates to Err void
+   * Result.err(); // Evaluates to Err undefined
    *
    * Result.err(null); // Evaluates to Err null
    * ```
    */
-  export function err(): Err<void>;
+  export function err(): Err<undefined>;
   export function err<T>(value: T): Err<T>;
-  export function err<T>(value?: T): Err<T> | Err<void> {
-    if (value === undefined) return new Err<void>(undefined);
+  export function err<T>(value?: T): Err<T> | Err<undefined> {
+    if (value === undefined) return new Err<undefined>(undefined);
     return new Err(value);
   }
 
@@ -641,17 +640,17 @@ export namespace Result {
    * parameter. If the parameter is not given the function returns type
    * `Result<T, unknown>`.
    *
-   * When the function receives undefined value Ok<void> will be returned.
+   * When the function receives undefined value Ok<undefined> will be returned.
    *
    * @example
    * ```ts
    * Result.from(42); // Evaluates to Ok 42
    *
-   * Result.from(undefined); // Evaluates to Ok void
+   * Result.from(undefined); // Evaluates to Ok undefined
    *
    * Result.from(Promise.resolve(42), "Rejected"); // Evaluates to Ok 42
    *
-   * Result.from(Promise.resolve(), "Rejected"); // Evaluates to Promise Ok void
+   * Result.from(Promise.resolve(), "Rejected"); // Evaluates to Promise Ok undefined
    *
    * Result.from(fetch("https://example.com"), "Rejected"); // Evaluates to Promise Result<Response, "Rejected">
    *
