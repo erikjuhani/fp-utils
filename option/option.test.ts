@@ -115,6 +115,30 @@ test("Option.flatMap example", () => {
   });
 });
 
+test("Option.flatMap union Some<string> | Some<number> | None", async () => {
+  // deno-lint-ignore require-await
+  const asyncGetUnionOption = async (flag: 0 | 1 | 2) => {
+    if (flag === 1) return Option.some("1");
+    return flag === 2 ? Option.some(42) : Option.none();
+  };
+
+  const tests: [flag: 0 | 1 | 2, expected: Option<string | number>][] = [
+    [0, Option.none()],
+    [1, Option.some("1")],
+    [2, Option.some(42)],
+  ];
+
+  await Promise.all(tests.map(async ([input, expected]) => {
+    const actual = await asyncGetUnionOption(input).then(
+      Option.flatMap((value) => {
+        if (value) return Option.some(value);
+        else return Option.none();
+      }),
+    );
+    assertEquals(actual, expected);
+  }));
+});
+
 test("Option.match Some", () => {
   const actual = Option.match((some) => `${some}`, () => "No value")(
     Option.some(0),
