@@ -1,3 +1,16 @@
+## 0.9.0
+
+BREAKING CHANGES:
+
+- [Use undefined instead of void as the unit type for Result](https://github.com/erikjuhani/fp-utils/commit/622ce74ef7d81d4fa7d7cbc2326683707d0500f8)
+
+CHANGES:
+
+- [Improve return type correctness for Option.from function](https://github.com/erikjuhani/fp-utils/commit/bf1aa6bddb5ad8ef7e557314e4d6c309484449d4)
+- [Make the value in Some explicitly of type NonNullable](https://github.com/erikjuhani/fp-utils/commit/d7e81fc315208d3d2f24b4cccbf591eaa93b30a9)
+- [Improve type inference for Option type](https://github.com/erikjuhani/fp-utils/commit/d7299901c2be5d8938bb7ac0c0b97eb44db29690)
+- [Improve type inference for Result type](https://github.com/erikjuhani/fp-utils/commit/b1db0bd740f02c355d6c0d5adc5df0112eba608b)
+
 ## 0.8.0
 
 BREAKING CHANGES:
