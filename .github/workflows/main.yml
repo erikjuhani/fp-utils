@@ -89,8 +89,8 @@ jobs:
       - name: Publish @fp-utils/option to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: option
-        run: npx jsr publish
+        working-directory: option/dist
+        run: npm publish
 
   publish_option_jsr:
     needs: release_option
@@ -126,8 +126,8 @@ jobs:
       - name: Publish @fp-utils/result to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: result
-        run: npx jsr publish
+        working-directory: result/dist
+        run: npm publish
 
   publish_result_jsr:
     needs: release_result
