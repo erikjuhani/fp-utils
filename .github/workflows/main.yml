@@ -64,7 +64,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check for version changes 
         id: release
-        run: git diff 'deno.json' | grep -q '+  "version":' && echo 'release=true' || echo 'release=false' >> $GITHUB_OUTPUT
+        run: git diff 'deno.json' | grep -q '+  "version":' && echo 'release=true' || echo 'release=false' >> $GITHUB_OUTPUT
         working-directory: result
 
 
