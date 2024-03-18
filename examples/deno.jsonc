@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@fp-utils/option": "../option/mod.ts",
+    "@fp-utils/result": "../result/mod.ts",
+    "@oxi/result": "jsr:@oxi/result@^0.2.0"
+  }
+}
