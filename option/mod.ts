@@ -663,10 +663,12 @@ export namespace Option {
    *   .match((x) => x * 2, () => 99); // Evaluates to 84
    * ```
    */
-  export function match<T, U1, U2>(
-    onSome: (value: T) => U1,
+  export function match<T, U1, U2, TOption>(
+    onSome: (
+      value: TOption extends Option<infer U> ? U : never,
+    ) => U1,
     onNone: () => U2,
-  ): (option: Option<T>) => U1 | U2;
+  ): (result: TOption) => U1 | U2;
   export function match<T, U1, U2>(
     onSome: (value: T) => U1,
     onNone: () => U2,

@@ -122,6 +122,25 @@ import { assertType, IsExact } from "../dev_deps.ts";
   >(true);
 });
 
+// Option.match higher order takes union type
+(async () => {
+  async function unionTypePromise(n: number = 1) {
+    if (n === 3) return Option.none();
+    if (n === 2) return Option.some({ number: 2 });
+    if (n === 1) return Option.some("42");
+    return Option.from(42);
+  }
+
+  await unionTypePromise().then(Option.match((value) => {
+    assertType<IsExact<typeof value, "42" | number | { number: number }>>(
+      true,
+    );
+    return value;
+  }, () => {
+    throw Error();
+  }));
+});
+
 // Option.from - union input type with undefined and union return type
 (() => {
   const fromUnionToOption = Option.from(
