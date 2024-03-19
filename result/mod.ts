@@ -45,7 +45,7 @@
 // deno-lint-ignore no-namespace
 export namespace Result {
   /**
-   * Recursive type helper for the Option.from function return type. The type
+   * Recursive type helper for the Result.from function return type. The type
    * is recursively traversed to find the correct type depending on the given
    * value. The recursion happens if the type is a function.
    */
