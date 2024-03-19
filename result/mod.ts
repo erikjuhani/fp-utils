@@ -874,10 +874,14 @@ export namespace Result {
    *   .match((ok) => ok * 2, (err) => err + 10); // Evaluates to 52
    * ```
    */
-  export function match<T, TError, U1, U2>(
-    onOk: (value: T) => U1,
-    onErr: (value: TError) => U2,
-  ): (result: Result<T, TError>) => U1 | U2;
+  export function match<T, TError, U1, U2, TResult>(
+    onOk: (
+      value: TResult extends Result<infer U, infer _> ? U : never,
+    ) => U1,
+    onErr: (
+      value: TResult extends Result<infer _, infer U> ? U : never,
+    ) => U2,
+  ): (result: TResult) => U1 | U2;
   export function match<T, TError, U1, U2>(
     onOk: (value: T) => U1,
     onErr: (value: TError) => U2,

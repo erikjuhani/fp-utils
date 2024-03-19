@@ -138,6 +138,25 @@ import { assertType, IsExact } from "../dev_deps.ts";
   );
 });
 
+// Result.match higher order takes union type
+(async () => {
+  // deno-lint-ignore require-await
+  async function unionTypePromise(n: number = 1) {
+    if (n === 3) return Result.err(100);
+    if (n === 2) return Result.ok();
+    if (n === 1) return Result.ok("42");
+    return Result.from(42, "Unexpected error");
+  }
+
+  await unionTypePromise().then(Result.match((value) => {
+    assertType<IsExact<typeof value, string | number | undefined>>(true);
+    return value;
+  }, (err) => {
+    assertType<IsExact<typeof err, string | number>>(true);
+    throw Error(String(err));
+  }));
+});
+
 // Result.from - throwing function
 (() => {
   const thrownResult = Result.from(() => {
@@ -205,5 +224,3 @@ import { assertType, IsExact } from "../dev_deps.ts";
       ),
     );
 });
-
-type T = IsExact<void, undefined>;

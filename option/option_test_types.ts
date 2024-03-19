@@ -124,6 +124,7 @@ import { assertType, IsExact } from "../dev_deps.ts";
 
 // Option.match higher order takes union type
 (async () => {
+  // deno-lint-ignore require-await
   async function unionTypePromise(n: number = 1) {
     if (n === 3) return Option.none();
     if (n === 2) return Option.some({ number: 2 });
