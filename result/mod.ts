@@ -631,8 +631,8 @@ export namespace Result {
    * returned.
    *
    * The `Err<TError>` return value can be controlled by the expected optional
-   * parameter. If the parameter is not given the function returns type
-   * `Result<T, unknown>`.
+   * parameter and if given a map function the error value can be mapped. If the
+   * parameter is not given the function returns type `Result<T, unknown>`.
    *
    * When the function receives undefined value Ok<undefined> will be returned.
    *
@@ -650,13 +650,14 @@ export namespace Result {
    *
    * Result.from(Promise.reject(), "Rejected"); // Evaluates to Promise Err "Rejected"
    *
-   * // Function that throws
    * Result.from<R, SyntaxError>(() => JSON.parse(rawJson)); // Evaluates to Result<R, SyntaxError>
+   *
+   * Result.from(() => JSON.parse(rawJson) as ReturnValue, (err: SyntaxError) => err.message); // Evaluates to Result<ReturnValue, string>
    * ```
    */
-  export function from<T, TError = unknown>(
+  export function from<T, TError = unknown, UError = unknown>(
     value: T | (() => T),
-    expected?: TError,
+    expected?: TError | ((value: TError) => UError),
   ): From<typeof value, TError> {
     type Value = typeof value;
 
