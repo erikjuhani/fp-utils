@@ -144,6 +144,25 @@ export namespace Result {
     map<U>(fn: (value: T) => U): Result<U, TError>;
 
     /**
+     * Result.filter returns a boolean that is evaluated with the given
+     * `predicate` function which is applied on the result value `T`. Err
+     * evaluates to `false`.
+     *
+     * @example
+     * ```ts
+     * Result.err(10)
+     *   .filter((x) => x >= 5); // evaluates to false
+     *
+     * Result.ok(2)
+     *   .filter((x) => x >= 5); // evaluates to false
+     *
+     * Result.ok(42)
+     *   .filter((x) => x >= 5); // evaluates to true
+     * ```
+     */
+    filter(predicate: (value: T) => boolean): boolean;
+
+    /**
      * Result.mapErr applies a function `fn` to result error value `TError` and
      * transforms it into value `U`.
      *
@@ -321,6 +340,23 @@ export namespace Result {
     }
 
     /**
+     * Ok.filter returns a boolean that is evaluated with the given
+     * `predicate` function which is applied on the result value `T`.
+     *
+     * @example
+     * ```ts
+     * Result.ok(2)
+     *   .filter((x) => x >= 5); // evaluates to false
+     *
+     * Result.ok(42)
+     *   .filter((x) => x >= 5); // evaluates to true
+     * ```
+     */
+    filter(predicate: (value: T) => boolean): boolean {
+      return predicate(this.value);
+    }
+
+    /**
      * Ok.mapErr performs no calculations and returns Ok<T>.
      *
      * @example
@@ -485,6 +521,19 @@ export namespace Result {
      */
     map<U>(_fn: (value: never) => U): this {
       return this;
+    }
+
+    /**
+     * Err.filter evaluates to `false`.
+     *
+     * @example
+     * ```ts
+     * Result.err(10)
+     *   .filter((x) => x >= 5); // evaluates to false
+     * ```
+     */
+    filter(_predicate: (value: never) => boolean): false {
+      return false;
     }
 
     /**
@@ -748,6 +797,29 @@ export namespace Result {
     fn: (value: T) => U,
   ): (result: Result<T, TError>) => Result<U, TError> {
     return (result) => result.map(fn);
+  }
+
+  /**
+   * Result.filter returns a boolean that is evaluated with the given
+   * `predicate` function which is applied on the result value `T`. Err
+   * evaluates to `false`.
+   *
+   * @example
+   * ```ts
+   * Result.err(10)
+   *   .filter((x) => x >= 5); // evaluates to false
+   *
+   * Result.ok(2)
+   *   .filter((x) => x >= 5); // evaluates to false
+   *
+   * Result.ok(42)
+   *   .filter((x) => x >= 5); // evaluates to true
+   * ```
+   */
+  export function filter<T, TError>(
+    predicate: (value: T) => boolean,
+  ): (result: Result<T, TError>) => boolean {
+    return (result) => result.filter(predicate);
   }
 
   /**

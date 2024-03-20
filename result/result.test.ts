@@ -102,6 +102,20 @@ test("Result.map on Err does not execute", () => {
   assertEquals(actual, Result.err(0));
 });
 
+test("Result.from", () => {
+  const predicate = (x: number) => x >= 5;
+  const tests: [Result<number, unknown>, boolean][] = [
+    [Result.err(10), false],
+    [Result.ok(2), false],
+    [Result.ok(42), true],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = Result.filter(predicate)(input);
+    assertEquals(actual, expected);
+  }
+});
+
 test("Result.mapErr", () => {
   const mapSpy = mock.spy((value: number) => value + 1);
   const actual = Result.mapErr(mapSpy)(Result.err(0));

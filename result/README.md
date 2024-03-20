@@ -127,6 +127,29 @@ Result.ok(42)
 
 </details>
 
+### `Result.filter`
+
+Signature: `(predicate: (value: T) => boolean): boolean`
+
+Result.filter returns a boolean that is evaluated with the given `predicate`
+function which is applied on the result value `T`. Err evaluates to `false`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Result.err(10)
+  .filter((x) => x >= 5); // evaluates to false
+
+Result.ok(2)
+  .filter((x) => x >= 5); // evaluates to false
+
+Result.ok(42)
+  .filter((x) => x >= 5); // evaluates to true
+```
+
+</details>
+
 ### `Result.mapErr`
 
 Signature: `<U>(fn: (value: TError) => U): Result<U, TError>`
