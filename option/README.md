@@ -105,6 +105,29 @@ Option.some(42)
 
 </details>
 
+### `Option.filter`
+
+Signature: `(predicate: (value: T) => boolean): boolean`
+
+Option.filter returns a boolean that is evaluated with the given `predicate`
+function which is applied on the option value `T`. None evaluates to `false`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option.none()
+  .filter((x) => x >= 5); // evaluates to false
+
+Option.some(2)
+  .filter((x) => x >= 5); // evaluates to false
+
+Option.some(42)
+  .filter((x) => x >= 5); // evaluates to true
+```
+
+</details>
+
 ### `Option.match`
 
 Signature: `<U1, U2>(onSome: (value: T) => U1, onNone: () => U2): U1 | U2`

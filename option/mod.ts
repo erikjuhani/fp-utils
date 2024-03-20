@@ -128,6 +128,25 @@ export namespace Option {
     map<U>(fn: (value: T) => U): Option<U>;
 
     /**
+     * Option.filter returns a boolean that is evaluated with the given
+     * `predicate` function which is applied on the option value `T`. None
+     * evaluates to `false`.
+     *
+     * @example
+     * ```ts
+     * Option.none()
+     *   .filter((x) => x >= 5); // evaluates to false
+     *
+     * Option.some(2)
+     *   .filter((x) => x >= 5); // evaluates to false
+     *
+     * Option.some(42)
+     *   .filter((x) => x >= 5); // evaluates to true
+     * ```
+     */
+    filter(predicate: (value: T) => boolean): boolean;
+
+    /**
      * Option.match transforms the option value `T` into `U1` using `onSome`
      * and then returns `U1`. If the option is None, `onNone` is called and `U2`
      * returned.
@@ -264,6 +283,23 @@ export namespace Option {
     }
 
     /**
+     * Some.filter returns a boolean that is evaluated with the given
+     * `predicate` function which is applied on the option value `T`.
+     *
+     * @example
+     * ```ts
+     * Option.some(2)
+     *   .filter((x) => x >= 5); // evaluates to false
+     *
+     * Option.some(42)
+     *   .filter((x) => x >= 5); // evaluates to true
+     * ```
+     */
+    filter(predicate: (value: T) => boolean): boolean {
+      return predicate(this.value);
+    }
+
+    /**
      * Option.match transforms the option value `T` into `U1` using `onSome` and
      * then returns `U1`.
      *
@@ -376,6 +412,19 @@ export namespace Option {
      */
     map<U>(_fn: (value: never) => NonNullable<U>): this {
       return this;
+    }
+
+    /**
+     * None.filter returns false.
+     *
+     * @example
+     * ```ts
+     * Option.none()
+     *   .filter((x) => x >= 5); // evaluates to false
+     * ```
+     */
+    filter(_predicate: (value: never) => boolean): false {
+      return false;
     }
 
     /**
@@ -565,6 +614,29 @@ export namespace Option {
     fn: (value: T) => U,
   ): (option: Option<T>) => Option<U> {
     return (option) => option.map(fn);
+  }
+
+  /**
+   * Option.filter returns a boolean that is evaluated with the given
+   * `predicate` function which is applied on the option value `T`. None
+   * evaluates to `false`.
+   *
+   * @example
+   * ```ts
+   * Option.none()
+   *   .filter((x) => x >= 5); // evaluates to false
+   *
+   * Option.some(2)
+   *   .filter((x) => x >= 5); // evaluates to false
+   *
+   * Option.some(42)
+   *   .filter((x) => x >= 5); // evaluates to true
+   * ```
+   */
+  export function filter<T>(
+    predicate: (value: T) => boolean,
+  ): (option: Option<T>) => boolean {
+    return (option) => option.filter(predicate);
   }
 
   /**

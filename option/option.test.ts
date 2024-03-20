@@ -74,6 +74,20 @@ test("Option.map", () => {
   assertEquals(actual, Option.some(1));
 });
 
+test("Option.filter", () => {
+  const predicate = (x: number) => x >= 5;
+  const tests: [input: Option<number>, expected: boolean][] = [
+    [Option.none(), false],
+    [Option.some(2), false],
+    [Option.some(42), true],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = Option.filter(predicate)(input);
+    assertEquals(actual, expected);
+  }
+});
+
 test("Option.map on None does not execute", () => {
   const mapSpy = mock.spy((value: number) => value + 1);
   const actual = Option.map(mapSpy)(Option.none());
