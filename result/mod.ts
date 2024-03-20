@@ -655,23 +655,28 @@ export namespace Result {
    * Result.from(() => JSON.parse(rawJson) as ReturnValue, (err: SyntaxError) => err.message); // Evaluates to Result<ReturnValue, string>
    * ```
    */
-  export function from<T, TError = unknown, UError = unknown>(
+  export function from<T, TError = unknown>(
     value: T | (() => T),
-    expected?: TError | ((value: TError) => UError),
+    // deno-lint-ignore no-explicit-any
+    expected?: TError | ((value: any) => TError),
   ): From<typeof value, TError> {
     type Value = typeof value;
 
     if (value instanceof Function) {
       try {
-        return Result.from<T, TError>(value(), expected);
+        return Result.from(value(), expected);
       } catch (e) {
+        if (expected instanceof Function) {
+          return Result.err(expected(e)) as From<never, TError>;
+        }
         return Result.err(expected ? expected : e) as From<never, TError>;
       }
     }
     if (isPromise<T>(value)) {
-      return value.then(Result.ok<T>).catch((e) =>
-        expected ? Result.err(expected) : Result.err(e)
-      ) as From<
+      return value.then(Result.ok<T>).catch((e) => {
+        if (expected instanceof Function) return Result.err(expected(e));
+        else return expected ? Result.err(expected) : Result.err(e);
+      }) as From<
         Value,
         TError
       >;
