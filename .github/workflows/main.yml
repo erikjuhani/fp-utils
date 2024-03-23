@@ -43,7 +43,7 @@ jobs:
 
   release_option:
     needs: verify
-    # if: ${{ needs.verify.outputs.option == 'true' }}
+    if: ${{ needs.verify.outputs.option == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       option_release: ${{ steps.should_run.outputs.option_release }}
@@ -98,7 +98,7 @@ jobs:
         with:
           deno-version: v1.x
       - name: Build @fp-utils/option npm package
-        run: deno task build --mod option
+        run: deno task build --allow-net --mod option
       - name: Publish @fp-utils/option to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -135,7 +135,7 @@ jobs:
         with:
           deno-version: v1.x
       - name: Build @fp-utils/result npm package
-        run: deno task build --mod result
+        run: deno task build --allow-net --mod result
       - name: Publish @fp-utils/result to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
