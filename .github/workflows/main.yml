@@ -43,15 +43,18 @@ jobs:
 
   release_option:
     needs: verify
-    if: ${{ needs.verify.outputs.option == 'true' }}
+    # if: ${{ needs.verify.outputs.option == 'true' }}
     outputs:
       release: ${{ steps.release.outputs.release }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Check for version changes 
         id: release
-        run: git diff 'deno.json' | grep -q '+  "version":' && echo 'release=true' || echo 'release=false' >> $GITHUB_OUTPUT
+        run: |
+          git diff HEAD^ HEAD -- 'deno.json' | grep -q '+  "version":' && echo 'release=true' || echo 'release=false' >> $GITHUB_OUTPUT
         working-directory: option
 
   release_result:
@@ -62,9 +65,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Check for version changes 
         id: release
-        run: git diff 'deno.json' | grep -q '+  "version":' && echo 'release=true' || echo 'release=false' >> $GITHUB_OUTPUT
+        run: |
+          git diff HEAD^ HEAD -- 'deno.json' | grep -q '+  "version":' && echo 'release=true' || echo 'release=false' >> $GITHUB_OUTPUT
         working-directory: result
 
 
