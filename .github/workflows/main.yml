@@ -120,7 +120,7 @@ jobs:
 
   publish_result_npm:
     needs: release_result
-    if: ${{ needs.release_option.outputs.result_release == 'true' }}
+    if: ${{ needs.release_result.outputs.result_release == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
