@@ -43,9 +43,9 @@ jobs:
 
   release_option:
     needs: verify
-    # if: ${{ needs.verify.outputs.option == 'true' }}
+    if: ${{ needs.verify.outputs.option == 'true' }}
     outputs:
-      release: ${{ steps.release.outputs.release }}
+      option_release: ${{ steps.release.outputs.option_release }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -54,14 +54,14 @@ jobs:
       - name: Check for version changes 
         id: release
         run: |
-          git diff HEAD^ HEAD -- 'deno.json' | grep -q '+  "version":' && echo 'release=true' || echo 'release=false' >> $GITHUB_OUTPUT
+          git diff HEAD^ HEAD -- 'deno.json' | grep -q '+  "version":' && echo 'option_release=true' || echo 'option_release=false' >> $GITHUB_OUTPUT
         working-directory: option
 
   release_result:
     needs: verify
     if: ${{ needs.verify.outputs.result == 'true' }}
     outputs:
-      release: ${{ steps.release.outputs.release }}
+      result_release: ${{ steps.release.outputs.result_release }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -70,13 +70,13 @@ jobs:
       - name: Check for version changes 
         id: release
         run: |
-          git diff HEAD^ HEAD -- 'deno.json' | grep -q '+  "version":' && echo 'release=true' || echo 'release=false' >> $GITHUB_OUTPUT
+          git diff HEAD^ HEAD -- 'deno.json' | grep -q '+  "version":' && echo 'result_release=true' || echo 'result_release=false' >> $GITHUB_OUTPUT
         working-directory: result
 
 
   publish_option_npm:
     needs: release_option
-    if: ${{ needs.release_option.outputs.release == 'true' }}
+    if: ${{ needs.release_option.outputs.option_release == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -100,7 +100,7 @@ jobs:
 
   publish_option_jsr:
     needs: release_option
-    if: ${{ needs.release_option.outputs.release == 'true' }}
+    if: ${{ needs.release_option.outputs.option_release == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -113,7 +113,7 @@ jobs:
 
   publish_result_npm:
     needs: release_result
-    if: ${{ needs.release_option.outputs.release == 'true' }}
+    if: ${{ needs.release_option.outputs.result_release == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -137,7 +137,7 @@ jobs:
 
   publish_result_jsr:
     needs: release_result
-    if: ${{ needs.release_result.outputs.release == 'true' }}
+    if: ${{ needs.release_result.outputs.result_release == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
