@@ -43,36 +43,43 @@ jobs:
 
   release_option:
     needs: verify
-    if: ${{ needs.verify.outputs.option == 'true' }}
-    outputs:
-      option_release: ${{ steps.release.outputs.option_release }}
+    # if: ${{ needs.verify.outputs.option == 'true' }}
     runs-on: ubuntu-latest
+    outputs:
+      option_release: ${{ steps.should_run.outputs.option_release }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - name: Check for version changes 
-        id: release
+        id: should_run
         run: |
-          git diff HEAD^ HEAD -- 'deno.json' | grep -q '+  "version":' && echo 'option_release=true' || echo 'option_release=false' >> $GITHUB_OUTPUT
+          if git diff HEAD^ HEAD -- 'deno.json' | grep -q '+  "version":' >/dev/null; then 
+            echo 'option_release=true' >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo 'option_release=false' >> $GITHUB_OUTPUT
         working-directory: option
 
   release_result:
     needs: verify
     if: ${{ needs.verify.outputs.result == 'true' }}
     outputs:
-      result_release: ${{ steps.release.outputs.result_release }}
+      result_release: ${{ steps.should_run.outputs.result_release }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - name: Check for version changes 
-        id: release
+        id: should_run
         run: |
-          git diff HEAD^ HEAD -- 'deno.json' | grep -q '+  "version":' && echo 'result_release=true' || echo 'result_release=false' >> $GITHUB_OUTPUT
+          if git diff HEAD^ HEAD -- 'deno.json' | grep -q '+  "version":' >/dev/null; then 
+            echo 'result_release=true' >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo 'result_release=false' >> $GITHUB_OUTPUT
         working-directory: result
-
 
   publish_option_npm:
     needs: release_option
