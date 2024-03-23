@@ -57,9 +57,9 @@ export namespace Option {
     : Option<T>;
 
   /**
-   * Type helper to determine if the value is a Promise.
+   * Type helper to determine if the value is a PromiseLike.
    */
-  function isPromise<T>(value: unknown): value is Promise<T> {
+  function isPromiseLike<T>(value: unknown): value is PromiseLike<T> {
     return isNonNullable(value) && typeof value === "object" && "then" in value;
   }
 
@@ -555,8 +555,8 @@ export namespace Option {
     if (value instanceof Function) {
       return Option.from<T>(value()) as From<Value>;
     }
-    if (isPromise<T>(value)) {
-      return value.then((value) =>
+    if (isPromiseLike<T>(value)) {
+      return Promise.resolve(value).then((value) =>
         value === null || value === undefined
           ? Option.none()
           : Option.some(value)

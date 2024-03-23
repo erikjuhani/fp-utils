@@ -57,9 +57,9 @@ export namespace Result {
     : Result<T, TError>;
 
   /**
-   * Type helper to determine if the value is a Promise.
+   * Type helper to determine if the value is a PromiseLike.
    */
-  function isPromise<T>(value: unknown): value is Promise<T> {
+  function isPromiseLike<T>(value: unknown): value is PromiseLike<T> {
     return isNonNullable(value) && typeof value === "object" && "then" in value;
   }
 
@@ -721,8 +721,8 @@ export namespace Result {
         return Result.err(expected ? expected : e) as From<never, TError>;
       }
     }
-    if (isPromise<T>(value)) {
-      return value.then(Result.ok<T>).catch((e) => {
+    if (isPromiseLike<T>(value)) {
+      return Promise.resolve(value).then(Result.ok<T>).catch((e) => {
         if (expected instanceof Function) return Result.err(expected(e));
         else return expected ? Result.err(expected) : Result.err(e);
       }) as From<

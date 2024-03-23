@@ -212,6 +212,23 @@ test("Result.from", async () => {
     [() => Promise.resolve(), Result.ok()],
     [() => Promise.reject("error"), Result.err("error")],
     [() => Promise.reject(), Result.err("error")],
+    // Custom PromiseLike successful
+    [
+      {
+        then: (onfulfilled?: (value?: unknown) => unknown) => onfulfilled?.(42),
+      },
+      Result.ok(42),
+    ],
+    // Custom PromiseLike failure
+    [
+      {
+        then: (
+          _onfulfilled?: (value?: unknown) => unknown,
+          onrejected?: (value?: unknown) => unknown,
+        ) => onrejected?.(),
+      },
+      Result.err("error"),
+    ],
     [0, Result.ok(0)],
     [null, Result.ok(null)],
     ["", Result.ok("")],

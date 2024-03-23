@@ -177,6 +177,23 @@ test("Option.from", async () => {
     [() => Promise.resolve(), Option.none()],
     [() => Promise.reject("error"), Option.none()],
     [() => Promise.reject(), Option.none()],
+    // Custom PromiseLike successful
+    [
+      {
+        then: (onfulfilled?: (value?: unknown) => unknown) => onfulfilled?.(42),
+      },
+      Option.some(42),
+    ],
+    // Custom PromiseLike failure
+    [
+      {
+        then: (
+          _onfulfilled?: (value?: unknown) => unknown,
+          onrejected?: (value?: unknown) => unknown,
+        ) => onrejected?.(),
+      },
+      Option.none(),
+    ],
     [null, Option.none()],
     [undefined, Option.none()],
     [0, Option.some(0)],
