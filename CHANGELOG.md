@@ -1,3 +1,21 @@
+## 0.10.0
+
+FEATURES:
+
+- [Add Option.filter function to filter options](https://github.com/erikjuhani/fp-utils/commit/c662d76f84897dd3182676b23e02867f8287167f)
+- [Add Result.filter function to filter results](https://github.com/erikjuhani/fp-utils/commit/041fb7fc0fca529b4238e159b1503d8ef916c078)
+- [Support promise likes with Option.from and Result.from functions](https://github.com/erikjuhani/fp-utils/commit/09b45f7512e1ef56add0e0a3715978780c048e7c)
+
+CHANGES:
+
+- [Better type inference for union types with Option.match](https://github.com/erikjuhani/fp-utils/commit/6ef287f52672f8d6cdcd761982c77487c2dbf2a9)
+- [Better type inference for union types with Result.match](https://github.com/erikjuhani/fp-utils/commit/78bad1cb74a3bbe75c8de96023b09b55580dc5d8)
+- [Change Result.from to error map function as the second argument](https://github.com/erikjuhani/fp-utils/commit/201510d25cd919b03cb773923fe17b249b1bba52)
+
+FIXES:
+
+- [Fix Option.match and Result.match generic could be any type](https://github.com/erikjuhani/fp-utils/commit/1b607aca793c53e8d02d5a57d03b911a5e1f65a4)
+
 ## 0.9.0
 
 BREAKING CHANGES:
