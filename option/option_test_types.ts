@@ -1,9 +1,9 @@
-import { Option } from "./mod.ts";
+import { None, Option, Some } from "./mod.ts";
 import { assertType, IsExact } from "../dev_deps.ts";
 
 // Option.map - number to string
 (() => {
-  const some = Option.some(42);
+  const some = Some(42);
 
   const t = some.map((value) => {
     assertType<IsExact<typeof value, 42>>(true);
@@ -17,7 +17,7 @@ import { assertType, IsExact } from "../dev_deps.ts";
 
 // Option.match - identity and throw
 (() => {
-  const option: Option<string> = Option.some("42");
+  const option: Option<string> = Some("42");
 
   const t = option.match(
     (value) => value,
@@ -31,28 +31,28 @@ import { assertType, IsExact } from "../dev_deps.ts";
 
 // Option.isNone and Option.isSome
 (() => {
-  const option: Option<string> = Option.some("42");
+  const option: Option<string> = Some("42");
 
   if (option.isNone()) {
-    assertType<IsExact<typeof option, Option.None>>(true);
+    assertType<IsExact<typeof option, None>>(true);
   }
 
   if (Option.isNone(option)) {
-    assertType<IsExact<typeof option, Option.None>>(true);
+    assertType<IsExact<typeof option, None>>(true);
   }
 
   if (option.isSome()) {
-    assertType<IsExact<typeof option, Option.Some<string>>>(true);
+    assertType<IsExact<typeof option, Some<string>>>(true);
   }
 
   if (Option.isSome(option)) {
-    assertType<IsExact<typeof option, Option.Some<string>>>(true);
+    assertType<IsExact<typeof option, Some<string>>>(true);
   }
 });
 
 // Option.match - match promise then callback
 (async () => {
-  const option: Option<string> = Option.some("42");
+  const option: Option<string> = Some("42");
 
   const t = await Promise.resolve(option).then(Option.match(
     (value) => value,
@@ -66,29 +66,29 @@ import { assertType, IsExact } from "../dev_deps.ts";
 
 // Option.flatMap - union input type and union return type (method)
 (() => {
-  const unionOption: Option<number | string> = Option.some(42) as
-    | Option.Some<number>
-    | Option.Some<string>
-    | Option.None;
+  const unionOption: Option<number | string> = Some(42) as
+    | Some<number>
+    | Some<string>
+    | None;
 
   const t = unionOption.flatMap((value) => {
     assertType<IsExact<typeof value, string | number>>(true);
-    if (value === 42) return Option.some(42);
-    if (value) return Option.some("Ok" as const);
-    return Option.none();
+    if (value === 42) return Some(42);
+    if (value) return Some("Ok" as const);
+    return None;
   });
 
   assertType<
-    IsExact<typeof t, Option.Some<42> | Option.Some<"Ok"> | Option.None>
+    IsExact<typeof t, Some<42> | Some<"Ok"> | None>
   >(true);
 });
 
 // Option.flatMap - union input type and union return type (callback)
 (async () => {
-  const unionOption = Option.some(42) as
-    | Option.Some<number>
-    | Option.Some<string>
-    | Option.None;
+  const unionOption = Some(42) as
+    | Some<number>
+    | Some<string>
+    | None;
 
   // Using the Option API this way requires you to pass the Option function (in
   // this case flatMap) to a function expecting a callback, since the method
@@ -97,9 +97,9 @@ import { assertType, IsExact } from "../dev_deps.ts";
   const t0 = await Promise.resolve(unionOption).then(
     Option.flatMap((value) => {
       assertType<IsExact<typeof value, string | number>>(true);
-      if (value === 42) return Option.some(42);
-      if (value) return Option.some("Ok" as const);
-      return Option.none();
+      if (value === 42) return Some(42);
+      if (value) return Some("Ok" as const);
+      return None;
     }),
   );
 
@@ -112,9 +112,9 @@ import { assertType, IsExact } from "../dev_deps.ts";
   // explicitly specified, due to TypeScript inference not working from right
   // to left.
   const t1 = Option.flatMap((value: number | string) => {
-    if (value === 42) return Option.some(42);
-    if (value) return Option.some("Ok" as const);
-    else return Option.none();
+    if (value === 42) return Some(42);
+    if (value) return Some("Ok" as const);
+    else return None;
   })(unionOption);
 
   assertType<
@@ -126,9 +126,9 @@ import { assertType, IsExact } from "../dev_deps.ts";
 (async () => {
   // deno-lint-ignore require-await
   async function unionTypePromise(n: number = 1) {
-    if (n === 3) return Option.none();
-    if (n === 2) return Option.some({ number: 2 });
-    if (n === 1) return Option.some("42");
+    if (n === 3) return None;
+    if (n === 2) return Some({ number: 2 });
+    if (n === 1) return Some("42");
     return Option.from(42);
   }
 

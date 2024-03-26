@@ -3,7 +3,7 @@
 // transferred to the patron Map and deleted from the Books Map. Returning
 // books does the opposite.
 import { std } from "dev_deps";
-import { Option } from "../option/mod.ts";
+import { None, Option, Some } from "../option/mod.ts";
 
 const { assert } = std;
 
@@ -90,7 +90,7 @@ const updateBorrowedBook = (bookName: string) => (patron: Patron) =>
       book.available || console.log(`'${bookName}' is not available`)
     )
     // Check that the book is available, if not we do not want to proceed with mutations
-    .flatMap((book) => book.available ? Option.some(book) : Option.none())
+    .flatMap((book) => book.available ? Some(book) : None)
     // Set the book as not available
     .map(updateBookAvailability(false))
     // Add the book to borrowed books list for patron
@@ -110,9 +110,7 @@ const borrowBook = (patronId: number, bookName: string) =>
         console.log(`${patron.name} has already two books borrowed`);
     })
     // Only patrons that have less than 3 books borrowed should be considered
-    .flatMap((patron) =>
-      patron.borrowedBooks.length < 3 ? Option.some(patron) : Option.none()
-    )
+    .flatMap((patron) => patron.borrowedBooks.length < 3 ? Some(patron) : None)
     .match(
       updateBorrowedBook(bookName),
       () => console.log(`'${bookName}' could not be borrowed`),
@@ -126,9 +124,7 @@ const returnBook = (patronId: number, bookId: number) =>
     )
     // Only patrons that have the book should be considered
     .flatMap((patron) =>
-      patron.borrowedBooks.find((b) => b.id === bookId)
-        ? Option.some(patron)
-        : Option.none()
+      patron.borrowedBooks.find((b) => b.id === bookId) ? Some(patron) : None
     )
     .flatMap((patron) =>
       Option.from(
@@ -149,7 +145,7 @@ borrowBook(101, "The fellowship of the ring");
 
 assert.assertEquals(
   tryGetPatronById(101).map(({ borrowedBooks }) => borrowedBooks),
-  Option.some([]),
+  Some([]),
 );
 
 console.log("---");
@@ -161,7 +157,7 @@ borrowBook(101, "The Hobbit");
 
 assert.assertEquals(
   tryGetPatronById(101).map(({ borrowedBooks }) => borrowedBooks),
-  Option.some([{ id: 4, title: "The Hobbit", available: true }]),
+  Some([{ id: 4, title: "The Hobbit", available: true }]),
 );
 
 console.log("---");
@@ -174,7 +170,7 @@ borrowBook(102, "The Hobbit");
 
 assert.assertEquals(
   tryGetPatronById(102).map(({ borrowedBooks }) => borrowedBooks.length),
-  Option.some(2),
+  Some(2),
 );
 
 console.log("---");
@@ -185,7 +181,7 @@ returnBook(101, 4);
 
 assert.assertEquals(
   tryGetPatronById(101).map(({ borrowedBooks }) => borrowedBooks),
-  Option.some([]),
+  Some([]),
 );
 
 console.log("---");
@@ -196,7 +192,7 @@ returnBook(101, 1);
 
 assert.assertEquals(
   tryGetPatronById(101).map(({ borrowedBooks }) => borrowedBooks),
-  Option.some([]),
+  Some([]),
 );
 
 console.log("---");
@@ -207,5 +203,5 @@ returnBook(102, 2);
 
 assert.assertEquals(
   tryGetPatronById(102).map(({ borrowedBooks }) => borrowedBooks.length),
-  Option.some(1),
+  Some(1),
 );

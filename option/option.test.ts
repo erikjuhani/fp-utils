@@ -1,5 +1,5 @@
 import { std } from "../dev_deps.ts";
-import { Option } from "./mod.ts";
+import { None, Option, Some } from "./mod.ts";
 
 const { assertThrows, assertEquals } = std.assert;
 const { mock } = std.testing;
@@ -9,7 +9,7 @@ test("Option.some passing null or undefined throws", () => {
   [null, undefined].forEach((value) => {
     assertThrows(
       // @ts-expect-error doesn't actually allow to pass a null or undefined to Option.some in compile time
-      () => Option.some(value),
+      () => Some(value),
       "Trying to pass nullable value to Some",
     );
   });
@@ -17,8 +17,8 @@ test("Option.some passing null or undefined throws", () => {
 
 test("Option.isSome", () => {
   const tests: [Option<unknown>, boolean][] = [
-    [Option.some(0), true],
-    [Option.none(), false],
+    [Some(0), true],
+    [None, false],
   ];
 
   tests.forEach(([input, expected]) => {
@@ -28,8 +28,8 @@ test("Option.isSome", () => {
 
 test("Option.isNone", () => {
   const tests: [Option<unknown>, boolean][] = [
-    [Option.some(0), false],
-    [Option.none(), true],
+    [Some(0), false],
+    [None, true],
   ];
 
   tests.forEach(([input, expected]) => {
@@ -38,48 +38,48 @@ test("Option.isNone", () => {
 });
 
 test("Option.unwrap on Some returns Option value", () => {
-  assertEquals(Option.unwrap(Option.some(0)), 0);
+  assertEquals(Option.unwrap(Some(0)), 0);
 });
 
 test("Option.unwrap on None throws", () => {
-  assertThrows(() => Option.unwrap(Option.none()), "Called unwrap on None");
+  assertThrows(() => Option.unwrap(None), "Called unwrap on None");
 });
 
 test("Option.unwrapOr on Some returns Option value", () => {
-  assertEquals(Option.unwrapOr(1)(Option.some(0)), 0);
+  assertEquals(Option.unwrapOr(1)(Some(0)), 0);
 });
 
 test("Option.unwrapOr on None returns or value", () => {
-  assertEquals(Option.unwrapOr(1)(Option.none()), 1);
+  assertEquals(Option.unwrapOr(1)(None), 1);
 });
 
 test("Option.inspect", () => {
   const mapSpy = mock.spy((value: number) => value + 1);
-  const actual = Option.inspect(mapSpy)(Option.some(0));
+  const actual = Option.inspect(mapSpy)(Some(0));
   mock.assertSpyCalls(mapSpy, 1);
-  assertEquals(actual, Option.some(0));
+  assertEquals(actual, Some(0));
 });
 
 test("Option.inspect on None does not execute", () => {
   const mapSpy = mock.spy((value: number) => value + 1);
-  const actual = Option.inspect(mapSpy)(Option.none());
+  const actual = Option.inspect(mapSpy)(None);
   mock.assertSpyCalls(mapSpy, 0);
-  assertEquals(actual, Option.none());
+  assertEquals(actual, None);
 });
 
 test("Option.map", () => {
   const mapSpy = mock.spy((value: number) => value + 1);
-  const actual = Option.map(mapSpy)(Option.some(0));
+  const actual = Option.map(mapSpy)(Some(0));
   mock.assertSpyCalls(mapSpy, 1);
-  assertEquals(actual, Option.some(1));
+  assertEquals(actual, Some(1));
 });
 
 test("Option.filter", () => {
   const predicate = (x: number) => x >= 5;
   const tests: [input: Option<number>, expected: boolean][] = [
-    [Option.none(), false],
-    [Option.some(2), false],
-    [Option.some(42), true],
+    [None, false],
+    [Some(2), false],
+    [Some(42), true],
   ];
 
   for (const [input, expected] of tests) {
@@ -90,24 +90,24 @@ test("Option.filter", () => {
 
 test("Option.map on None does not execute", () => {
   const mapSpy = mock.spy((value: number) => value + 1);
-  const actual = Option.map(mapSpy)(Option.none());
+  const actual = Option.map(mapSpy)(None);
 
   mock.assertSpyCalls(mapSpy, 0);
-  assertEquals(actual, Option.none());
+  assertEquals(actual, None);
 });
 
 test("Option.flatMap", () => {
-  const flatMapSpy = mock.spy((value: number) => Option.some(value + 1));
-  const actual = Option.flatMap(flatMapSpy)(Option.some(0));
+  const flatMapSpy = mock.spy((value: number) => Some(value + 1));
+  const actual = Option.flatMap(flatMapSpy)(Some(0));
   mock.assertSpyCalls(flatMapSpy, 1);
-  assertEquals(actual, Option.some(1));
+  assertEquals(actual, Some(1));
 });
 
 test("Option.flatMap on None does not execute", () => {
-  const flatMapSpy = mock.spy((value: number) => Option.some(value + 1));
-  const actual = Option.flatMap(flatMapSpy)(Option.none());
+  const flatMapSpy = mock.spy((value: number) => Some(value + 1));
+  const actual = Option.flatMap(flatMapSpy)(None);
   mock.assertSpyCalls(flatMapSpy, 0);
-  assertEquals(actual, Option.none());
+  assertEquals(actual, None);
 });
 
 test("Option.flatMap example", () => {
@@ -115,13 +115,13 @@ test("Option.flatMap example", () => {
 
   const tryParse: TryParse = (input: string) => {
     const value = parseInt(input);
-    return isNaN(value) ? Option.none() : Option.some(value);
+    return isNaN(value) ? None : Some(value);
   };
 
   const tests: [Option<string>, Option<number>][] = [
-    [Option.some("42"), Option.some(42)],
-    [Option.none(), Option.none()],
-    [Option.some("Forty-two"), Option.none()],
+    [Some("42"), Some(42)],
+    [None, None],
+    [Some("Forty-two"), None],
   ];
 
   tests.forEach(([input, expected]) => {
@@ -132,21 +132,21 @@ test("Option.flatMap example", () => {
 test("Option.flatMap union Some<string> | Some<number> | None", async () => {
   // deno-lint-ignore require-await
   const asyncGetUnionOption = async (flag: 0 | 1 | 2) => {
-    if (flag === 1) return Option.some("1");
-    return flag === 2 ? Option.some(42) : Option.none();
+    if (flag === 1) return Some("1");
+    return flag === 2 ? Some(42) : None;
   };
 
   const tests: [flag: 0 | 1 | 2, expected: Option<string | number>][] = [
-    [0, Option.none()],
-    [1, Option.some("1")],
-    [2, Option.some(42)],
+    [0, None],
+    [1, Some("1")],
+    [2, Some(42)],
   ];
 
   await Promise.all(tests.map(async ([input, expected]) => {
     const actual = await asyncGetUnionOption(input).then(
       Option.flatMap((value) => {
-        if (value) return Option.some(value);
-        else return Option.none();
+        if (value) return Some(value);
+        else return None;
       }),
     );
     assertEquals(actual, expected);
@@ -155,34 +155,34 @@ test("Option.flatMap union Some<string> | Some<number> | None", async () => {
 
 test("Option.match Some", () => {
   const actual = Option.match((some) => `${some}`, () => "No value")(
-    Option.some(0),
+    Some(0),
   );
   assertEquals(actual, "0");
 });
 
 test("Option.match None", () => {
   const actual = Option.match((some) => `${some}`, () => "No value")(
-    Option.none(),
+    None,
   );
   assertEquals(actual, "No value");
 });
 
 test("Option.from", async () => {
   const tests: [input: unknown, expected: Option<unknown>][] = [
-    [Promise.resolve(0), Option.some(0)],
-    [Promise.resolve(), Option.none()],
-    [Promise.reject("error"), Option.none()],
-    [Promise.reject(), Option.none()],
-    [() => Promise.resolve(0), Option.some(0)],
-    [() => Promise.resolve(), Option.none()],
-    [() => Promise.reject("error"), Option.none()],
-    [() => Promise.reject(), Option.none()],
+    [Promise.resolve(0), Some(0)],
+    [Promise.resolve(), None],
+    [Promise.reject("error"), None],
+    [Promise.reject(), None],
+    [() => Promise.resolve(0), Some(0)],
+    [() => Promise.resolve(), None],
+    [() => Promise.reject("error"), None],
+    [() => Promise.reject(), None],
     // Custom PromiseLike successful
     [
       {
         then: (onfulfilled?: (value?: unknown) => unknown) => onfulfilled?.(42),
       },
-      Option.some(42),
+      Some(42),
     ],
     // Custom PromiseLike failure
     [
@@ -192,16 +192,16 @@ test("Option.from", async () => {
           onrejected?: (value?: unknown) => unknown,
         ) => onrejected?.(),
       },
-      Option.none(),
+      None,
     ],
-    [null, Option.none()],
-    [undefined, Option.none()],
-    [0, Option.some(0)],
-    ["", Option.some("")],
-    [() => 0, Option.some(0)],
-    [() => null, Option.none()],
-    [() => {}, Option.none()],
-    [() => () => 0, Option.some(0)],
+    [null, None],
+    [undefined, None],
+    [0, Some(0)],
+    ["", Some("")],
+    [() => 0, Some(0)],
+    [() => null, None],
+    [() => {}, None],
+    [() => () => 0, Some(0)],
   ];
 
   for (const [input, expected] of tests) {

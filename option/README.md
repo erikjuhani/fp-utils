@@ -35,7 +35,35 @@ const bookFound = tryGetBook(1);
 
 ## Usage
 
-### `Option.flatMap`
+### Option methods
+
+Option methods are chainable functions that allow for a sequence of operation
+with the contained value `T` in the Option.
+
+#### `Option.filter`
+
+Signature: `(predicate: (value: T) => boolean): boolean`
+
+Option.filter returns a boolean that is evaluated with the given `predicate`
+function which is applied on the option value `T`. None evaluates to `false`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Some(2)
+  .filter((x) => x >= 5); // evaluates to false
+
+Some(42)
+  .filter((x) => x >= 5); // evaluates to true
+
+None
+  .filter((x) => x >= 5); // evaluates to false
+```
+
+</details>
+
+#### `Option.flatMap`
 
 Signature: `<U>(fn: (value: T) => Option<U>): Option<U>`
 
@@ -50,22 +78,22 @@ type TryParse = (input: string) => Option<number>;
 
 const tryParse: TryParse = (input: string) => {
   const value = parseInt(input);
-  return isNaN(value) ? Option.none() : Option.some(value);
+  return isNaN(value) ? None : Some(value);
 };
 
-Option.none()
-  .flatMap(tryParse); // Evaluates to None
-
-Option.some("42")
+Some("42")
   .flatMap(tryParse); // Evaluates to Some 42
 
-Option.some("Forty-two")
+Some("Forty-two")
+  .flatMap(tryParse); // Evaluates to None
+
+None
   .flatMap(tryParse); // Evaluates to None
 ```
 
 </details>
 
-### `Option.inspect`
+#### `Option.inspect`
 
 Signature: `(fn: (value: T) => void): Option<T>`
 
@@ -76,16 +104,50 @@ contained option value `T` if the option is some.
   <summary>Example</summary>
 
 ```ts
-Option.none()
-  .inspect((x) => console.log(x * 2)); // Prints nothing
-
-Option.some(42)
+Some(42)
   .inspect((x) => console.log(x * 2)); // Prints 84
+
+None
+  .inspect((x) => console.log(x * 2)); // Prints nothing
 ```
 
 </details>
 
-### `Option.map`
+#### `Option.isNone`
+
+Signature: `(): this is None`
+
+Option.isNone returns `true` if the option is `None`
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Some(42).isNone(); // Evaluates to false
+
+None.isNone(); // Evaluates to true
+```
+
+</details>
+
+#### `Option.isSome`
+
+Signature: `<T>(): this is Some<T>`
+
+Option.isSome returns `true` if the option is `Some`
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Some(42).isSome(); // Evaluates to true
+
+None.isSome(); // Evaluates to false
+```
+
+</details>
+
+#### `Option.map`
 
 Signature: `<U>(fn: (value: T) => U): Option<U>`
 
@@ -96,39 +158,16 @@ value `U`.
   <summary>Example</summary>
 
 ```ts
-Option.none()
-  .map((x) => x * 2); // Evaluates to None
-
-Option.some(42)
+Some(42)
   .map((x) => x * 2); // Evaluates to Some 84
+
+None
+  .map((x) => x * 2); // Evaluates to None
 ```
 
 </details>
 
-### `Option.filter`
-
-Signature: `(predicate: (value: T) => boolean): boolean`
-
-Option.filter returns a boolean that is evaluated with the given `predicate`
-function which is applied on the option value `T`. None evaluates to `false`.
-
-<details>
-  <summary>Example</summary>
-
-```ts
-Option.none()
-  .filter((x) => x >= 5); // evaluates to false
-
-Option.some(2)
-  .filter((x) => x >= 5); // evaluates to false
-
-Option.some(42)
-  .filter((x) => x >= 5); // evaluates to true
-```
-
-</details>
-
-### `Option.match`
+#### `Option.match`
 
 Signature: `<U1, U2>(onSome: (value: T) => U1, onNone: () => U2): U1 | U2`
 
@@ -139,16 +178,16 @@ returns `U1`. If the option is None, `onNone` is called and `U2` returned.
   <summary>Example</summary>
 
 ```ts
-Option.none()
-  .match((x) => x * 2, () => 99); // Evaluates to 99
-
-Option.some(42)
+Some(42)
   .match((x) => x * 2, () => 99); // Evaluates to 84
+
+None
+  .match((x) => x * 2, () => 99); // Evaluates to 99
 ```
 
 </details>
 
-### `Option.unwrap`
+#### `Option.unwrap`
 
 Signature: `(): T`
 
@@ -159,14 +198,14 @@ otherwise it will throw.
   <summary>Example</summary>
 
 ```ts
-Option.some(42).unwrap(); // Evaluates to 42
+Some(42).unwrap(); // Evaluates to 42
 
-Option.none().unwrap(); // ! Throws an exception
+None().unwrap(); // Throws an exception!
 ```
 
 </details>
 
-### `Option.unwrapOr`
+#### `Option.unwrapOr`
 
 Signature: `(defaultValue: T): T`
 
@@ -177,33 +216,167 @@ default value if the option is `None`.
   <summary>Example</summary>
 
 ```ts
-Option.some(42).unwrapOr(99); // Evaluates to 42
+Some(42).unwrapOr(99); // Evaluates to 42
 
-Option.none().unwrapOr(99); // Evaluates to 99
+None.unwrapOr(99); // Evaluates to 99
 ```
 
 </details>
 
-### `Option.isSome`
+### Option higher-order functions
 
-Signature: `<T>(): this is Some<T>`
+Option higher-order functions allow for Option value `T` chainability within
+callbacks like Promise.then.
 
-Option.isSome returns `true` if the option is `Some`
+```ts
+Promise.resolve(42)
+  .then(Option.inspect)
+  .then(Option.map((value) => value + 10))
+  .then(Option.unwrap); // Evaluates to 52
+```
+
+#### `Option.filter`
+
+Signature: `(predicate: (value: T) => boolean): (option: Option<T>) => boolean`
+
+Option.filter returns a boolean that is evaluated with the given `predicate`
+function which is applied on the option value `T`. None evaluates to `false`.
 
 <details>
   <summary>Example</summary>
 
 ```ts
-Option.none().isSome(); // Evaluates to false
+Option
+  .filter((x: number) => x >= 5)(Some(2)); // evaluates to false
 
-Option.some(42).isSome(); // Evaluates to true
+Option
+  .filter((x: number) => x >= 5)(Some(42)); // evaluates to true
+
+Option
+  .filter((x: number) => x >= 5)(None); // evaluates to false
 ```
 
 </details>
 
-### `Option.isNone`
+#### `Option.flatMap`
 
-Signature: `(): this is None`
+Signature:
+`flatMap(fn: (value: T) => Option<U>): (option: Option<T>) => Option<U>`
+
+Option.flatMap applies a function `fn` to the content of option `T` and
+transforms it into an option `U`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+type TryParse = (input: string) => Option<number>;
+
+const tryParse: TryParse = (input: string) => {
+  const value = parseInt(input);
+  return isNaN(value) ? None : Some(value);
+};
+
+Option
+  .flatMap(tryParse)(Some("42")); // Evaluates to Some 42
+
+Option
+  .flatMap(tryParse)(Some("Forty-two")); // Evaluates to None
+
+Option
+  .flatMap(tryParse)(None); // Evaluates to None
+```
+
+</details>
+
+#### `Option.inspect`
+
+Signature: `inspect(fn: (value: T) => void): (option: Option<T>) => Option<T>`
+
+Option.inspect calls the provided function `fn` with a reference to the
+contained option value `T` if the option is some.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option
+  .inspect((x: number) => console.log(x * 2))(Some(42)); // Prints 84
+
+Option
+  .inspect((x: number) => console.log(x * 2))(None); // Prints nothing
+```
+
+</details>
+
+#### `Option.map`
+
+Signature: `map(fn: (value: T) => U): (option: Option<T>) => Option<U>`
+
+Option.map applies a function `fn` to option value `T` and transforms it into
+value `U`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option
+  .map((x: number) => x * 2)(Some(42)); // Evaluates to Some 84
+
+Option
+  .map((x: number) => x * 2)(None); // Evaluates to None
+```
+
+</details>
+
+#### `Option.match`
+
+Signature:
+`match(onSome: (value: T) => U1, onNone: () => U2): (option: Option<T>) => U1 | U2`
+
+Option.match transforms the option value `T` into `U1` using `onSome` and then
+returns `U1`. If the option is None, `onNone` is called and `U2` returned.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option
+  .match((x: number) => x * 2, () => 99)(Some(42)); // Evaluates to 84
+
+Option
+  .match((x: number) => x * 2, () => 99)(None); // Evaluates to 99
+```
+
+</details>
+
+#### `Option.unwrapOr`
+
+Signature: `unwrapOr(defaultValue: T): (option: Option<T>) => T`
+
+Option.unwrapOr returns the value `T` from the associated option or returns the
+default value if the option is `None`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option
+  .unwrapOr(99)(Some(42)); // Evaluates to 42
+
+Option
+  .unwrapOr(99)(None); // Evaluates to 99
+```
+
+</details>
+
+### Option static methods
+
+Static methods for working with options.
+
+#### `Option.isNone`
+
+Signature: `isNone(option: Option<T>): option is None`
 
 Option.isNone returns `true` if the option is `None`
 
@@ -211,9 +384,84 @@ Option.isNone returns `true` if the option is `None`
   <summary>Example</summary>
 
 ```ts
-Option.none().isNone(); // Evaluates to true
+Option
+  .isNone(Some(42)); // Evaluates to false
 
-Option.some(42).isNone(); // Evaluates to false
+Option
+  .isNone(None); // Evaluates to true
+```
+
+</details>
+
+#### `Option.isSome`
+
+Signature: `isSome(option: Option<T>): option is Some<T>`
+
+Option.isSome returns `true` if the option is `Some`
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option
+  .isSome(Some(42)); // Evaluates to true
+
+Option
+  .isSome(None); // Evaluates to false
+```
+
+</details>
+
+#### `Option.none`
+
+Signature: `none(): None`
+
+Option.none returns a None option.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option
+  .none(); // Evaluates to None
+```
+
+#### `Option.some`
+
+Signature: `some(value: NonNullable<T>): Some<NonNullable<T>>`
+
+Option.some creates an option Some with value `T`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option
+  .some(42); // Evaluates to Some 42
+
+Option
+  .some(undefined); // Throws an exception or compiler error!
+
+Option
+  .some(null); // Throws an exception or compiler error!
+```
+
+#### `Option.unwrap`
+
+Signature: `unwrap(option: Option<T>): T`
+
+Option.unwrap returns the value `T` from the associated option if it is `Some`;
+otherwise it will throw.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option
+  .unwrap(Some(42)); // Evaluates to 42
+
+Option
+  .unwrap(None); // Throws an exception!
 ```
 
 </details>
