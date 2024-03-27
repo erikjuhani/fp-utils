@@ -1,14 +1,16 @@
 {
   "tasks": {
-    "build": "deno run --allow-run --allow-write --allow-env --allow-read ./build_npm.ts",
+    "build": "deno run --allow-sys --allow-net --allow-run --allow-write --allow-env --allow-read ./build_npm.ts",
     "test": "deno test --allow-env --allow-read",
     "check": "deno check ./option/mod.ts ./option/option_test_types.ts ./result/mod.ts ./result/result_test_types.ts",
     "coverage": "deno task test --coverage=.coverage && deno coverage .coverage && rm -r .coverage",
     "bench": "deno bench --allow-env --allow-read ./option ./result"
   },
   "imports": {
-    "dev_deps": "./dev_deps.ts",
+    "@deno/dnt": "jsr:@deno/dnt@^0.41.0",
     "@fp-utils/option": "./option/mod.ts",
-    "@fp-utils/result": "./result/mod.ts"
+    "@fp-utils/result": "./result/mod.ts",
+    "@std/cli": "jsr:@std/cli@^0.220.1",
+    "dev_deps": "./dev_deps.ts"
   }
 }

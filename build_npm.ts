@@ -1,4 +1,5 @@
-import { dnt, std } from "dev_deps";
+import { parseArgs } from "@std/cli";
+import { build, emptyDir } from "@deno/dnt";
 
 type Args = { mod?: string };
 
@@ -15,8 +16,8 @@ type DenoJSON = {
   repository: { type: string; url: string };
 };
 
-const parseArgs = () => {
-  const { mod } = std.flags.parse<Args>(Deno.args);
+const parse = () => {
+  const { mod } = parseArgs<Args>(Deno.args);
   if (!mod || typeof mod !== "string") {
     throw Error(
       "No module directory provided, please provide a module directory using `--mod <module_name>`",
@@ -34,10 +35,10 @@ const loadDenoJSON = async (mod: string): Promise<DenoJSON> => {
 
 const commentsRegex = /\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm;
 
-const { mod } = parseArgs();
+const { mod } = parse();
 const denoJson = await loadDenoJSON(mod);
 
-async function build(module: string) {
+async function buildModule(module: string) {
   const outDir = `./${module}/dist`;
 
   const copyReadme = () => Deno.copyFileSync("LICENSE", `${outDir}/LICENSE`);
@@ -57,9 +58,9 @@ async function build(module: string) {
     });
   };
 
-  await dnt.emptyDir(outDir);
+  await emptyDir(outDir);
 
-  await dnt.build({
+  await build({
     entryPoints: [`./${module}/mod.ts`],
     outDir,
     shims: {},
@@ -79,4 +80,4 @@ async function build(module: string) {
   });
 }
 
-build(mod);
+buildModule(mod);
