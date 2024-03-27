@@ -41,7 +41,7 @@ import { None as _None, Option, Some as _Some } from "./option.ts";
 export { Option };
 
 export const Some = Option.some;
-export const None = Option.none();
+export const None: None = Option.none();
 
 // deno-lint-ignore no-empty-interface
 export interface Some<T> extends _Some<T> {}
