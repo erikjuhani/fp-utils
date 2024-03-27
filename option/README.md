@@ -35,6 +35,23 @@ const bookFound = tryGetBook(1);
 
 ## Usage
 
+### Constructors
+
+Similar as how `String` or `Number` constructors are used in JavaScript:
+
+Use `Some(42)` constructor to wrap a value for existing value and for
+non-existent value use the static `None` class.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+const some = Some(42);
+const none = None;
+```
+
+</details>
+
 ### Option methods
 
 Option methods are chainable functions that allow for a sequence of operation
@@ -230,6 +247,7 @@ callbacks like Promise.then.
 
 ```ts
 Promise.resolve(42)
+  .then(Option.from)
   .then(Option.inspect)
   .then(Option.map((value) => value + 10))
   .then(Option.unwrap); // Evaluates to 52
@@ -374,6 +392,47 @@ Option
 
 Static methods for working with options.
 
+#### `Option.from`
+
+Signature: `from(value: T | (() => T)): From<T>`
+
+Option.from converts a nullable value, non-nullable value, a function or a
+promise to an option.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option
+  .from(undefined); // Evaluates to None
+
+Option
+  .from(null); // Evaluates to None
+
+Option
+  .from(42); // Evaluates to Some 42
+
+Option
+  .from(() => 42); // Evaluates to Some 42
+
+Option
+  .from(() => Promise.resolve(42)); // Evaluates to Promise<Some 42>
+
+Option
+  .from(() => Promise.reject()); // Evaluates to Promise<None>
+
+Option
+  .from(Promise.resolve(42)); // Evaluates to Promise<Some 42>
+
+Option
+  .from(Promise.resolve(undefined)); // Evaluates to Promise<None>
+
+Option
+  .from(Promise.reject()); // Evaluates to Promise<None>
+```
+
+</details>
+
 #### `Option.isNone`
 
 Signature: `isNone(option: Option<T>): option is None`
@@ -426,6 +485,8 @@ Option
   .none(); // Evaluates to None
 ```
 
+</details>
+
 #### `Option.some`
 
 Signature: `some(value: NonNullable<T>): Some<NonNullable<T>>`
@@ -445,6 +506,8 @@ Option
 Option
   .some(null); // Throws an exception or compiler error!
 ```
+
+</details>
 
 #### `Option.unwrap`
 
