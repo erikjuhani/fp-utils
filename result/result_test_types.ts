@@ -1,9 +1,9 @@
-import { Result } from "./mod.ts";
+import { Err, Ok, Result } from "./mod.ts";
 import { assertType, IsExact } from "../dev_deps.ts";
 
 // Result.map - unit to string
 (() => {
-  const unitResult = Result.ok();
+  const unitResult = Ok();
 
   const t = unitResult.map((value) => {
     assertType<IsExact<typeof value, undefined>>(true);
@@ -12,22 +12,22 @@ import { assertType, IsExact } from "../dev_deps.ts";
 
   // When this fails it means that we are falsely returning something else than a string
   // Usually this would mean that we instead return a never type due to failing inference
-  assertType<IsExact<typeof t, Result.Ok<string>>>(true);
+  assertType<IsExact<typeof t, Ok<string>>>(true);
 });
 
 (() => {
-  const ok = Result.ok(42);
+  const ok = Ok(42);
 
   const t = ok.map((value) => {
     assertType<IsExact<typeof value, number>>(true);
   });
 
-  assertType<IsExact<typeof t, Result.Ok<void>>>(true);
+  assertType<IsExact<typeof t, Ok<void>>>(true);
 });
 
 // Result.match - identity and throw
 (() => {
-  const result: Result<string, unknown> = Result.ok("42");
+  const result: Result<string, unknown> = Ok("42");
 
   const t = result.match(
     (value) => value,
@@ -41,28 +41,28 @@ import { assertType, IsExact } from "../dev_deps.ts";
 
 // Result.isErr and Result.isOk
 (() => {
-  const result: Result<string, string> = Result.ok("42");
+  const result: Result<string, string> = Ok("42");
 
   if (result.isErr()) {
-    assertType<IsExact<typeof result, Result.Err<string>>>(true);
+    assertType<IsExact<typeof result, Err<string>>>(true);
   }
 
   if (Result.isErr(result)) {
-    assertType<IsExact<typeof result, Result.Err<string>>>(true);
+    assertType<IsExact<typeof result, Err<string>>>(true);
   }
 
   if (result.isOk()) {
-    assertType<IsExact<typeof result, Result.Ok<string>>>(true);
+    assertType<IsExact<typeof result, Ok<string>>>(true);
   }
 
   if (Result.isOk(result)) {
-    assertType<IsExact<typeof result, Result.Ok<string>>>(true);
+    assertType<IsExact<typeof result, Ok<string>>>(true);
   }
 });
 
 // Result.match - match promise then callback
 (async () => {
-  const result: Result<string, unknown> = Result.ok("42");
+  const result: Result<string, unknown> = Ok("42");
 
   const t = await Promise.resolve(result).then(Result.match(
     (value) => value,
@@ -76,16 +76,16 @@ import { assertType, IsExact } from "../dev_deps.ts";
 
 // Result.flatMap - union input type and union return type (method)
 (() => {
-  const unionResult = Result.ok() as
-    | Result.Ok<undefined>
-    | Result.Err<string>
-    | Result.Ok<number>;
+  const unionResult = Ok() as
+    | Ok<undefined>
+    | Err<string>
+    | Ok<number>;
 
   const t = unionResult.flatMap((value) => {
     assertType<IsExact<typeof value, number | undefined>>(true);
-    if (value === 42) return Result.ok();
-    if (value) return Result.ok("Ok" as const);
-    else return Result.err("Got undefined value");
+    if (value === 42) return Ok();
+    if (value) return Ok("Ok" as const);
+    else return Err("Got undefined value");
   });
 
   assertType<IsExact<typeof t, Result<"Ok" | undefined, string>>>(true);
@@ -93,10 +93,10 @@ import { assertType, IsExact } from "../dev_deps.ts";
 
 // Result.flatMap - union input type and union return type (callback)
 (async () => {
-  const unionResult = Result.ok() as
-    | Result.Ok<undefined>
-    | Result.Err<string>
-    | Result.Ok<number>;
+  const unionResult = Ok() as
+    | Ok<undefined>
+    | Err<string>
+    | Ok<number>;
 
   // Using the Result API this way requires you to pass the Result function (in
   // this case flatMap) to a function expecting a callback, since the method
@@ -105,9 +105,9 @@ import { assertType, IsExact } from "../dev_deps.ts";
   const t0 = await Promise.resolve(unionResult).then((a) => a).then(
     Result.flatMap((value) => {
       assertType<IsExact<typeof value, number | undefined>>(true);
-      if (value === 42) return Result.ok();
-      if (value) return Result.ok("Ok" as const);
-      else return Result.err("Got undefined value");
+      if (value === 42) return Ok();
+      if (value) return Ok("Ok" as const);
+      else return Err("Got undefined value");
     }),
   );
 
@@ -118,9 +118,9 @@ import { assertType, IsExact } from "../dev_deps.ts";
   // explicitly specified, due to TypeScript inference not working from right
   // to left.
   const t1 = Result.flatMap((value: number | undefined) => {
-    if (value === 42) return Result.ok();
-    if (value) return Result.ok("Ok" as const);
-    else return Result.err("Got undefined value");
+    if (value === 42) return Ok();
+    if (value) return Ok("Ok" as const);
+    else return Err("Got undefined value");
   })(unionResult);
 
   assertType<IsExact<typeof t1, Result<"Ok" | undefined, string>>>(true);
@@ -142,9 +142,9 @@ import { assertType, IsExact } from "../dev_deps.ts";
 (async () => {
   // deno-lint-ignore require-await
   async function unionTypePromise(n: number = 1) {
-    if (n === 3) return Result.err(100);
-    if (n === 2) return Result.ok();
-    if (n === 1) return Result.ok("42");
+    if (n === 3) return Err(100);
+    if (n === 2) return Ok();
+    if (n === 1) return Ok("42");
     return Result.from(42, "Unexpected error");
   }
 

@@ -3,7 +3,7 @@
 // transferred to the patron Map and deleted from the Books Map. Returning
 // books does the opposite.
 import { std } from "dev_deps";
-import { Result } from "../result/mod.ts";
+import { Err, Ok, Result } from "../result/mod.ts";
 
 const { assert } = std;
 
@@ -31,8 +31,8 @@ const books = new Map<ID, Book>([
 const getBook = (id: number) => {
   const book = books.get(id);
 
-  if (book) return Result.ok(book);
-  else return Result.err(`Could not find book with id: ${id}`);
+  if (book) return Ok(book);
+  else return Err(`Could not find book with id: ${id}`);
 };
 
 const patrons = new Map<ID, Patron>([
@@ -50,8 +50,7 @@ const patrons = new Map<ID, Patron>([
 const getPatronById = (id: number) => {
   const patron = patrons.get(id);
 
-  if (patron) return Result.ok(patron);
-  else return Result.err(`Could not find book with id: ${id}`);
+  return patron ? Ok(patron) : Err(`Could not find book with id: ${id}`);
 };
 
 const findBookByName = (title: string) => {
@@ -59,8 +58,7 @@ const findBookByName = (title: string) => {
     book.title.toLowerCase() === title.toLowerCase()
   );
 
-  if (book) return Result.ok(book);
-  else return Result.err(`Could not find book with title: ${title}`);
+  return book ? Ok(book) : Err(`Could not find book with title: ${title}`);
 };
 
 const addBorrowedBookForPatron = (patron: Patron) => (book: Book) => {
@@ -102,9 +100,7 @@ const updateBorrowedBook = (bookName: string) => (patron: Patron) =>
     )
     // Check that the book is available, if not we do not want to proceed with mutations
     .flatMap((book) =>
-      book.available
-        ? Result.ok(book)
-        : Result.err(`Book ${bookName} is not available`)
+      book.available ? Ok(book) : Err(`Book ${bookName} is not available`)
     )
     // Set the book as not available
     .map(updateBookAvailability(false))
@@ -125,8 +121,8 @@ const borrowBook = (patronId: number, bookName: string) =>
     // Only patrons that have less than 3 books borrowed should be considered
     .flatMap((patron) =>
       patron.borrowedBooks.length < 3
-        ? Result.ok(patron)
-        : Result.err(`Patron ${patron.name} has already two books borrowed`)
+        ? Ok(patron)
+        : Err(`Patron ${patron.name} has already two books borrowed`)
     )
     .inspectErr(console.error)
     .match(
@@ -138,16 +134,14 @@ const returnBook = (patronId: number, bookId: number) =>
   getPatronById(patronId)
     // Only patrons that have the book should be considered
     .flatMap((patron) =>
-      patron.borrowedBooks.find((b) => b.id === bookId)
-        ? Result.ok(patron)
-        : Result.err(
-          `Patron ${patron.name} has not borrowed book with id ${bookId}`,
-        )
+      patron.borrowedBooks.find((b) => b.id === bookId) ? Ok(patron) : Err(
+        `Patron ${patron.name} has not borrowed book with id ${bookId}`,
+      )
     )
     .flatMap((patron) => {
       const book = patron.borrowedBooks.find((book) => bookId === book.id);
       if (book) return getBook(bookId).map((book) => [patron, book] as const);
-      return Result.err(
+      return Err(
         `No borrowed book found with id ${bookId} with patron ${patron.name}`,
       );
     })
@@ -166,7 +160,7 @@ borrowBook(101, "The fellowship of the ring");
 
 assert.assertEquals(
   getPatronById(101).map(({ borrowedBooks }) => borrowedBooks),
-  Result.ok([]),
+  Ok([]),
 );
 
 console.log("---");
@@ -178,7 +172,7 @@ borrowBook(101, "The Hobbit");
 
 assert.assertEquals(
   getPatronById(101).map(({ borrowedBooks }) => borrowedBooks),
-  Result.ok([{ id: 4, title: "The Hobbit", available: true }]),
+  Ok([{ id: 4, title: "The Hobbit", available: true }]),
 );
 
 console.log("---");
@@ -191,7 +185,7 @@ borrowBook(102, "The Hobbit");
 
 assert.assertEquals(
   getPatronById(102).map(({ borrowedBooks }) => borrowedBooks.length),
-  Result.ok(2),
+  Ok(2),
 );
 
 console.log("---");
@@ -202,7 +196,7 @@ returnBook(101, 4);
 
 assert.assertEquals(
   getPatronById(101).map(({ borrowedBooks }) => borrowedBooks),
-  Result.ok([]),
+  Ok([]),
 );
 
 console.log("---");
@@ -213,7 +207,7 @@ returnBook(101, 1);
 
 assert.assertEquals(
   getPatronById(101).map(({ borrowedBooks }) => borrowedBooks),
-  Result.ok([]),
+  Ok([]),
 );
 
 console.log("---");
@@ -224,5 +218,5 @@ returnBook(102, 2);
 
 assert.assertEquals(
   getPatronById(102).map(({ borrowedBooks }) => borrowedBooks.length),
-  Result.ok(1),
+  Ok(1),
 );

@@ -40,9 +40,9 @@ export namespace fpUtils {
    * @expected-type Ok<number>
    */
   export function ok() {
-    type ExpectedType = fp_utils.Result.Ok<number>;
+    type ExpectedType = fp_utils.Ok<number>;
 
-    const ok = fp_utils.Result.ok(42);
+    const ok = fp_utils.Ok(42);
     assertType<IsExact<typeof ok, ExpectedType>>(true);
     assertEquals(ok.unwrap(), 42);
     return ok;
@@ -53,9 +53,9 @@ export namespace fpUtils {
    * @expected-type Ok<string>
    */
   export function map() {
-    type ExpectedType = fp_utils.Result.Ok<string>;
+    type ExpectedType = fp_utils.Ok<string>;
 
-    const result = fp_utils.Result.ok(42)
+    const result = fp_utils.Ok(42)
       .map((value) => value + 10)
       .map(String);
 
@@ -79,17 +79,17 @@ export namespace fpUtils {
       // Commented out example of using higher order function
       // .then(
       //   fp_utils.Result.flatMap((value) => {
-      //     if (value === 42) return fp_utils.Result.ok("42");
-      //     if (value === 0) return fp_utils.Result.err("Got zero");
-      //     return fp_utils.Result.ok();
+      //     if (value === 42) return fp_utils.Ok("42");
+      //     if (value === 0) return fp_utils.Err("Got zero");
+      //     return fp_utils.Ok();
       //   }),
       // here we use the class method to keep the benchmark comparison fair
       .then(
         (result) =>
           result.flatMap((value) => {
-            if (value === 42) return fp_utils.Result.ok("42");
-            if (value === 0) return fp_utils.Result.err("Got zero");
-            return fp_utils.Result.ok();
+            if (value === 42) return fp_utils.Ok("42");
+            if (value === 0) return fp_utils.Err("Got zero");
+            return fp_utils.Ok();
           }),
       );
 
@@ -108,10 +108,8 @@ export namespace fpUtils {
 
     // deno-lint-ignore require-await
     async function unionTypePromise(n: number = 1) {
-      if (n === 2) return fp_utils.Result.ok(42);
-      return n === 1
-        ? fp_utils.Result.ok("+1")
-        : fp_utils.Result.err("Got zero");
+      if (n === 2) return fp_utils.Ok(42);
+      return n === 1 ? fp_utils.Ok("+1") : fp_utils.Err("Got zero");
     }
 
     const result = await unionTypePromise()
