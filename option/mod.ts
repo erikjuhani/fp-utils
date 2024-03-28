@@ -36,7 +36,8 @@
  * ```
  */
 
-import { None as _None, Option, Some as _Some } from "./option.ts";
+import { Option } from "./option.ts";
+import type { None as _None, Some as _Some } from "./option.ts";
 
 export { Option };
 
@@ -46,7 +47,6 @@ export const Some = Option.some;
 /** None represents the absence of a value. */
 export const None: None = Option.none();
 
-// deno-lint-ignore no-empty-interface
 export interface Some<T> extends _Some<T> {}
-// deno-lint-ignore no-empty-interface
+
 export interface None extends _None {}

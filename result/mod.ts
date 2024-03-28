@@ -37,7 +37,8 @@
  * ```
  */
 
-import { Err as _Err, Ok as _Ok, Result } from "./result.ts";
+import { Result } from "./result.ts";
+import type { Err as _Err, Ok as _Ok } from "./result.ts";
 
 export { Result };
 
@@ -47,7 +48,6 @@ export const Ok = Result.ok;
 /** Err represents a failing computation with value `T` contained in the result. */
 export const Err = Result.err;
 
-// deno-lint-ignore no-empty-interface
 export interface Ok<T> extends _Ok<T> {}
-// deno-lint-ignore no-empty-interface
+
 export interface Err<TError> extends _Err<TError> {}
