@@ -426,49 +426,58 @@ export abstract class Option<T> {
  * Some represents the presence of a value `T` contained in the option.
  */
 export class Some<T> extends Option<T> {
-  private value: NonNullable<T>;
+  #value: NonNullable<T>;
 
   constructor(value: T) {
     super();
     if (!isNonNullable(value)) {
       throw Error("Trying to pass nullable value to Some");
     }
-    this.value = value;
+    this.#value = value;
   }
 
+  /** {@link Option.filter} */
+  filter(predicate: (value: T) => boolean): boolean {
+    return predicate(this.#value);
+  }
+
+  /** {@link Option.flatMap} */
   flatMap<U extends Option<unknown>>(fn: (value: T) => U): U {
-    return fn(this.value);
+    return fn(this.#value);
   }
 
+  /** {@link Option.inspect} */
   inspect(fn: (value: T) => void): this {
-    fn(this.value);
+    fn(this.#value);
     return this;
   }
 
+  /** {@link Option.map} */
   map<U>(fn: (value: T) => NonNullable<U>): Option<NonNullable<U>> {
-    return Option.some(fn(this.value));
+    return Option.some(fn(this.#value));
   }
 
-  filter(predicate: (value: T) => boolean): boolean {
-    return predicate(this.value);
-  }
-
+  /** {@link Option.match} */
   match<U1, U2>(onSome: (value: T) => U1, _onNone: () => U2): U1 {
-    return onSome(this.value);
+    return onSome(this.#value);
   }
 
+  /** {@link Option.unwrap} */
   unwrap(): T {
-    return this.value;
+    return this.#value;
   }
 
+  /** {@link Option.unwrapOr} */
   unwrapOr(_defaultValue: T): T {
-    return this.value;
+    return this.#value;
   }
 
+  /** {@link Option.isSome} */
   isSome<T>(): this is Some<T> {
     return true;
   }
 
+  /** {@link Option.isNone} */
   isNone(): this is None {
     return false;
   }
@@ -478,39 +487,48 @@ export class Some<T> extends Option<T> {
  * None represents the absence of a value.
  */
 export class None extends Option<never> {
+  /** {@link Option.filter} */
+  filter(_predicate: (value: never) => boolean): false {
+    return false;
+  }
+
+  /** {@link Option.flatMap} */
   flatMap<U extends Option<unknown>>(_fn: (value: never) => U): U {
     // Hacky fix to make type inference behave as expected
     return this as unknown as U;
   }
 
+  /** {@link Option.inspect} */
   inspect(_fn: (value: never) => void): this {
     return this;
   }
 
+  /** {@link Option.map} */
   map<U>(_fn: (value: never) => NonNullable<U>): this {
     return this;
   }
 
-  filter(_predicate: (value: never) => boolean): false {
-    return false;
-  }
-
+  /** {@link Option.match} */
   match<U1, U2>(_onSome: (value: never) => U1, onNone: () => U2): U2 {
     return onNone();
   }
 
+  /** {@link Option.unwrap} */
   unwrap(): never {
     throw Error("Called unwrap on None");
   }
 
+  /** {@link Option.unwrapOr} */
   unwrapOr<U>(defaultValue: U): U {
     return defaultValue;
   }
 
+  /** {@link Option.isSome} */
   isSome(): this is Some<never> {
     return false;
   }
 
+  /** {@link Option.isNone} */
   isNone(): this is None {
     return true;
   }

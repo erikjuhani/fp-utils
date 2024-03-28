@@ -40,7 +40,10 @@ import { None as _None, Option, Some as _Some } from "./option.ts";
 
 export { Option };
 
+/** Some represents the presence of a value `T` contained in the option. */
 export const Some = Option.some;
+
+/** None represents the absence of a value. */
 export const None: None = Option.none();
 
 // deno-lint-ignore no-empty-interface

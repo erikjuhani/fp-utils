@@ -41,8 +41,10 @@ import { Err as _Err, Ok as _Ok, Result } from "./result.ts";
 
 export { Result };
 
+/** Ok represents a succesful computation with value `T` contained in the result. */
 export const Ok = Result.ok;
 
+/** Err represents a failing computation with value `T` contained in the result. */
 export const Err = Result.err;
 
 // deno-lint-ignore no-empty-interface

@@ -587,39 +587,48 @@ export class Ok<T> extends Result<T, never> {
     this.#value = value;
   }
 
+  /** {@link Result.filter} */
   filter(predicate: (value: T) => boolean): boolean {
     return predicate(this.#value);
   }
 
+  /** {@link Result.flatMap} */
   flatMap<U, UError>(fn: (value: T) => Result<U, UError>): Result<U, UError> {
     return fn(this.#value);
   }
 
+  /** {@link Result.inspect} */
   inspect(fn: (value: T) => void): this {
     fn(this.#value);
     return this;
   }
 
+  /** {@link Result.inspectErr} */
   inspectErr(_fn: (value: never) => void): this {
     return this;
   }
 
+  /** {@link Result.isErr} */
   isErr(): this is Err<never> {
     return false;
   }
 
+  /** {@link Result.isOk} */
   isOk<T>(): this is Ok<T> {
     return true;
   }
 
+  /** {@link Result.map} */
   map<U>(fn: (value: T) => U): Ok<U> {
     return Result.ok(fn(this.#value));
   }
 
+  /** {@link Result.mapErr} */
   mapErr<U>(_fn: (value: never) => U): this {
     return this;
   }
 
+  /** {@link Result.match} */
   match<U1, U2>(
     onOk: (value: T) => U1,
     _onErr: (value: never) => U2,
@@ -628,14 +637,17 @@ export class Ok<T> extends Result<T, never> {
     return onOk(this.#value);
   }
 
+  /** {@link Result.unwrap} */
   unwrap(): T {
     return this.#value;
   }
 
+  /** {@link Result.unwrapErr} */
   unwrapErr(): never {
     throw Error("Called unwrapErr on Ok");
   }
 
+  /** {@link Result.unwrapOr} */
   unwrapOr(_defaultValue: T): T {
     return this.#value;
   }
@@ -647,14 +659,18 @@ export class Ok<T> extends Result<T, never> {
  */
 export class Err<TError> extends Result<never, TError> {
   #value: TError;
+
   constructor(value: TError) {
     super();
     this.#value = value;
   }
+
+  /** {@link Result.filter} */
   filter(_predicate: (value: never) => boolean): false {
     return false;
   }
 
+  /** {@link Result.flatMap} */
   flatMap<U, UError>(
     _fn: (value: never) => Result<U, UError>,
   ): Result<U, UError> {
@@ -662,43 +678,53 @@ export class Err<TError> extends Result<never, TError> {
     return this as unknown as Result<U, UError>;
   }
 
+  /** {@link Result.inspect} */
   inspect(_fn: (value: never) => void): this {
     return this;
   }
 
+  /** {@link Result.inspectErr} */
   inspectErr(fn: (value: TError) => void): this {
     fn(this.#value);
     return this;
   }
 
+  /** {@link Result.isErr} */
   isErr(): this is Err<TError> {
     return true;
   }
 
+  /** {@link Result.isOk} */
   isOk<T>(): this is Ok<T> {
     return false;
   }
 
+  /** {@link Result.map} */
   map<U>(_fn: (value: never) => U): this {
     return this;
   }
 
+  /** {@link Result.mapErr} */
   mapErr<U>(fn: (value: TError) => U): Err<U> {
     return Result.err(fn(this.#value));
   }
 
+  /** {@link Result.match} */
   match<U1, U2>(_onOk: (value: never) => U1, onErr: (value: TError) => U2): U2 {
     return onErr(this.#value);
   }
 
+  /** {@link Result.unwrap} */
   unwrap(): never {
     throw Error("Called unwrap on Err");
   }
 
+  /** {@link Result.unwrapErr} */
   unwrapErr(): TError {
     return this.#value;
   }
 
+  /** {@link Result.unwrapOr} */
   unwrapOr<U>(defaultValue: U): U {
     return defaultValue;
   }
