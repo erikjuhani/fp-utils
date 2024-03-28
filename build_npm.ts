@@ -74,7 +74,9 @@ async function buildModule(module: string) {
       copyReadme();
       stripCommentsFromJSFiles(
         `${outDir}/esm/mod.js`,
+        `${outDir}/esm/${module}.js`,
         `${outDir}/script/mod.js`,
+        `${outDir}/script/${module}.js`,
       );
     },
   });
