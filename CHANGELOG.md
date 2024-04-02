@@ -1,3 +1,16 @@
+## 0.11.1
+
+FIXES:
+
+- [Strip comments from option.js and result.js files](https://github.com/erikjuhani/fp-utils/commit/55123c5e7c32eb40acbd2290eaa891cab98757f8)
+
+## 0.11.0
+
+BREAKING CHANGES:
+
+- [Option module overhaul](https://github.com/erikjuhani/fp-utils/commit/feeffa63db6d53d3fa980022e9f627d26bf4578a)
+- [Result module overhaul](https://github.com/erikjuhani/fp-utils/commit/544d6b330d0e8862a85dec263ca66eb2c3df71cb)
+
 ## 0.10.0
 
 FEATURES:
