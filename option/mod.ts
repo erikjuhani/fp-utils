@@ -41,12 +41,32 @@ import type { None as _None, Some as _Some } from "./option.ts";
 
 export { Option };
 
-/** Some represents the presence of a value `T` contained in the option. */
+/**
+ * Some creates an option Some with value `T`.
+ *
+ * @example
+ * ```ts
+ * Some(42); // Evaluates to Some 42
+ *
+ * Some(undefined); // Throws an exception or compiler error!
+ *
+ * Some(null); // Throws an exception or compiler error!
+ * ```
+ */
 export const Some = Option.some;
 
-/** None represents the absence of a value. */
+/**
+ * None returns a None option.
+ *
+ * @example
+ * ```ts
+ * const none = None; // Evaluates to None
+ * ```
+ */
 export const None: None = Option.none();
 
+/** Some represents the presence of a value `T` contained in the option. */
 export interface Some<T> extends _Some<T> {}
 
+/** None represents the absence of a value. */
 export interface None extends _None {}

@@ -5,12 +5,13 @@
  */
 export abstract class Result<T, TError> {
   /**
-   * Result.err creates a result Err with error value `T`. Type `undefined` can
-   * be interpreted to have the same significance as the `unit` type. Unit type
-   * signifies the absence of a specific value and acts as a placeholder when no
-   * other value exits or is needed.
+   * Result.err creates a result Err with error value `TError`. Type
+   * `undefined` can be interpreted to have the same significance as the `unit`
+   * type. Unit type signifies the absence of a specific value and acts as a
+   * placeholder when no other value exits or is needed.
    *
-   * @example ```ts
+   * @example
+   * ```ts
    * Result
    *   .err("error"); // Evaluates to Err "error"
    *
@@ -25,8 +26,8 @@ export abstract class Result<T, TError> {
    * ```
    */
   static err(): Err<undefined>;
-  static err<T>(value: T): Err<T>;
-  static err<T>(value?: T): Err<T> | Err<undefined> {
+  static err<TError>(value: TError): Err<TError>;
+  static err<TError>(value?: TError): Err<TError> | Err<undefined> {
     if (value === undefined) return new Err<undefined>(undefined);
     return new Err(value);
   }

@@ -42,12 +42,47 @@ import type { Err as _Err, Ok as _Ok } from "./result.ts";
 
 export { Result };
 
-/** Ok represents a succesful computation with value `T` contained in the result. */
+/**
+ * Ok creates a result Ok with value `T`. If called without arguments
+ * Ok<undefined> is returned. Type `undefined` can be interpreted to have the
+ * same significance as the `unit` type. Unit type signifies the absence of a
+ * specific value and acts as a placeholder when no other value exits or is
+ * needed.
+ *
+ * @example
+ * ```ts
+ * Ok("value"); // Evaluates to Ok "value"
+ *
+ * Ok(42); // Evaluates to Ok 42
+ *
+ * Ok(); // Evaluates to Ok undefined
+ *
+ * Ok(null); // Evaluates to Ok null
+ * ```
+ */
 export const Ok = Result.ok;
 
-/** Err represents a failing computation with value `T` contained in the result. */
+/**
+ * Err creates a result Err with error value `TError`. Type `undefined` can be
+ * interpreted to have the same significance as the `unit` type. Unit type
+ * signifies the absence of a specific value and acts as a placeholder when no
+ * other value exits or is needed.
+ *
+ * @example
+ * ```ts
+ * Err("error"); // Evaluates to Err "error"
+ *
+ * Err(42); // Evaluates to Err 42
+ *
+ * Err(); // Evaluates to Err undefined
+ *
+ * Err(null); // Evaluates to Err null
+ * ```
+ */
 export const Err = Result.err;
 
+/** Ok represents a succesful computation with value `T` contained in the result. */
 export interface Ok<T> extends _Ok<T> {}
 
+/** Err represents a failing computation with value `T` contained in the result. */
 export interface Err<TError> extends _Err<TError> {}

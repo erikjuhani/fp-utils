@@ -16,7 +16,7 @@ Result is similar to Option, the main difference is that it holds either a value
 or an error, and not value or none.
 
 ```ts
-import { Result } from "@fp-utils/result";
+import { Err, Ok, Result } from "@fp-utils/result";
 
 type BookIndex = number;
 type BookName = string;
@@ -343,7 +343,7 @@ Result
   .filter((x: number) => x >= 5)(Ok(42)); // evaluates to true
 
 Result
-  .filter((x) => x >= 5)(Err(10)); // evaluates to false
+  .filter((x: number) => x >= 5)(Err(10)); // evaluates to false
 ```
 
 </details>
