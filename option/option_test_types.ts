@@ -48,6 +48,60 @@ import { assertType, IsExact } from "../dev_deps.ts";
   if (Option.isSome(option)) {
     assertType<IsExact<typeof option, Some<string>>>(true);
   }
+
+  const option1 = Some(42) as Some<number> | Some<string> | None;
+
+  if (option1.isNone()) {
+    assertType<IsExact<typeof option1, None>>(true);
+  }
+
+  if (Option.isNone(option1)) {
+    assertType<IsExact<typeof option1, None>>(true);
+  }
+
+  if (option1.isSome()) {
+    assertType<IsExact<typeof option1, Some<number> | Some<string>>>(true);
+  }
+
+  if (Option.isSome(option1)) {
+    assertType<IsExact<typeof option1, Some<string> | Some<number>>>(true);
+  }
+
+  const option2 = Some(42);
+
+  if (option2.isNone()) {
+    assertType<IsExact<typeof option2, Some<42> & None>>(true);
+  }
+
+  if (Option.isNone(option2)) {
+    assertType<IsExact<typeof option2, Some<42> & None>>(true);
+  }
+
+  if (option2.isSome()) {
+    assertType<IsExact<typeof option2, Some<42>>>(true);
+  }
+
+  if (Option.isSome(option2)) {
+    assertType<IsExact<typeof option2, Some<42>>>(true);
+  }
+
+  const option3 = None;
+
+  if (option3.isNone()) {
+    assertType<IsExact<typeof option3, None>>(true);
+  }
+
+  if (Option.isNone(option3)) {
+    assertType<IsExact<typeof option3, None>>(true);
+  }
+
+  if (option3.isSome()) {
+    assertType<IsExact<typeof option3, None & Some<never>>>(true);
+  }
+
+  if (Option.isSome(option3)) {
+    assertType<IsExact<typeof option3, None & Some<never>>>(true);
+  }
 });
 
 // Option.match - match promise then callback

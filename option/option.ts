@@ -147,7 +147,7 @@ export abstract class Option<T> {
    *   .isNone(None); // Evaluates to true
    * ```
    */
-  static isNone<T>(option: Option<T>): option is None {
+  static isNone(option: Option<unknown>): option is None {
     return option.isNone();
   }
 
@@ -163,8 +163,10 @@ export abstract class Option<T> {
    *   .isSome(None); // Evaluates to false
    * ```
    */
-  static isSome<T>(option: Option<T>): option is Some<T> {
-    return option.isSome();
+  static isSome<T, TOption extends Option<T>>(
+    option: TOption | Some<T>,
+  ): option is Some<TOption extends Option<infer Z> ? Z : never> {
+    return (option as TOption).isSome();
   }
 
   /**
