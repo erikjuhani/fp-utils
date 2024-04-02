@@ -463,7 +463,7 @@ export abstract class Result<T, TError> {
    *   .isErr(); // Evaluates to true
    * ```
    */
-  abstract isErr(): this is Err<TError>;
+  abstract isErr<UError extends TError>(): this is Err<UError>;
 
   /**
    * Result.isOk returns `true` if the result is `Ok`.
@@ -690,12 +690,12 @@ export class Err<TError> extends Result<never, TError> {
   }
 
   /** {@link Result.isErr} */
-  isErr(): this is Err<TError> {
+  isErr<TError>(): this is Err<TError> {
     return true;
   }
 
   /** {@link Result.isOk} */
-  isOk<T>(): this is Ok<T> {
+  isOk(): this is Ok<never> {
     return false;
   }
 

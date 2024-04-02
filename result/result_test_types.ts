@@ -58,6 +58,60 @@ import { assertType, IsExact } from "../dev_deps.ts";
   if (Result.isOk(result)) {
     assertType<IsExact<typeof result, Ok<string>>>(true);
   }
+
+  const result1 = Ok(42) as Ok<number> | Err<string> | Ok<undefined>;
+
+  if (result1.isErr()) {
+    assertType<IsExact<typeof result1, Err<string>>>(true);
+  }
+
+  if (Result.isErr(result1)) {
+    assertType<IsExact<typeof result1, Err<string>>>(true);
+  }
+
+  if (result1.isOk()) {
+    assertType<IsExact<typeof result1, Ok<number> | Ok<undefined>>>(true);
+  }
+
+  if (Result.isOk(result1)) {
+    assertType<IsExact<typeof result1, Ok<number> | Ok<undefined>>>(true);
+  }
+
+  const result2 = Ok(42);
+
+  if (result2.isErr()) {
+    assertType<IsExact<typeof result2, Ok<number> & Err<never>>>(true);
+  }
+
+  if (Result.isErr(result2)) {
+    assertType<IsExact<typeof result2, Ok<number> & Err<never>>>(true);
+  }
+
+  if (result2.isOk()) {
+    assertType<IsExact<typeof result2, Ok<number>>>(true);
+  }
+
+  if (Result.isOk(result2)) {
+    assertType<IsExact<typeof result2, Ok<number>>>(true);
+  }
+
+  const result3 = Err(42);
+
+  if (result3.isErr()) {
+    assertType<IsExact<typeof result3, Err<number>>>(true);
+  }
+
+  if (Result.isErr(result3)) {
+    assertType<IsExact<typeof result3, Err<number>>>(true);
+  }
+
+  if (result3.isOk()) {
+    assertType<IsExact<typeof result3, Err<number> & Ok<never>>>(true);
+  }
+
+  if (Result.isOk(result3)) {
+    assertType<IsExact<typeof result3, Err<number> & Ok<never>>>(true);
+  }
 });
 
 // Result.match - match promise then callback
