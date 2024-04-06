@@ -59,6 +59,48 @@ const err = Err(42);
 Result methods are chainable functions that enable a sequence of operations with
 the contained value `T` in the Result.
 
+#### `Result.expect`
+
+Signature: `(value: string): T`
+
+Result.expect will return the wrapped value if the result is Ok. If the result
+is Err the function will throw an error with the given input value as the error
+message.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Ok(42)
+  .expect("Value should exist"); // evaluates 42
+
+Err(42)
+  .expect("Value should exist"); // Throws an exception with message Value should exist!
+```
+
+</details>
+
+#### `Result.expectErr`
+
+Signature: `(value: string): TError`
+
+Result.expectErr will return the wrapped value if the result is Err. If the
+result is Ok the function will throw an error with the given input value as the
+error message.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Ok(42)
+  .expect("Value should exist"); // Throws an exception with message Value should exist!
+
+Err(42)
+  .expect("Value should exist"); // evaluates 42
+```
+
+</details>
+
 #### `Result.filter`
 
 Signature: `(predicate: (value: T) => boolean): boolean`
@@ -323,6 +365,48 @@ Promise.resolve(42)
   .then(Result.map((value) => value + 10)) // Evaluates to 52
   .then(Result.unwrap); // Returns 52
 ```
+
+#### `Result.expect`
+
+Signature: `expect(value: string): (result: Result<T, TError>) => T`
+
+Result.expect will return the wrapped value if the result is Ok. If the result
+is Err the function will throw an error with the given input value as the error
+message.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Result
+  .expect("Value should exist")(Ok(42)); // Evaluates 42
+
+Result
+  .expect("Value should exist")(Err(42)); // Throws an exception with message Value should exist!
+```
+
+</details>
+
+#### `Result.expectErr`
+
+Signature: `expectErr(value: string): (result: Result<T, TError>) => TError`
+
+Result.expectErr will return the wrapped value if the result is Err. If the
+result is Ok the function will throw an error with the given input value as the
+error message.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Result
+  .expect("Value should exist")(Ok(42)); // Throws an exception with message Value should exist!
+
+Result
+  .expectErr("Value should exist")(Err(42)); // Evaluates 42
+```
+
+</details>
 
 #### `Result.filter`
 

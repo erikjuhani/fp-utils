@@ -27,6 +27,36 @@ test("Result.isErr", () => {
   });
 });
 
+test("Result.expect", () => {
+  assertEquals(Ok(42).expect("Value should exist"), 42);
+  assertEquals(Result.expect("Value should exist")(Ok(42)), 42);
+  assertThrows(
+    () => Err(42).expect("Value should exist"),
+    Error,
+    "Value should exist",
+  );
+  assertThrows(
+    () => Result.expect("Value should exist")(Err(42)),
+    Error,
+    "Value should exist",
+  );
+});
+
+test("Result.expectErr", () => {
+  assertEquals(Err(42).expectErr("Value should exist"), 42);
+  assertEquals(Result.expectErr("Value should exist")(Err(42)), 42);
+  assertThrows(
+    () => Ok(42).expectErr("Value should exist"),
+    Error,
+    "Value should exist",
+  );
+  assertThrows(
+    () => Result.expectErr("Value should exist")(Ok(42)),
+    Error,
+    "Value should exist",
+  );
+});
+
 test("Ok returns unit if no value is applied", () => {
   assertEquals(Ok().unwrap(), undefined);
 });

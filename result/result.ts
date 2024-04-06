@@ -33,6 +33,44 @@ export abstract class Result<T, TError> {
   }
 
   /**
+   * Result.expect will return the wrapped value if the result is Ok. If the
+   * result is Err the function will throw an error with the given input value
+   * as the error message.
+   *
+   * @example
+   * ```ts
+   * Result
+   *   .expect("Value should exist")(Ok(42)); // Evaluates 42
+   *
+   * Result
+   *   .expect("Value should exist")(Err(42)); // Throws an exception with message Value should exist!
+   * ```
+   */
+  static expect<T, TError>(value: string): (result: Result<T, TError>) => T {
+    return (result) => result.expect(value);
+  }
+
+  /**
+   * Result.expectErr will return the wrapped error value if the result is Err.
+   * If the result is Ok the function will throw an error with the given input
+   * value as the error message.
+   *
+   * @example
+   * ```ts
+   * Result
+   *   .expectErr("Value should exist")(Ok(42)); // Throws an exception with message Value should exist!
+   *
+   * Result
+   *   .expectErr("Value should exist")(Err(42)); // evaluates 42
+   * ```
+   */
+  static expectErr<T, TError>(
+    value: string,
+  ): (result: Result<T, TError>) => TError {
+    return (result) => result.expectErr(value);
+  }
+
+  /**
    * Result.filter returns a boolean that is evaluated with the given
    * `predicate` function which is applied on the result value `T`. Err
    * evaluates to `false`.
@@ -376,6 +414,38 @@ export abstract class Result<T, TError> {
   }
 
   /**
+   * Result.expect will return the wrapped value if the result is Ok. If the
+   * result is Err the function will throw an error with the given input value
+   * as the error message.
+   *
+   * @example
+   * ```ts
+   * Ok(42)
+   *   .expect("Value should exist"); // evaluates 42
+   *
+   * Err(42)
+   *   .expect("Value should exist"); // Throws an exception with message Value should exist!
+   * ```
+   */
+  abstract expect<U extends T>(value: string): T | U;
+
+  /**
+   * Result.expectErr will return the wrapped error value if the result is Err.
+   * If the result is Ok the function will throw an error with the given input
+   * value as the error message.
+   *
+   * @example
+   * ```ts
+   * Ok(42)
+   *   .expect("Value should exist"); // Throws an exception with message Value should exist!
+   *
+   * Err(42)
+   *   .expect("Value should exist"); // evaluates 42
+   * ```
+   */
+  abstract expectErr(value: string): TError;
+
+  /**
    * Result.filter returns a boolean that is evaluated with the given
    * `predicate` function which is applied on the result value `T`. Err
    * evaluates to `false`.
@@ -588,6 +658,16 @@ export class Ok<T> extends Result<T, never> {
     this.#value = value;
   }
 
+  /** {@link Result.expect} */
+  expect(_value: string): T {
+    return this.#value;
+  }
+
+  /** {@link Result.expectErr} */
+  expectErr(value: string): never {
+    throw new Error(value);
+  }
+
   /** {@link Result.filter} */
   filter(predicate: (value: T) => boolean): boolean {
     return predicate(this.#value);
@@ -664,6 +744,16 @@ export class Err<TError> extends Result<never, TError> {
   constructor(value: TError) {
     super();
     this.#value = value;
+  }
+
+  /** {@link Result.expect} */
+  expect(value: string): never {
+    throw new Error(value);
+  }
+
+  /** {@link Result.expectErr} */
+  expectErr(_value: string): TError {
+    return this.#value;
   }
 
   /** {@link Result.filter} */
