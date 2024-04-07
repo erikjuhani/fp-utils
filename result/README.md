@@ -93,10 +93,10 @@ error message.
 
 ```ts
 Ok(42)
-  .expect("Value should exist"); // Throws an exception with message Value should exist!
+  .expectErr("Value should exist"); // Throws an exception with message Value should exist!
 
 Err(42)
-  .expect("Value should exist"); // evaluates 42
+  .expectErr("Value should exist"); // evaluates 42
 ```
 
 </details>
@@ -400,7 +400,7 @@ error message.
 
 ```ts
 Result
-  .expect("Value should exist")(Ok(42)); // Throws an exception with message Value should exist!
+  .expectErr("Value should exist")(Ok(42)); // Throws an exception with message Value should exist!
 
 Result
   .expectErr("Value should exist")(Err(42)); // Evaluates 42
