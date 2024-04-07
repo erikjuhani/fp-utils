@@ -17,7 +17,7 @@
  * value or an error, and not value or none.
  *
  * ```ts
- * import { Result } from "@fp-utils/result";
+ * import { Err, Ok, Result } from "@fp-utils/result";
  *
  * type BookIndex = number;
  * type BookName = string;
