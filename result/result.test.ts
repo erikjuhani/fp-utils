@@ -70,7 +70,7 @@ test("Result.unwrap on Ok returns Ok value", () => {
 });
 
 test("Result.unwrap on Err throws", () => {
-  assertThrows(() => Result.unwrap(Err(0)), "Called unwrap on Err");
+  assertThrows(() => Result.unwrap(Err(0)), Error, "Called unwrap on Err");
 });
 
 test("Result.unwrapErr on Err returns Err value", () => {
@@ -78,7 +78,7 @@ test("Result.unwrapErr on Err returns Err value", () => {
 });
 
 test("Result.unwrapErr on Ok throws", () => {
-  assertThrows(() => Result.unwrapErr(Ok(0)), "Called unwrap on Ok");
+  assertThrows(() => Result.unwrapErr(Ok(0)), Error, "Called unwrapErr on Ok");
 });
 
 test("Result.unwrapOr on Ok returns Ok value", () => {
@@ -276,4 +276,35 @@ test("Result.from", async () => {
     const actual = await Result.from(input, "error");
     assertEquals(actual, expected);
   }
+
+  // Result.from expected as function
+  assertEquals(
+    Result.from(() => {
+      throw new Error("error");
+    }, (err: Error) => `original ${err.message}`).unwrapErr(),
+    "original error",
+  );
+
+  // Result.from without expected defined
+  assertEquals(
+    Result.from(() => {
+      throw new Error("error");
+    }).unwrapErr(),
+    new Error("error"),
+  );
+
+  // Result.from expected as function
+  assertEquals(
+    (await Result.from(
+      Promise.reject("error"),
+      (err: string) => `original ${err}`,
+    )).unwrapErr(),
+    "original error",
+  );
+
+  // Result.from without expected defined
+  assertEquals(
+    (await Result.from(Promise.reject("error"))).unwrapErr(),
+    "error",
+  );
 });
