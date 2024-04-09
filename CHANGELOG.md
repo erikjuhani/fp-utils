@@ -1,3 +1,19 @@
+## 0.12.0
+
+FEATURES:
+
+- [Add expect and expectErr for Result](https://github.com/erikjuhani/fp-utils/commit/5b359d1d6c79ee95b965f1a780872cc1aef38b08)
+
+FIXES:
+
+- [Fix imports in Result module documentation code example](https://github.com/erikjuhani/fp-utils/commit/e54475ec0308c790776c881c2a2eec98c4681574)
+
+CHANGES:
+
+- [Improve constructor documentation](https://github.com/erikjuhani/fp-utils/commit/088e4212ce44e379f8b9c6369f3e6fc6910fec9d)
+- [Improve Result isOk and isErr type guard type inference](https://github.com/erikjuhani/fp-utils/commit/b829ce916b78836e86c46a93a57a05a0445e572b)
+- [Improve Option isSome and isNone type guard type inference](https://github.com/erikjuhani/fp-utils/commit/78e5eb9a771e9d69788370ebce0da653a23783c5)
+
 ## 0.11.1
 
 FIXES:
