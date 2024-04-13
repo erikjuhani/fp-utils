@@ -1,5 +1,5 @@
 import { Err, Ok, Result } from "./mod.ts";
-import { assertType, IsExact } from "../dev_deps.ts";
+import { assertType, type IsExact } from "../dev_deps.ts";
 
 // Result.map - unit to string
 (() => {
@@ -133,16 +133,52 @@ import { assertType, IsExact } from "../dev_deps.ts";
   const unionResult = Ok() as
     | Ok<undefined>
     | Err<string>
-    | Ok<number>;
+    | Ok<number>
+    | Err<number>
+    | Result<string, string>;
 
-  const t = unionResult.flatMap((value) => {
-    assertType<IsExact<typeof value, number | undefined>>(true);
+  const t0 = unionResult.flatMap((value) => {
+    assertType<IsExact<typeof value, string | number | undefined>>(true);
     if (value === 42) return Ok();
     if (value) return Ok("Ok" as const);
     else return Err("Got undefined value");
   });
 
-  assertType<IsExact<typeof t, Result<"Ok" | undefined, string>>>(true);
+  assertType<
+    IsExact<
+      typeof t0,
+      Err<string> | Err<number> | Result<"Ok" | undefined, string>
+    >
+  >(true);
+
+  const t1 = unionResult.inspectErr((value) => {
+    assertType<IsExact<typeof value, string | number>>(true);
+  });
+
+  assertType<
+    IsExact<
+      typeof t1,
+      | Result<string, string>
+      | Ok<number>
+      | Ok<undefined>
+      | Err<string>
+      | Err<number>
+    >
+  >(
+    true,
+  );
+
+  // FlatMap on Err should always return Err type
+  const t2 = Err(10).flatMap(() => Ok(10));
+  assertType<IsExact<typeof t2, Err<number>>>(true);
+
+  const t3 = Ok(10).flatMap(() => Err(10));
+  assertType<IsExact<typeof t3, Result<never, number>>>(true);
+
+  const t4 = (Ok(10) as Result<number, string>).flatMap((value) =>
+    value > 10 ? Ok("10") : Err(10)
+  );
+  assertType<IsExact<typeof t4, Result<string, number>>>(true);
 });
 
 // Result.flatMap - union input type and union return type (callback)
@@ -150,22 +186,26 @@ import { assertType, IsExact } from "../dev_deps.ts";
   const unionResult = Ok() as
     | Ok<undefined>
     | Err<string>
-    | Ok<number>;
+    | Ok<number>
+    | Err<number>
+    | Result<string, string>;
 
   // Using the Result API this way requires you to pass the Result function (in
   // this case flatMap) to a function expecting a callback, since the method
   // is a higher order function. Also the inference only works correctly from
   // left to right.
-  const t0 = await Promise.resolve(unionResult).then((a) => a).then(
+  const t0 = await Promise.resolve(unionResult).then(
     Result.flatMap((value) => {
-      assertType<IsExact<typeof value, number | undefined>>(true);
+      assertType<IsExact<typeof value, string | number | undefined>>(true);
       if (value === 42) return Ok();
       if (value) return Ok("Ok" as const);
       else return Err("Got undefined value");
     }),
   );
 
-  assertType<IsExact<typeof t0, Result<"Ok" | undefined, string>>>(true);
+  assertType<IsExact<typeof t0, Result<"Ok" | undefined, string | number>>>(
+    true,
+  );
 
   // When the Result.flatMap function is not used in a callback and the result
   // is given directly, it is expected that the callback type needs to be
@@ -174,10 +214,78 @@ import { assertType, IsExact } from "../dev_deps.ts";
   const t1 = Result.flatMap((value: number | undefined) => {
     if (value === 42) return Ok();
     if (value) return Ok("Ok" as const);
+    if (value === 102) return Err(102);
     else return Err("Got undefined value");
   })(unionResult);
 
-  assertType<IsExact<typeof t1, Result<"Ok" | undefined, string>>>(true);
+  // We cannot infer the original Result type so we return type unknown for err
+  // type, which is better than a wrong type.
+  assertType<IsExact<typeof t1, Result<"Ok" | undefined, unknown>>>(
+    true,
+  );
+
+  const t2 = await Promise.resolve(unionResult).then(
+    Result.inspectErr((value) => {
+      assertType<IsExact<typeof value, string | number>>(true);
+    }),
+  );
+
+  assertType<IsExact<typeof t2, typeof unionResult>>(true);
+
+  const t3 = await Promise.resolve(unionResult).then(
+    Result.inspect((value) => {
+      assertType<IsExact<typeof value, string | number | undefined>>(true);
+    }),
+  );
+
+  assertType<IsExact<typeof t3, typeof unionResult>>(true);
+
+  const t4 = await Promise.resolve(unionResult).then(
+    Result.map((value) => {
+      assertType<IsExact<typeof value, string | number | undefined>>(true);
+      return String(value);
+    }),
+  );
+
+  assertType<IsExact<typeof t4, Result<string, string | number>>>(true);
+
+  const t5 = await Promise.resolve(unionResult).then(
+    Result.mapErr((value) => {
+      assertType<IsExact<typeof value, number | string>>(true);
+      return String(value);
+    }),
+  );
+
+  assertType<IsExact<typeof t5, Result<string | number | undefined, string>>>(
+    true,
+  );
+
+  const t6 = await Promise.resolve(unionResult).then(
+    Result.expect("Error"),
+  );
+
+  assertType<IsExact<typeof t6, string | number | undefined>>(true);
+
+  const t7 = await Promise.resolve(unionResult).then(
+    Result.expectErr("Error"),
+  );
+
+  assertType<IsExact<typeof t7, number | string>>(true);
+
+  const t8 = await Promise.resolve(unionResult).then(
+    Result.filter((value) => {
+      assertType<IsExact<typeof value, string | number | undefined>>(true);
+      return Boolean(value);
+    }),
+  );
+
+  assertType<IsExact<typeof t8, boolean>>(true);
+
+  const t9 = await Promise.resolve(unionResult).then(
+    Result.unwrapOr("abc"),
+  );
+
+  assertType<IsExact<typeof t9, string | number | undefined>>(true);
 });
 
 // Result.from - function union input type with undefined and union return type

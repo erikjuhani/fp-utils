@@ -46,6 +46,10 @@ export abstract class Result<T, TError> {
    *   .expect("Value should exist")(Err(42)); // Throws an exception with message Value should exist!
    * ```
    */
+  // deno-lint-ignore no-explicit-any
+  static expect<T, TError, TResult extends Result<any, TError>>(
+    value: string,
+  ): (result: TResult) => TResult extends Result<infer U, infer _> ? U : never;
   static expect<T, TError>(value: string): (result: Result<T, TError>) => T {
     return (result) => result.expect(value);
   }
@@ -64,6 +68,10 @@ export abstract class Result<T, TError> {
    *   .expectErr("Value should exist")(Err(42)); // evaluates 42
    * ```
    */
+  // deno-lint-ignore no-explicit-any
+  static expectErr<T, TError, TResult extends Result<T, any>>(
+    value: string,
+  ): (result: TResult) => TResult extends Result<infer _, infer U> ? U : never;
   static expectErr<T, TError>(
     value: string,
   ): (result: Result<T, TError>) => TError {
@@ -87,6 +95,12 @@ export abstract class Result<T, TError> {
    *   .filter((x: number) => x >= 5)(Err(10)); // evaluates to false
    * ```
    */
+  // deno-lint-ignore no-explicit-any
+  static filter<T, TError, TResult extends Result<any, TError>>(
+    predicate: (
+      value: TResult extends Result<infer U, infer _> ? U : never,
+    ) => boolean,
+  ): (result: TResult) => boolean;
   static filter<T, TError>(
     predicate: (value: T) => boolean,
   ): (result: Result<T, TError>) => boolean {
@@ -116,10 +130,33 @@ export abstract class Result<T, TError> {
    *   .flatMap(tryParse)(Err("error")); // Evaluates to Err "error"
    * ```
    */
+  static flatMap<
+    T,
+    TError,
+    U,
+    UError,
+    // deno-lint-ignore no-explicit-any
+    TResult extends Result<any, TError>,
+    UResult extends Result<U, UError>,
+  >(
+    fn: (
+      value: TResult extends Result<infer U, infer _> ? U : never,
+    ) => UResult,
+  ): (result: TResult) => Result<
+    UResult extends Result<infer U, infer _> ? U : never,
+    UResult extends Result<infer _, infer UError>
+      ? TResult extends Result<infer _, infer U> ? U | UError
+      : UError
+      : never
+  >;
   static flatMap<T, TError, U, UError>(
-    fn: (value: T) => Ok<U> | Err<UError>,
-  ): (result: Result<T, TError>) => Result<U, UError> {
-    return (result) => result.flatMap(fn);
+    fn: (value: T) => Result<U, UError>,
+  ): (
+    result: Result<T, TError>,
+  ) => typeof result extends Err<TError> ? Err<TError> : Result<U, UError> {
+    return (result) =>
+      result.flatMap(fn) as typeof result extends Err<TError> ? Err<TError>
+        : Result<U, UError>;
   }
 
   /**
@@ -203,6 +240,10 @@ export abstract class Result<T, TError> {
    *   .inspect((x) => console.log(x * 2))(Err(42)); // Prints nothing
    * ```
    */
+  // deno-lint-ignore no-explicit-any
+  static inspect<T, TError, TResult extends Result<any, TError>>(
+    fn: (value: TResult extends Result<infer U, infer _> ? U : never) => void,
+  ): (result: TResult) => TResult;
   static inspect<T, TError>(
     fn: (value: T) => void,
   ): (result: Result<T, TError>) => Result<T, TError> {
@@ -222,6 +263,10 @@ export abstract class Result<T, TError> {
    *   .inspectErr((x: number) => console.log(x * 2))(Err(42)); // Prints 84
    * ```
    */
+  // deno-lint-ignore no-explicit-any
+  static inspectErr<T, TError, TResult extends Result<T, any>>(
+    fn: (value: TResult extends Result<infer _, infer U> ? U : never) => void,
+  ): (result: TResult) => TResult;
   static inspectErr<T, TError>(
     fn: (value: TError) => void,
   ): (result: Result<T, TError>) => Result<T, TError> {
@@ -275,6 +320,16 @@ export abstract class Result<T, TError> {
    *   .map((x: number) => x * 2)(Err(42)); // Evaluates to Err 42
    * ```
    */
+  // deno-lint-ignore no-explicit-any
+  static map<T, TError, U, TResult extends Result<any, TError>>(
+    fn: (value: TResult extends Result<infer U, infer _> ? U : never) => U,
+  ): (
+    result: TResult,
+  ) => Result<
+    U,
+    TResult extends Result<infer _, infer TError0> ? TError0
+      : never
+  >;
   static map<T, TError, U>(
     fn: (value: T) => U,
   ): (result: Result<T, TError>) => Result<U, TError> {
@@ -294,6 +349,16 @@ export abstract class Result<T, TError> {
    *   .mapErr((x) => x * 2)(Err(42)); // Evaluates to Err 84
    * ```
    */
+  // deno-lint-ignore no-explicit-any
+  static mapErr<T, TError, U, TResult extends Result<T, any>>(
+    fn: (value: TResult extends Result<infer _, infer U> ? U : never) => U,
+  ): (
+    result: TResult,
+  ) => Result<
+    TResult extends Result<infer T0, infer _> ? T0
+      : never,
+    U
+  >;
   static mapErr<T, TError, UError>(
     fn: (value: TError) => UError,
   ): (result: Result<T, TError>) => Result<T, UError> {
@@ -407,6 +472,12 @@ export abstract class Result<T, TError> {
    *   .unwrapOr(99)(Err(42)); // Evaluates to 99
    * ```
    */
+  // deno-lint-ignore no-explicit-any
+  static unwrapOr<T, TError, TResult extends Result<any, TError>>(
+    defaultValue: T,
+  ): (
+    result: TResult,
+  ) => (TResult extends Result<infer U, infer _> ? U : never) | T;
   static unwrapOr<T, TError>(
     defaultValue: T,
   ): (result: Result<T, TError>) => T {
@@ -487,6 +558,9 @@ export abstract class Result<T, TError> {
    *   .flatMap(tryParse); // Evaluates to Err "error"
    * ```
    */
+  abstract flatMap<U, UError>(
+    fn: (value: T) => Ok<U> | Err<UError>,
+  ): Result<U, UError>;
   abstract flatMap<U, UError>(
     fn: (value: T) => Result<U, UError>,
   ): Result<U, UError>;
@@ -653,6 +727,7 @@ export abstract class Result<T, TError> {
  */
 export class Ok<T> extends Result<T, never> {
   #value: T;
+
   constructor(value: T) {
     super();
     this.#value = value;
@@ -674,7 +749,9 @@ export class Ok<T> extends Result<T, never> {
   }
 
   /** {@link Result.flatMap} */
-  flatMap<U, UError>(fn: (value: T) => Result<U, UError>): Result<U, UError> {
+  flatMap<U, UError>(
+    fn: (value: T) => Result<U, UError>,
+  ): Result<U, UError> {
     return fn(this.#value);
   }
 
@@ -764,9 +841,8 @@ export class Err<TError> extends Result<never, TError> {
   /** {@link Result.flatMap} */
   flatMap<U, UError>(
     _fn: (value: never) => Result<U, UError>,
-  ): Result<U, UError> {
-    // Hacky fix to make type inference behave as expected
-    return this as unknown as Result<U, UError>;
+  ): this {
+    return this;
   }
 
   /** {@link Result.inspect} */
