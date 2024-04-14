@@ -50,11 +50,25 @@ export abstract class Option<T> {
    *   .flatMap(tryParse)(None); // Evaluates to None
    * ```
    */
-  static flatMap<T, U extends Option<unknown>>(
-    fn: (value: T) => U,
-  ): (option: Option<T>) => Option<U extends Option<infer Z> ? Z : never> {
+  static flatMap<
+    U,
+    // deno-lint-ignore no-explicit-any
+    TOption extends Option<any>,
+    UOption extends Option<U>,
+  >(
+    fn: (
+      value: TOption extends Option<infer U> ? U : never,
+    ) => UOption,
+  ): (option: TOption) => Option<
+    UOption extends Option<infer U> ? U : never
+  >;
+  static flatMap<T, U>(
+    fn: (value: T) => Option<NonNullable<U>>,
+  ): (
+    option: Option<T>,
+  ) => typeof option extends Some<T> ? Some<U> : None {
     return (option) =>
-      option.flatMap(fn) as Option<U extends Option<infer Z> ? Z : never>;
+      option.flatMap(fn) as typeof option extends Some<T> ? Some<U> : None;
   }
 
   /**
@@ -321,7 +335,12 @@ export abstract class Option<T> {
    *   .flatMap(tryParse); // Evaluates to None
    * ```
    */
-  abstract flatMap<U extends Option<unknown>>(fn: (value: T) => U): U;
+  abstract flatMap<U, UOption extends Some<NonNullable<U>> | None>(
+    fn: (value: T) => UOption,
+  ): UOption;
+  abstract flatMap<U, UOption extends Option<NonNullable<U>>>(
+    fn: (value: T) => UOption,
+  ): UOption;
 
   /**
    * Option.inspect calls the provided function `fn` with a reference to the
@@ -444,7 +463,9 @@ export class Some<T> extends Option<T> {
   }
 
   /** {@link Option.flatMap} */
-  flatMap<U extends Option<unknown>>(fn: (value: T) => U): U {
+  flatMap<U, UOption extends Option<NonNullable<U>>>(
+    fn: (value: T) => UOption,
+  ): UOption {
     return fn(this.#value);
   }
 
@@ -495,9 +516,10 @@ export class None extends Option<never> {
   }
 
   /** {@link Option.flatMap} */
-  flatMap<U extends Option<unknown>>(_fn: (value: never) => U): U {
-    // Hacky fix to make type inference behave as expected
-    return this as unknown as U;
+  flatMap<U, UOption extends Option<NonNullable<U>>>(
+    _fn: (value: never) => UOption,
+  ): this {
+    return this;
   }
 
   /** {@link Option.inspect} */

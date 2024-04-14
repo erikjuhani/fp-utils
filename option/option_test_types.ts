@@ -1,5 +1,5 @@
 import { None, Option, Some } from "./mod.ts";
-import { assertType, IsExact } from "../dev_deps.ts";
+import { assertType, type IsExact } from "../dev_deps.ts";
 
 // Option.map - number to string
 (() => {
