@@ -285,9 +285,9 @@ export abstract class Result<T, TError> {
    *   .isErr(Err(42)); // Evaluates to true
    * ```
    */
-  static isErr<T, TError>(
-    result: Result<T, TError>,
-  ): result is Err<TError> {
+  static isErr<T, TError, TResult extends Result<T, TError>>(
+    result: TResult,
+  ): result is TResult extends Ok<unknown> ? never : TResult {
     return result.isErr();
   }
 
@@ -303,7 +303,9 @@ export abstract class Result<T, TError> {
    *   .isOk(Err(42)); // Evaluates to false
    * ```
    */
-  static isOk<T, TError>(result: Result<T, TError>): result is Ok<T> {
+  static isOk<T, TError, TResult extends Result<T, TError>>(
+    result: TResult,
+  ): result is TResult extends Err<unknown> ? never : TResult {
     return result.isOk();
   }
 
@@ -438,6 +440,10 @@ export abstract class Result<T, TError> {
    *   .unwrap(Err(42)); // Throws an exception!
    * ```
    */
+  // deno-lint-ignore no-explicit-any
+  static unwrap<T, TError, TResult extends Result<any, TError>>(
+    result: TResult,
+  ): TResult extends Result<infer U, infer _> ? U : never;
   static unwrap<T, TError>(result: Result<T, TError>): T {
     return result.unwrap();
   }
@@ -455,6 +461,10 @@ export abstract class Result<T, TError> {
    *   .unwrapErr(Err(42)); // Evaluates to 42
    * ```
    */
+  // deno-lint-ignore no-explicit-any
+  static unwrapErr<T, TError, TResult extends Result<any, TError>>(
+    result: TResult,
+  ): TResult extends Result<infer _, infer UError> ? UError : never;
   static unwrapErr<T, TError>(result: Result<T, TError>): TError {
     return result.unwrapErr();
   }
@@ -767,7 +777,7 @@ export class Ok<T> extends Result<T, never> {
   }
 
   /** {@link Result.isErr} */
-  isErr(): this is Err<never> {
+  isErr(): false {
     return false;
   }
 
@@ -862,7 +872,7 @@ export class Err<TError> extends Result<never, TError> {
   }
 
   /** {@link Result.isOk} */
-  isOk(): this is Ok<never> {
+  isOk(): false {
     return false;
   }
 

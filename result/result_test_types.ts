@@ -48,7 +48,7 @@ import { assertType, type IsExact } from "../dev_deps.ts";
   }
 
   if (Result.isErr(result)) {
-    assertType<IsExact<typeof result, Err<string>>>(true);
+    assertType<IsExact<typeof result, Result<string, string>>>(true);
   }
 
   if (result.isOk()) {
@@ -56,7 +56,7 @@ import { assertType, type IsExact } from "../dev_deps.ts";
   }
 
   if (Result.isOk(result)) {
-    assertType<IsExact<typeof result, Ok<string>>>(true);
+    assertType<IsExact<typeof result, Result<string, string>>>(true);
   }
 
   const result1 = Ok(42) as Ok<number> | Err<string> | Ok<undefined>;
@@ -80,11 +80,11 @@ import { assertType, type IsExact } from "../dev_deps.ts";
   const result2 = Ok(42);
 
   if (result2.isErr()) {
-    assertType<IsExact<typeof result2, Ok<number> & Err<never>>>(true);
+    assertType<IsExact<typeof result2, Ok<number>>>(true);
   }
 
   if (Result.isErr(result2)) {
-    assertType<IsExact<typeof result2, Ok<number> & Err<never>>>(true);
+    assertType<IsExact<typeof result2, never>>(true);
   }
 
   if (result2.isOk()) {
@@ -106,11 +106,11 @@ import { assertType, type IsExact } from "../dev_deps.ts";
   }
 
   if (result3.isOk()) {
-    assertType<IsExact<typeof result3, Err<number> & Ok<never>>>(true);
+    assertType<IsExact<typeof result3, Err<number>>>(true);
   }
 
   if (Result.isOk(result3)) {
-    assertType<IsExact<typeof result3, Err<number> & Ok<never>>>(true);
+    assertType<IsExact<typeof result3, never>>(true);
   }
 });
 
@@ -286,6 +286,32 @@ import { assertType, type IsExact } from "../dev_deps.ts";
   );
 
   assertType<IsExact<typeof t9, string | number | undefined>>(true);
+
+  const t10 = [Ok(42), Err("Error"), Ok("string") as Result<string, number>]
+    .filter(Result.isOk);
+
+  assertType<IsExact<typeof t10, (Ok<number> | Result<string, number>)[]>>(
+    true,
+  );
+
+  const t11 = [Ok(42), Err("Error"), Ok("string") as Result<string, number>]
+    .filter(Result.isErr);
+
+  assertType<IsExact<typeof t11, (Err<string> | Result<string, number>)[]>>(
+    true,
+  );
+
+  const t12 = await Promise.resolve(unionResult).then(
+    Result.unwrap,
+  );
+
+  assertType<IsExact<typeof t12, string | number | undefined>>(true);
+
+  const t13 = await Promise.resolve(unionResult).then(
+    Result.unwrapErr,
+  );
+
+  assertType<IsExact<typeof t13, string | number>>(true);
 });
 
 // Result.from - function union input type with undefined and union return type
