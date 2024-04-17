@@ -21,9 +21,14 @@ export abstract class Option<T> {
    *   .filter((x: number) => x >= 5)(None); // evaluates to false
    * ```
    */
-  static filter<T>(
-    predicate: (value: T) => boolean,
-  ): (option: Option<T>) => boolean {
+  // deno-lint-ignore no-explicit-any
+  static filter<TOption extends Option<any>>(
+    predicate: (
+      value: TOption extends Some<infer U> ? U
+        : TOption extends Option<infer U> ? U
+        : never,
+    ) => boolean,
+  ): (option: TOption) => boolean {
     return (option) => option.filter(predicate);
   }
 
@@ -50,25 +55,19 @@ export abstract class Option<T> {
    *   .flatMap(tryParse)(None); // Evaluates to None
    * ```
    */
-  static flatMap<
-    U,
-    // deno-lint-ignore no-explicit-any
-    TOption extends Option<any>,
-    UOption extends Option<U>,
-  >(
+  // deno-lint-ignore no-explicit-any
+  static flatMap<TOption extends Option<any>, UOption extends Option<any>>(
     fn: (
-      value: TOption extends Option<infer U> ? U : never,
+      value: TOption extends Some<infer U> ? U
+        : TOption extends Option<infer U> ? U
+        : never,
     ) => UOption,
   ): (option: TOption) => Option<
-    UOption extends Option<infer U> ? U : never
-  >;
-  static flatMap<T, U>(
-    fn: (value: T) => Option<NonNullable<U>>,
-  ): (
-    option: Option<T>,
-  ) => typeof option extends Some<T> ? Some<U> : None {
-    return (option) =>
-      option.flatMap(fn) as typeof option extends Some<T> ? Some<U> : None;
+    UOption extends Some<infer U> ? U
+      : UOption extends Option<infer U> ? U
+      : never
+  > {
+    return (option) => option.flatMap(fn);
   }
 
   /**
@@ -139,14 +138,15 @@ export abstract class Option<T> {
    *   .inspect((x: number) => console.log(x * 2))(None); // Prints nothing
    * ```
    */
-  static inspect<T, TOption extends Option<T>>(
-    fn: (value: TOption extends Option<infer U> ? U : T) => void,
+  // deno-lint-ignore no-explicit-any
+  static inspect<TOption extends Option<any>>(
+    fn: (
+      value: TOption extends Some<infer U> ? U
+        : TOption extends Option<infer U> ? U
+        : never,
+    ) => void,
   ): (option: TOption) => TOption {
-    return (option) =>
-      option.inspect(
-        // @ts-expect-error does not accept the inferred callback function, but works as expected with the expect error clause
-        fn,
-      );
+    return (option) => option.inspect(fn);
   }
 
   /**
@@ -196,9 +196,14 @@ export abstract class Option<T> {
    *   .map((x: number) => x * 2)(None); // Evaluates to None
    * ```
    */
-  static map<T, U = unknown>(
-    fn: (value: T) => U,
-  ): (option: Option<T>) => Option<U> {
+  // deno-lint-ignore no-explicit-any
+  static map<U, TOption extends Option<any>>(
+    fn: (
+      value: TOption extends Some<infer U> ? U
+        : TOption extends Option<infer U> ? U
+        : never,
+    ) => NonNullable<U>,
+  ): (option: TOption) => Option<NonNullable<U>> {
     return (option) => option.map(fn);
   }
 
@@ -217,7 +222,11 @@ export abstract class Option<T> {
    * ```
    */
   static match<T, U1, U2, TOption extends Option<unknown>>(
-    onSome: (value: TOption extends Option<infer U> ? U : never) => U1,
+    onSome: (
+      value: TOption extends Some<infer U> ? U
+        : TOption extends Option<infer U> ? U
+        : never,
+    ) => U1,
     onNone: () => U2,
   ): (option: TOption) => U1 | U2;
   static match<T, U1, U2>(
@@ -272,7 +281,12 @@ export abstract class Option<T> {
    *   .unwrap(None); // Throws an exception!
    * ```
    */
-  static unwrap<T>(option: Option<T>): T {
+  // deno-lint-ignore no-explicit-any
+  static unwrap<TOption extends Option<any>>(
+    option: TOption,
+  ): TOption extends Some<infer U> ? U
+    : TOption extends Option<infer U> ? U
+    : never {
     return option.unwrap();
   }
 
@@ -289,7 +303,12 @@ export abstract class Option<T> {
    *   .unwrapOr(99)(None); // Evaluates to 99
    * ```
    */
-  static unwrapOr<T>(defaultValue: T): (option: Option<T>) => T {
+  // deno-lint-ignore no-explicit-any
+  static unwrapOr<TOption extends Option<any>>(
+    defaultValue: TOption extends Some<infer U> ? U
+      : TOption extends Option<infer U> ? U
+      : never,
+  ): (option: TOption) => typeof defaultValue {
     return (option) => option.unwrapOr(defaultValue);
   }
 
@@ -335,12 +354,14 @@ export abstract class Option<T> {
    *   .flatMap(tryParse); // Evaluates to None
    * ```
    */
-  abstract flatMap<U, UOption extends Some<NonNullable<U>> | None>(
+  // deno-lint-ignore no-explicit-any
+  abstract flatMap<U extends NonNullable<any>, UOption extends Option<U>>(
     fn: (value: T) => UOption,
   ): UOption;
-  abstract flatMap<U, UOption extends Option<NonNullable<U>>>(
+  // deno-lint-ignore no-explicit-any
+  abstract flatMap<U extends NonNullable<any>, UOption extends Option<U>>(
     fn: (value: T) => UOption,
-  ): UOption;
+  ): this;
 
   /**
    * Option.inspect calls the provided function `fn` with a reference to the
@@ -394,7 +415,7 @@ export abstract class Option<T> {
    *   .map((x) => x * 2); // Evaluates to Some 84
    * ```
    */
-  abstract map<U>(fn: (value: T) => U): Option<U>;
+  abstract map<U>(fn: (value: T) => NonNullable<U>): Option<NonNullable<U>>;
 
   /**
    * Option.match transforms the option value `T` into `U1` using `onSome`
@@ -463,7 +484,8 @@ export class Some<T> extends Option<T> {
   }
 
   /** {@link Option.flatMap} */
-  flatMap<U, UOption extends Option<NonNullable<U>>>(
+  // deno-lint-ignore no-explicit-any
+  flatMap<U extends NonNullable<any>, UOption extends Option<U>>(
     fn: (value: T) => UOption,
   ): UOption {
     return fn(this.#value);
@@ -501,7 +523,7 @@ export class Some<T> extends Option<T> {
   }
 
   /** {@link Option.isNone} */
-  isNone(): this is None {
+  isNone(): false {
     return false;
   }
 }
@@ -516,7 +538,8 @@ export class None extends Option<never> {
   }
 
   /** {@link Option.flatMap} */
-  flatMap<U, UOption extends Option<NonNullable<U>>>(
+  // deno-lint-ignore no-explicit-any
+  flatMap<U extends NonNullable<any>, UOption extends Option<U>>(
     _fn: (value: never) => UOption,
   ): this {
     return this;
@@ -548,7 +571,7 @@ export class None extends Option<never> {
   }
 
   /** {@link Option.isSome} */
-  isSome(): this is Some<never> {
+  isSome(): false {
     return false;
   }
 

@@ -5,14 +5,41 @@ import { assertType, type IsExact } from "../dev_deps.ts";
 (() => {
   const some = Some(42);
 
-  const t = some.map((value) => {
+  const t0 = some.map((value) => {
     assertType<IsExact<typeof value, 42>>(true);
     return value.toString();
   });
 
   // When this fails it means that we are falsely returning something else than a string
   // Usually this would mean that we instead return a never type due to failing inference
-  assertType<IsExact<typeof t, Option<string>>>(true);
+  assertType<IsExact<typeof t0, Option<string>>>(true);
+});
+
+// Test for nullable values
+(() => {
+  // @ts-expect-error doesn't actually allow to pass a null or undefined to Some in compile time
+  const some = Some(undefined);
+
+  assertType<IsExact<typeof some, Some<never>>>(true);
+
+  const option = Some(42);
+
+  // @ts-expect-error doesn't actually allow to pass a null or undefined to Some in compile time
+  const t1 = option.map((value) => {
+    assertType<IsExact<typeof value, 42>>(true);
+    return undefined;
+  });
+
+  // deno-lint-ignore ban-types
+  assertType<IsExact<typeof t1, Option<{}>>>(true);
+
+  const t2 = option.flatMap((value) => {
+    assertType<IsExact<typeof value, 42>>(true);
+    // @ts-expect-error doesn't actually allow to pass a null or undefined to Some in compile time
+    return Some(null);
+  });
+
+  assertType<IsExact<typeof t2, Some<never>>>(true);
 });
 
 // Option.match - identity and throw
@@ -70,7 +97,7 @@ import { assertType, type IsExact } from "../dev_deps.ts";
   const option2 = Some(42);
 
   if (option2.isNone()) {
-    assertType<IsExact<typeof option2, Some<42> & None>>(true);
+    assertType<IsExact<typeof option2, Some<42>>>(true);
   }
 
   if (Option.isNone(option2)) {
@@ -96,7 +123,7 @@ import { assertType, type IsExact } from "../dev_deps.ts";
   }
 
   if (option3.isSome()) {
-    assertType<IsExact<typeof option3, None & Some<never>>>(true);
+    assertType<IsExact<typeof option3, None>>(true);
   }
 
   if (Option.isSome(option3)) {
@@ -119,22 +146,55 @@ import { assertType, type IsExact } from "../dev_deps.ts";
 });
 
 // Option.flatMap - union input type and union return type (method)
-(() => {
-  const unionOption: Option<number | string> = Some(42) as
+(async () => {
+  const unionOption = Some(42) as
     | Some<number>
     | Some<string>
+    | Option<boolean>
     | None;
 
-  const t = unionOption.flatMap((value) => {
-    assertType<IsExact<typeof value, string | number>>(true);
+  const t0 = unionOption.flatMap((value) => {
+    assertType<IsExact<typeof value, string | number | boolean>>(true);
     if (value === 42) return Some(42);
     if (value) return Some("Ok" as const);
     return None;
   });
 
   assertType<
-    IsExact<typeof t, Some<42> | Some<"Ok"> | None>
+    IsExact<typeof t0, Some<42> | Some<"Ok"> | None>
   >(true);
+
+  const t1 = await Promise.resolve(unionOption).then(
+    Option.inspect((value) => {
+      assertType<IsExact<typeof value, string | number | boolean>>(true);
+    }),
+  );
+
+  assertType<IsExact<typeof t1, typeof unionOption>>(true);
+
+  const t2 = await Promise.resolve(unionOption).then(
+    Option.map((value) => {
+      assertType<IsExact<typeof value, string | number | boolean>>(true);
+      return String(value);
+    }),
+  );
+
+  assertType<IsExact<typeof t2, Option<string>>>(true);
+
+  const t3 = await Promise.resolve(unionOption).then(
+    Option.filter((value) => {
+      assertType<IsExact<typeof value, string | number | boolean>>(true);
+      return Boolean(value);
+    }),
+  );
+
+  assertType<IsExact<typeof t3, boolean>>(true);
+
+  const t4 = await Promise.resolve(unionOption).then(
+    Option.unwrapOr("abc"),
+  );
+
+  assertType<IsExact<typeof t4, string | number | boolean>>(true);
 });
 
 // Option.flatMap - union input type and union return type (callback)
@@ -142,6 +202,7 @@ import { assertType, type IsExact } from "../dev_deps.ts";
   const unionOption = Some(42) as
     | Some<number>
     | Some<string>
+    | Option<boolean>
     | None;
 
   // Using the Option API this way requires you to pass the Option function (in
@@ -150,22 +211,23 @@ import { assertType, type IsExact } from "../dev_deps.ts";
   // left to right.
   const t0 = await Promise.resolve(unionOption).then(
     Option.flatMap((value) => {
-      assertType<IsExact<typeof value, string | number>>(true);
+      assertType<IsExact<typeof value, string | number | boolean>>(true);
       if (value === 42) return Some(42);
+      if (value === 102) return Some(true) as Option<boolean>;
       if (value) return Some("Ok" as const);
       return None;
     }),
   );
 
   assertType<
-    IsExact<typeof t0, Option<"Ok" | 42>>
+    IsExact<typeof t0, Option<"Ok" | 42 | boolean>>
   >(true);
 
   // When the Option.flatMap function is not used in a callback and the option
   // is given directly, it is expected that the callback type needs to be
   // explicitly specified, due to TypeScript inference not working from right
   // to left.
-  const t1 = Option.flatMap((value: number | string) => {
+  const t1 = Option.flatMap((value: number | string | boolean) => {
     if (value === 42) return Some(42);
     if (value) return Some("Ok" as const);
     else return None;
