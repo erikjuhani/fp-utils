@@ -1,3 +1,20 @@
+## 0.13.0
+
+FEATURES:
+
+- [Add Option.zip method and higher-order function variant](https://github.com/erikjuhani/fp-utils/commit/5e0f2100a5c10c998bee35580184373ef3074ed3)
+
+FIXES:
+
+- [Fix expectErr code examples in Result module README](https://github.com/erikjuhani/fp-utils/commit/bb21167f06264392e899a297125678e64da5ab5f)
+- [Fix type inference for unwrap, unwrapErr, isOk and isErr HOFs](https://github.com/erikjuhani/fp-utils/commit/eb3424aa17f10a0fed1c5ab54e57346350da7054)
+
+CHANGES:
+
+- [Improve type inference for result higher order functions](https://github.com/erikjuhani/fp-utils/commit/eef05022981e2663866b1417e7a9bdcb518fb800)
+- [Improve type inference for Option flatMap](https://github.com/erikjuhani/fp-utils/commit/1ef1bb29f1f53aa42afb0a33172ea6ab32acd7e6)
+- [Improve type inference for Option higher order functions](https://github.com/erikjuhani/fp-utils/commit/2f1e3c91d2f721db10c1acd5083ab6e70aa97cce)
+
 ## 0.12.0
 
 FEATURES:
