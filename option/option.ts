@@ -313,6 +313,36 @@ export abstract class Option<T> {
   }
 
   /**
+   * Option.zip combines two option values into a tuple and returns the tuple
+   * wrapped in Option.
+   *
+   * @example
+   * ```ts
+   * Option
+   *   .zip(Some(84))(Some(42)); // Evaluates to Some<[42, 84]>
+   *
+   * Option
+   *   .zip(None)(Some(42)); // Evaluates to None
+   *
+   * Option
+   *   .zip(Some(84))(None); // Evaluates to None
+   * ```
+   */
+  // deno-lint-ignore no-explicit-any
+  static zip<TOption extends Option<any>, UOption extends Option<any>>(
+    optionB: UOption,
+  ): (optionA: TOption) => Option<[
+    TOption extends Some<infer U> ? U
+      : TOption extends Option<infer U> ? U
+      : never,
+    UOption extends Some<infer U> ? U
+      : UOption extends Option<infer U> ? U
+      : never,
+  ]> {
+    return (optionA) => optionA.zip(optionB);
+  }
+
+  /**
    * Option.filter returns a boolean that is evaluated with the given
    * `predicate` function which is applied on the option value `T`. None
    * evaluates to `false`.
@@ -462,6 +492,21 @@ export abstract class Option<T> {
    */
   abstract unwrapOr<U>(defaultValue: U): U;
   abstract unwrapOr<U>(defaultValue: T | U): T | U;
+
+  /**
+   * Option.zip combines two option values into a tuple and returns the tuple
+   * wrapped in Option.
+   *
+   * @example
+   * ```ts
+   * Some(42).zip(Some(84)); // Evaluates to Some<[42, 84]>
+   *
+   * Some(42).zip(None); // Evaluates to None
+   *
+   * None.zip(Some(84)); // Evaluates to None
+   * ```
+   */
+  abstract zip<U>(option: Option<U>): Option<[T, U]>;
 }
 
 /**
@@ -526,6 +571,11 @@ export class Some<T> extends Option<T> {
   isNone(): false {
     return false;
   }
+
+  /** {@link Option.zip} */
+  zip<U>(option: Option<U>): Option<[T, U]> {
+    return option.map((value) => [this.#value, value]);
+  }
 }
 
 /**
@@ -578,6 +628,11 @@ export class None extends Option<never> {
   /** {@link Option.isNone} */
   isNone(): this is None {
     return true;
+  }
+
+  /** {@link Option.zip} */
+  zip<U>(_option: Option<U>): this {
+    return this;
   }
 }
 

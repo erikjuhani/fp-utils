@@ -74,6 +74,27 @@ test("Option.map", () => {
   assertEquals(actual, Some(1));
 });
 
+test("Option.zip", () => {
+  const tests: [
+    a: Option<unknown>,
+    b: Option<unknown>,
+    expected: Option<unknown[]>,
+  ][] = [
+    [Some(42), Some(84), Some([42, 84])],
+    [Some(42), Some("84"), Some([42, "84"])],
+    [None, Some(84), None],
+    [Some(42), None, None],
+  ];
+
+  for (const [a, b, expected] of tests) {
+    const actual = a.zip(b);
+    assertEquals(actual, expected);
+
+    const actualHof = Option.zip(b)(a);
+    assertEquals(actualHof, expected);
+  }
+});
+
 test("Option.filter", () => {
   const predicate = (x: number) => x >= 5;
   const tests: [input: Option<number>, expected: boolean][] = [

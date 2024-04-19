@@ -195,6 +195,22 @@ import { assertType, type IsExact } from "../dev_deps.ts";
   );
 
   assertType<IsExact<typeof t4, string | number | boolean>>(true);
+
+  const t5 = await Promise.resolve(unionOption).then(
+    Option.zip(Some("abc")),
+  );
+
+  assertType<IsExact<typeof t5, Option<[string | number | boolean, "abc"]>>>(
+    true,
+  );
+
+  const t6 = await Promise.resolve(unionOption).then(
+    Option.zip(None),
+  );
+
+  assertType<IsExact<typeof t6, Option<[string | number | boolean, never]>>>(
+    true,
+  );
 });
 
 // Option.flatMap - union input type and union return type (callback)

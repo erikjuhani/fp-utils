@@ -240,6 +240,26 @@ None.unwrapOr(99); // Evaluates to 99
 
 </details>
 
+#### `Option.zip`
+
+Signature: `<U>(option: Option<U>): Option<[T, U]>`
+
+Option.zip combines two option values into a tuple and returns the tuple wrapped
+in Option.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Some(42).zip(Some(84)); // Evaluates to Some<[42, 84]>
+
+Some(42).zip(None); // Evaluates to None
+
+None.zip(Some(84)); // Evaluates to None
+```
+
+</details>
+
 ### Option higher-order functions
 
 Option higher-order functions allow for Option value `T` chainability within
@@ -384,6 +404,29 @@ Option
 
 Option
   .unwrapOr(99)(None); // Evaluates to 99
+```
+
+</details>
+
+#### `Option.zip`
+
+Signature: `zip<U>(option: Option<U>): (option: Option<T>) => Option<[T, U]>`
+
+Option.zip combines two option values into a tuple and returns the tuple wrapped
+in Option.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option
+  .zip(Some(84))(Some(42)); // Evaluates to Some<[42, 84]>
+
+Option
+  .zip(None)(Some(42)); // Evaluates to None
+
+Option
+  .zip(Some(84))(None); // Evaluates to None
 ```
 
 </details>
