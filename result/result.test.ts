@@ -1,8 +1,7 @@
-import { std } from "../dev_deps.ts";
-import { Err, Ok, Result } from "./mod.ts";
+import { assertSpyCalls, spy } from "@std/testing/mock";
+import { assertEquals, assertThrows } from "@std/assert";
+import { Err, Ok, Result } from "@fp-utils/result";
 
-const { assertThrows, assertEquals } = std.assert;
-const { mock } = std.testing;
 const { test } = Deno;
 
 test("Result.isOk", () => {
@@ -90,45 +89,45 @@ test("Result.unwrapOr on Err returns or value", () => {
 });
 
 test("Result.inspect", () => {
-  const mapSpy = mock.spy((value: number) => value + 1);
+  const mapSpy = spy((value: number) => value + 1);
   const actual = Result.inspect(mapSpy)(Ok(0));
-  mock.assertSpyCalls(mapSpy, 1);
+  assertSpyCalls(mapSpy, 1);
   assertEquals(actual, Ok(0));
 });
 
 test("Result.inspect on Err does not execute", () => {
-  const mapSpy = mock.spy((value: number) => value + 1);
+  const mapSpy = spy((value: number) => value + 1);
   const actual = Result.inspect(mapSpy)(Err(0));
-  mock.assertSpyCalls(mapSpy, 0);
+  assertSpyCalls(mapSpy, 0);
   assertEquals(actual, Err(0));
 });
 
 test("Result.inspectErr", () => {
-  const mapSpy = mock.spy((value: number) => value + 1);
+  const mapSpy = spy((value: number) => value + 1);
   const actual = Result.inspectErr(mapSpy)(Err(0));
-  mock.assertSpyCalls(mapSpy, 1);
+  assertSpyCalls(mapSpy, 1);
   assertEquals(actual, Err(0));
 });
 
 test("Result.inspectErr on Ok does not execute", () => {
-  const mapSpy = mock.spy((value: number) => value + 1);
+  const mapSpy = spy((value: number) => value + 1);
   const actual = Result.inspectErr(mapSpy)(Ok(0));
-  mock.assertSpyCalls(mapSpy, 0);
+  assertSpyCalls(mapSpy, 0);
   assertEquals(actual, Ok(0));
 });
 
 test("Result.map", () => {
-  const mapSpy = mock.spy((value: number) => value + 1);
+  const mapSpy = spy((value: number) => value + 1);
   const actual = Result.map(mapSpy)(Ok(0));
-  mock.assertSpyCalls(mapSpy, 1);
+  assertSpyCalls(mapSpy, 1);
   assertEquals(actual, Ok(1));
 });
 
 test("Result.map on Err does not execute", () => {
-  const mapSpy = mock.spy((value: number) => value + 1);
+  const mapSpy = spy((value: number) => value + 1);
   const actual = Result.map(mapSpy)(Err(0));
 
-  mock.assertSpyCalls(mapSpy, 0);
+  assertSpyCalls(mapSpy, 0);
   assertEquals(actual, Err(0));
 });
 
@@ -147,24 +146,24 @@ test("Result.from", () => {
 });
 
 test("Result.mapErr", () => {
-  const mapSpy = mock.spy((value: number) => value + 1);
+  const mapSpy = spy((value: number) => value + 1);
   const actual = Result.mapErr(mapSpy)(Err(0));
-  mock.assertSpyCalls(mapSpy, 1);
+  assertSpyCalls(mapSpy, 1);
   assertEquals(actual, Err(1));
 });
 
 test("Result.mapErr on Ok does not execute", () => {
-  const mapSpy = mock.spy((value: number) => value + 1);
+  const mapSpy = spy((value: number) => value + 1);
   const actual = Result.mapErr(mapSpy)(Ok(0));
 
-  mock.assertSpyCalls(mapSpy, 0);
+  assertSpyCalls(mapSpy, 0);
   assertEquals(actual, Ok(0));
 });
 
 test("Result.flatMap", () => {
-  const mapSpy = mock.spy((value: number) => Ok(value + 1));
+  const mapSpy = spy((value: number) => Ok(value + 1));
   const actual = Result.flatMap(mapSpy)(Ok(0));
-  mock.assertSpyCalls(mapSpy, 1);
+  assertSpyCalls(mapSpy, 1);
   assertEquals(actual, Ok(1));
 });
 
@@ -188,9 +187,9 @@ test("Result.flatMap example", () => {
 });
 
 test("Result.flatMap on Err does not execute", () => {
-  const flatMapSpy = mock.spy((value: number) => Ok(value + 1));
+  const flatMapSpy = spy((value: number) => Ok(value + 1));
   const actual = Result.flatMap(flatMapSpy)(Err(0));
-  mock.assertSpyCalls(flatMapSpy, 0);
+  assertSpyCalls(flatMapSpy, 0);
   assertEquals(actual, Err(0));
 });
 

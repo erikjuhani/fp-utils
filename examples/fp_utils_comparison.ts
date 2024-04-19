@@ -23,15 +23,14 @@
  * Although with some of the libraries we need to make compromises with the
  * expectations.
  */
-import { assertType, IsExact, std } from "../dev_deps.ts";
+import { assertType, IsExact } from "@std/testing/types";
+import { assertEquals } from "@std/assert";
 import * as fp_utils from "@fp-utils/result";
-import * as oxi_result from "@oxi/result";
+import * as oxi_result from "jsr:@oxi/result";
 import * as oxide_ts from "npm:oxide.ts";
 import * as ts_belt from "npm:@mobily/ts-belt@4.0.0-rc.5";
 import * as ts_result_es from "npm:ts-results-es";
 import * as badrap_result from "npm:@badrap/result";
-
-const { assertEquals } = std.assert;
 
 // deno-lint-ignore no-namespace
 export namespace fpUtils {

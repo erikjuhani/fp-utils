@@ -8,7 +8,8 @@
 // This result example demonstrates how easy it is to attach options to
 // existing TypeScript functionality and how options can ultimately compress
 // the lines of code by making the logic into one sequence.
-import { std } from "dev_deps";
+import { assertEquals } from "@std/assert";
+import { Result } from "@fp-utils/result";
 import {
   fetchFailure,
   fetchSuccess,
@@ -16,9 +17,6 @@ import {
   InfoResponse,
   notFound,
 } from "./fetch_common.ts";
-import { Result } from "../result/mod.ts";
-
-const { assert } = std;
 
 // deno-lint-ignore no-namespace
 export namespace Native {
@@ -71,26 +69,26 @@ export namespace WithResult {
       );
 }
 
-assert.assertEquals(
+assertEquals(
   `Deno
  | 2018
  | Deno is a runtime for JavaScript, TypeScript, and WebAssembly. Deno was co-created by Ryan Dahl, who also created Node.js.`,
   await Native.infoSuccess(),
 );
 
-assert.assertEquals(
+assertEquals(
   "No info found",
   await Native.infoFailure(),
 );
 
-assert.assertEquals(
+assertEquals(
   `Deno
  | 2018
  | Deno is a runtime for JavaScript, TypeScript, and WebAssembly. Deno was co-created by Ryan Dahl, who also created Node.js.`,
   await WithResult.infoSuccess(),
 );
 
-assert.assertEquals(
+assertEquals(
   "No info found",
   await WithResult.infoFailure(),
 );

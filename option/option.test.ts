@@ -1,8 +1,7 @@
-import { std } from "../dev_deps.ts";
-import { None, Option, Some } from "./mod.ts";
+import { assertSpyCalls, spy } from "@std/testing/mock";
+import { assertEquals, assertThrows } from "@std/assert";
+import { None, Option, Some } from "@fp-utils/option";
 
-const { assertThrows, assertEquals } = std.assert;
-const { mock } = std.testing;
 const { test } = Deno;
 
 test("Option.some passing null or undefined throws", () => {
@@ -54,23 +53,23 @@ test("Option.unwrapOr on None returns or value", () => {
 });
 
 test("Option.inspect", () => {
-  const mapSpy = mock.spy((value: number) => value + 1);
+  const mapSpy = spy((value: number) => value + 1);
   const actual = Option.inspect(mapSpy)(Some(0));
-  mock.assertSpyCalls(mapSpy, 1);
+  assertSpyCalls(mapSpy, 1);
   assertEquals(actual, Some(0));
 });
 
 test("Option.inspect on None does not execute", () => {
-  const mapSpy = mock.spy((value: number) => value + 1);
+  const mapSpy = spy((value: number) => value + 1);
   const actual = Option.inspect(mapSpy)(None);
-  mock.assertSpyCalls(mapSpy, 0);
+  assertSpyCalls(mapSpy, 0);
   assertEquals(actual, None);
 });
 
 test("Option.map", () => {
-  const mapSpy = mock.spy((value: number) => value + 1);
+  const mapSpy = spy((value: number) => value + 1);
   const actual = Option.map(mapSpy)(Some(0));
-  mock.assertSpyCalls(mapSpy, 1);
+  assertSpyCalls(mapSpy, 1);
   assertEquals(actual, Some(1));
 });
 
@@ -110,24 +109,24 @@ test("Option.filter", () => {
 });
 
 test("Option.map on None does not execute", () => {
-  const mapSpy = mock.spy((value: number) => value + 1);
+  const mapSpy = spy((value: number) => value + 1);
   const actual = Option.map(mapSpy)(None);
 
-  mock.assertSpyCalls(mapSpy, 0);
+  assertSpyCalls(mapSpy, 0);
   assertEquals(actual, None);
 });
 
 test("Option.flatMap", () => {
-  const flatMapSpy = mock.spy((value: number) => Some(value + 1));
+  const flatMapSpy = spy((value: number) => Some(value + 1));
   const actual = Option.flatMap(flatMapSpy)(Some(0));
-  mock.assertSpyCalls(flatMapSpy, 1);
+  assertSpyCalls(flatMapSpy, 1);
   assertEquals(actual, Some(1));
 });
 
 test("Option.flatMap on None does not execute", () => {
-  const flatMapSpy = mock.spy((value: number) => Some(value + 1));
+  const flatMapSpy = spy((value: number) => Some(value + 1));
   const actual = Option.flatMap(flatMapSpy)(None);
-  mock.assertSpyCalls(flatMapSpy, 0);
+  assertSpyCalls(flatMapSpy, 0);
   assertEquals(actual, None);
 });
 

@@ -2,10 +2,8 @@
 // a library with borrowing and return system. When books are borrowed they are
 // transferred to the patron Map and deleted from the Books Map. Returning
 // books does the opposite.
-import { std } from "dev_deps";
-import { None, Option, Some } from "../option/mod.ts";
-
-const { assert } = std;
+import { None, Option, Some } from "@fp-utils/option";
+import { assertEquals } from "@std/assert";
 
 type ID = number;
 
@@ -143,7 +141,7 @@ borrowBook(101, "The fellowship of the ring");
 // Frodo wants to borrow 'The fellowship of the ring'
 // 'The fellowship of the ring' is not available
 
-assert.assertEquals(
+assertEquals(
   tryGetPatronById(101).map(({ borrowedBooks }) => borrowedBooks),
   Some([]),
 );
@@ -155,7 +153,7 @@ borrowBook(101, "The Hobbit");
 // Frodo wants to borrow 'The Hobbit'
 // 'The Hobbit' was borrowed by Frodo
 
-assert.assertEquals(
+assertEquals(
   tryGetPatronById(101).map(({ borrowedBooks }) => borrowedBooks),
   Some([{ id: 4, title: "The Hobbit", available: true }]),
 );
@@ -168,7 +166,7 @@ borrowBook(102, "The Hobbit");
 // Samwais has already two books borrowed
 // 'The Hobbit' is not available
 
-assert.assertEquals(
+assertEquals(
   tryGetPatronById(102).map(({ borrowedBooks }) => borrowedBooks.length),
   Some(2),
 );
@@ -179,7 +177,7 @@ console.log("---");
 returnBook(101, 4);
 // 'The Hobbit' was returned by Frodo
 
-assert.assertEquals(
+assertEquals(
   tryGetPatronById(101).map(({ borrowedBooks }) => borrowedBooks),
   Some([]),
 );
@@ -190,7 +188,7 @@ console.log("---");
 returnBook(101, 1);
 // Frodo has not borrowed a book with id 1
 
-assert.assertEquals(
+assertEquals(
   tryGetPatronById(101).map(({ borrowedBooks }) => borrowedBooks),
   Some([]),
 );
@@ -201,7 +199,7 @@ console.log("---");
 returnBook(102, 2);
 // 'The Two Towers' was returned by Samwais
 
-assert.assertEquals(
+assertEquals(
   tryGetPatronById(102).map(({ borrowedBooks }) => borrowedBooks.length),
   Some(1),
 );

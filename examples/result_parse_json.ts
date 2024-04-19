@@ -1,9 +1,7 @@
 // Demonstrates how the Result type can be used with existing JSON.parse
 // functionality.
-import { std } from "dev_deps";
-import { Result } from "../result/mod.ts";
-
-const { assert } = std;
+import { assertEquals } from "@std/assert";
+import { Result } from "@fp-utils/result";
 
 type JSONWithProperty = { property: number };
 
@@ -83,32 +81,32 @@ export namespace WithResult {
       .map(JSON.stringify);
 }
 
-assert.assertEquals(
+assertEquals(
   "Unexpected end of JSON input",
   Native.invalidJSON(),
 );
 
-assert.assertEquals(
+assertEquals(
   "Unexpected end of JSON input",
   WithResult.invalidJSON().unwrapErr(),
 );
 
-assert.assertEquals(
+assertEquals(
   'Wrong type of json, expected "property" field, got "prop"',
   Native.invalidJSONContent(),
 );
 
-assert.assertEquals(
+assertEquals(
   'Wrong type of json, expected "property" field, got "prop"',
   WithResult.invalidJSONContent().unwrapErr(),
 );
 
-assert.assertEquals(
+assertEquals(
   '{"property":42}',
   Native.validJSONContent(),
 );
 
-assert.assertEquals(
+assertEquals(
   '{"property":42}',
   WithResult.validJSONContent().unwrap(),
 );

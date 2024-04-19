@@ -1,7 +1,5 @@
+import { assertEquals } from "@std/assert";
 import { Err, Ok, Result } from "@fp-utils/result";
-import { std } from "dev_deps";
-
-const { assert } = std;
 
 type BookIndex = number;
 type BookName = string;
@@ -15,14 +13,14 @@ const tryGetBook = (index: BookIndex): Result<BookName, string> =>
 
 const bookFound = tryGetBook(1);
 
-assert.assertEquals(
+assertEquals(
   bookFound,
   Ok("The Fellowship of the Ring"),
 );
 
 const bookNotFound = tryGetBook(2);
 
-assert.assertEquals(
+assertEquals(
   bookNotFound,
   Err("Cannot find a book with index 2"),
 );

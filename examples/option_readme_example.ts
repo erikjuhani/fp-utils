@@ -1,7 +1,5 @@
+import { assertEquals } from "@std/assert";
 import { None, Option, Some } from "@fp-utils/option";
-import { std } from "dev_deps";
-
-const { assert } = std;
 
 type BookId = number;
 type BookName = string;
@@ -15,14 +13,14 @@ const tryGetBook = (id: BookId): Option<BookName> => Option.from(books.get(id));
 
 const bookFound = tryGetBook(1);
 
-assert.assertEquals(
+assertEquals(
   bookFound,
   Some("The Hobbit"),
 );
 
 const bookNotFound = tryGetBook(0);
 
-assert.assertEquals(
+assertEquals(
   bookNotFound,
   None,
 );

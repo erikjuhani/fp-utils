@@ -1,5 +1,5 @@
-import { Err, Ok, Result } from "./mod.ts";
-import { assertType, type IsExact } from "../dev_deps.ts";
+import { assertType, type IsExact } from "@std/testing/types";
+import { Err, Ok, Result } from "@fp-utils/result";
 
 // Result.map - unit to string
 (() => {
