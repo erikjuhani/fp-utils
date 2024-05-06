@@ -204,6 +204,27 @@ None
 
 </details>
 
+#### `Option.toString`
+
+Signature: `(): "Some(value)" | "None"`
+
+Option.toString returns the string representation of the result and the
+stringified value as `Some(value)` if the result is `Some` or `None` if the
+result is `None`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Some(42)
+  .toString(); // Evaluates to "Some(42)"
+
+None
+  .toString(); // Evaluates to "None"
+```
+
+</details>
+
 #### `Option.unwrap`
 
 Signature: `(): T`
@@ -548,6 +569,27 @@ Option
 
 Option
   .some(null); // Throws an exception or compiler error!
+```
+
+</details>
+
+#### `Option.toString`
+
+Signature: `toString(option: Option<T>): "Some(value)" | "None"`
+
+Option.toString returns the string representation of the result and the
+stringified value as `Some(value)` if the result is `Some` or `None` if the
+result is `None`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option
+  .toString(Some(42)); // Evaluates to "Some(42)"
+
+Option
+  .toString(None); // Evaluates to "None"
 ```
 
 </details>

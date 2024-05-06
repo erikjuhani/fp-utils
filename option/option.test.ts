@@ -66,6 +66,21 @@ test("Option.inspect on None does not execute", () => {
   assertEquals(actual, None);
 });
 
+test("Option.toString", () => {
+  const tests: [Option<unknown>, string][] = [
+    [None, "None"],
+    [Some(10), "Some(10)"],
+    [Some(Some(10)), "Some(Some(10))"],
+    [Some(None), "Some(None)"],
+    [Some({ value: "some" }), 'Some({"value":"some"})'],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = Option.toString(input);
+    assertEquals(actual, expected);
+  }
+});
+
 test("Option.map", () => {
   const mapSpy = spy((value: number) => value + 1);
   const actual = Option.map(mapSpy)(Some(0));

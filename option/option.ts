@@ -269,6 +269,24 @@ export abstract class Option<T> {
   }
 
   /**
+   * Option.toString returns the string representation of the result and the
+   * stringified value as `Some(value)` if the result is `Some` or `None` if
+   * the result is `None`.
+   *
+   * @example
+   * ```ts
+   * Option
+   *   .toString(Some(42)); // Evaluates to "Some(42)"
+   *
+   * Option
+   *   .toString(None); // Evaluates to "None"
+   * ```
+   */
+  static toString<T>(option: Option<T>): `Some(${string})` | "None" {
+    return option.toString();
+  }
+
+  /**
    * Option.unwrap returns the value `T` from the associated option if it is
    * `Some`; otherwise it will throw.
    *
@@ -467,6 +485,22 @@ export abstract class Option<T> {
   ): U1 | U2;
 
   /**
+   * Option.toString returns the string representation of the option and the
+   * stringified value as `Some(value)` if the result is `Some` or `None` if
+   * the result is `None`.
+   *
+   * @example
+   * ```ts
+   * Some(42)
+   *   .toString(); // Evaluates to "Some(42)"
+   *
+   * None
+   *   .toString(); // Evaluates to "None"
+   * ```
+   */
+  abstract toString(): `Some(${string})` | "None";
+
+  /**
    * Option.unwrap returns the value `T` from the associated option if it is
    * `Some`; otherwise it will throw.
    *
@@ -552,16 +586,6 @@ export class Some<T> extends Option<T> {
     return onSome(this.#value);
   }
 
-  /** {@link Option.unwrap} */
-  unwrap(): T {
-    return this.#value;
-  }
-
-  /** {@link Option.unwrapOr} */
-  unwrapOr(_defaultValue: T): T {
-    return this.#value;
-  }
-
   /** {@link Option.isSome} */
   isSome<T>(): this is Some<T> {
     return true;
@@ -572,9 +596,32 @@ export class Some<T> extends Option<T> {
     return false;
   }
 
+  /** {@link Option.toString} */
+  toString(): `Some(${string})` {
+    return `Some(${
+      this.#value instanceof Option
+        ? this.#value.toString()
+        : JSON.stringify(this.#value)
+    })`;
+  }
+
+  /** {@link Option.unwrap} */
+  unwrap(): T {
+    return this.#value;
+  }
+
+  /** {@link Option.unwrapOr} */
+  unwrapOr(_defaultValue: T): T {
+    return this.#value;
+  }
+
   /** {@link Option.zip} */
   zip<U>(option: Option<U>): Option<[T, U]> {
     return option.map((value) => [this.#value, value]);
+  }
+
+  [Symbol.for("Deno.customInspect")](): `Some(${string})` {
+    return this.toString();
   }
 }
 
@@ -610,16 +657,6 @@ export class None extends Option<never> {
     return onNone();
   }
 
-  /** {@link Option.unwrap} */
-  unwrap(): never {
-    throw Error("Called unwrap on None");
-  }
-
-  /** {@link Option.unwrapOr} */
-  unwrapOr<U>(defaultValue: U): U {
-    return defaultValue;
-  }
-
   /** {@link Option.isSome} */
   isSome(): false {
     return false;
@@ -630,9 +667,28 @@ export class None extends Option<never> {
     return true;
   }
 
+  /** {@link Option.toString} */
+  toString(): "None" {
+    return "None";
+  }
+
+  /** {@link Option.unwrap} */
+  unwrap(): never {
+    throw Error("Called unwrap on None");
+  }
+
+  /** {@link Option.unwrapOr} */
+  unwrapOr<U>(defaultValue: U): U {
+    return defaultValue;
+  }
+
   /** {@link Option.zip} */
   zip<U>(_option: Option<U>): this {
     return this;
+  }
+
+  [Symbol.for("Deno.customInspect")](): "None" {
+    return this.toString();
   }
 }
 
