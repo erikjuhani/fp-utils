@@ -46,16 +46,24 @@ async function buildModule(module: string) {
   const copyLicense = () =>
     Deno.copyFileSync(`./${module}/README.md`, `${outDir}/README.md`);
 
-  const stripCommentsFromJSFiles = (...filepaths: string[]) => {
-    const decoder = new TextDecoder("utf-8");
+  const decoder = new TextDecoder("utf-8");
 
-    filepaths.forEach((filepath) => {
-      const file = decoder.decode(Deno.readFileSync(filepath));
-      Deno.writeTextFileSync(
-        filepath,
-        file.replace(commentsRegex, ""),
-      );
-    });
+  const stripComments = (filepath: string) => {
+    const file = decoder.decode(Deno.readFileSync(filepath));
+    Deno.writeTextFileSync(
+      filepath,
+      file.replace(commentsRegex, ""),
+    );
+  };
+
+  const replaceDenoSymbols = (filepath: string) => {
+    const file = decoder.decode(Deno.readFileSync(filepath));
+    const customInspectSymbol = "Deno.customInspect";
+
+    Deno.writeTextFileSync(
+      filepath,
+      file.replaceAll(customInspectSymbol, "nodejs.util.inspect.custom"),
+    );
   };
 
   await emptyDir(outDir);
@@ -72,12 +80,18 @@ async function buildModule(module: string) {
     postBuild: () => {
       copyLicense();
       copyReadme();
-      stripCommentsFromJSFiles(
+
+      const files = [
         `${outDir}/esm/mod.js`,
         `${outDir}/esm/${module}.js`,
         `${outDir}/script/mod.js`,
         `${outDir}/script/${module}.js`,
-      );
+      ];
+
+      files.forEach((filepath) => {
+        stripComments(filepath);
+        replaceDenoSymbols(filepath);
+      });
     },
   });
 }
