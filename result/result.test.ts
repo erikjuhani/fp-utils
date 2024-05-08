@@ -131,6 +131,21 @@ test("Result.map on Err does not execute", () => {
   assertEquals(actual, Err(0));
 });
 
+test("Result.toString", () => {
+  const tests: [Result<unknown, unknown>, string][] = [
+    [Err(10), "Err(10)"],
+    [Ok(10), "Ok(10)"],
+    [Ok({ value: "ok" }), 'Ok({"value":"ok"})'],
+    [Err(Ok(10)), "Err(Ok(10))"],
+    [Ok(Err(10)), "Ok(Err(10))"],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = Result.toString(input);
+    assertEquals(actual, expected);
+  }
+});
+
 test("Result.from", () => {
   const predicate = (x: number) => x >= 5;
   const tests: [Result<number, unknown>, boolean][] = [

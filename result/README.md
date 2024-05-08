@@ -293,6 +293,27 @@ Err(42)
 
 </details>
 
+#### `Result.toString`
+
+Signature: `(): "Ok(value)" | "Err(value)"`
+
+Result.toString returns the string representation of the result and the
+stringified value as `Ok(value)` if the result is `Ok` or `Err(value)` if the
+result is `Err`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Ok(42)
+  .toString(); // Evaluates to "Ok(42)"
+
+Err(42)
+  .toString(); // Evaluates to "Err(42)"
+```
+
+</details>
+
 #### `Result.unwrap`
 
 Signature: `(): T`
@@ -732,6 +753,27 @@ Result
 
 Result
   .ok(null); // Evaluates to Ok null
+```
+
+</details>
+
+#### `Result.toString`
+
+Signature: `toString(result: Result<T, TError>): "Ok(value)" | "Err(value)"`
+
+Result.toString returns the string representation of the result and the
+stringified value as `Ok(value)` if the result is `Ok` or `Err(value)` if the
+result is `Err`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Result
+  .toString(Ok(42)); // Evaluates to "Ok(42)"
+
+Result
+  .toString(Err(42)); // Evaluates to "Err(42)"
 ```
 
 </details>

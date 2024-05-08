@@ -428,6 +428,26 @@ export abstract class Result<T, TError> {
   }
 
   /**
+   * Result.toString returns the string representation of the result and the
+   * stringified value as `Ok(value)` if the result is `Ok` or `Err(value)` if
+   * the result is `Err`.
+   *
+   * @example
+   * ```ts
+   * Result
+   *   .toString(Ok(42)); // Evaluates to "Ok(42)"
+   *
+   * Result
+   *   .toString(Err(42)); // Evaluates to "Err(42)"
+   * ```
+   */
+  static toString<T, TError>(
+    result: Result<T, TError>,
+  ): `Ok(${string})` | `Err(${string})` {
+    return result.toString();
+  }
+
+  /**
    * Result.unwrap returns the value `T` from the associated result if it is
    * `Ok`; otherwise it will throw.
    *
@@ -685,6 +705,22 @@ export abstract class Result<T, TError> {
   ): U1 | U2;
 
   /**
+   * Result.toString returns the string representation of the result and the
+   * stringified value as `Ok(value)` if the result is `Ok` or `Err(value)` if
+   * the result is `Err`.
+   *
+   * @example
+   * ```ts
+   * Ok(42)
+   *   .toString(); // Evaluates to "Ok(42)"
+   *
+   * Err(42)
+   *   .toString(); // Evaluates to "Err(42)"
+   * ```
+   */
+  abstract toString(): `Ok(${string})` | `Err(${string})`;
+
+  /**
    * Result.unwrap returns the value `T` from the associated result if it is
    * `Ok`; otherwise it will throw.
    *
@@ -805,6 +841,15 @@ export class Ok<T> extends Result<T, never> {
     return onOk(this.#value);
   }
 
+  /** {@link Result.toString} */
+  toString(): `Ok(${string})` {
+    return `Ok(${
+      this.#value instanceof Result
+        ? this.#value.toString()
+        : JSON.stringify(this.#value) ?? ""
+    })`;
+  }
+
   /** {@link Result.unwrap} */
   unwrap(): T {
     return this.#value;
@@ -818,6 +863,10 @@ export class Ok<T> extends Result<T, never> {
   /** {@link Result.unwrapOr} */
   unwrapOr(_defaultValue: T): T {
     return this.#value;
+  }
+
+  [Symbol.for("Deno.customInspect")](): `Ok(${string})` {
+    return this.toString();
   }
 }
 
@@ -891,6 +940,15 @@ export class Err<TError> extends Result<never, TError> {
     return onErr(this.#value);
   }
 
+  /** {@link Result.toString} */
+  toString(): `Err(${string})` {
+    return `Err(${
+      this.#value instanceof Result
+        ? this.#value.toString()
+        : JSON.stringify(this.#value) ?? ""
+    })`;
+  }
+
   /** {@link Result.unwrap} */
   unwrap(): never {
     throw Error("Called unwrap on Err");
@@ -904,6 +962,10 @@ export class Err<TError> extends Result<never, TError> {
   /** {@link Result.unwrapOr} */
   unwrapOr<U>(defaultValue: U): U {
     return defaultValue;
+  }
+
+  [Symbol.for("Deno.customInspect")](): `Err(${string})` {
+    return this.toString();
   }
 }
 
