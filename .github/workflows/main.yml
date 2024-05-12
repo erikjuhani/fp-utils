@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        command: ['fmt --check', 'task check', 'lint', 'task test']
+        command: ['format', 'typecheck', 'lint', 'test']
     steps:
       - uses: actions/checkout@v4
 
@@ -31,7 +31,7 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
-      - run: deno ${{ matrix.command }}
+      - run: deno task ${{ matrix.command }}
 
   release:
     runs-on: ubuntu-latest
