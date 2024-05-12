@@ -37,116 +37,68 @@ jobs:
       - name: Run tests
         run: deno task test
 
-  release_option:
-    needs: verify
-    if: ${{ github.ref == 'refs/heads/main' && needs.verify.outputs.option == 'true' }}
+  release:
     runs-on: ubuntu-latest
+    needs: verify
+    strategy:
+      matrix:
+        module: [option, result]
+        exclude:
+          - module: ${{ needs.prepare.outputs.option != 'true' && 'option' }}
+          - module: ${{ needs.prepare.outputs.result != 'true' && 'result' }}
+    if: ${{ github.ref == 'refs/heads/main' && (needs.prepare.outputs.option == 'true' || needs.prepare.outputs.result == 'true') }}
     outputs:
-      option_release: ${{ steps.should_run.outputs.option_release }}
+      option_release: ${{ steps.should_run.outputs.option_release == 'true' && needs.prepare.outputs.option == 'true' && 'true' }}
+      result_release: ${{ steps.should_run.outputs.result_release == 'true '&& needs.prepare.result.option == 'true' && 'true' }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - name: Check for version changes 
+        working-directory: ${{ matrix.module }}
         id: should_run
         run: |
+          module=${{ matrix.module }}
           if git diff HEAD^ HEAD -- 'deno.json' | grep -q '+  "version":' >/dev/null; then 
-            echo 'option_release=true' >> $GITHUB_OUTPUT
+            echo "${module}_release=true" >> $GITHUB_OUTPUT
             exit 0
           fi
-          echo 'option_release=false' >> $GITHUB_OUTPUT
-        working-directory: option
+          echo "${module}_release=false" >> $GITHUB_OUTPUT
 
-  release_result:
-    needs: verify
-    if: ${{ github.ref == 'refs/heads/main' && needs.verify.outputs.result == 'true' }}
-    outputs:
-      result_release: ${{ steps.should_run.outputs.result_release }}
+  publish:
+    needs: release
+    if: ${{ needs.release.outputs.option_release == 'true' || needs.release.outputs.result_release == 'true' }}
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-      - name: Check for version changes 
-        id: should_run
-        run: |
-          if git diff HEAD^ HEAD -- 'deno.json' | grep -q '+  "version":' >/dev/null; then 
-            echo 'result_release=true' >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          echo 'result_release=false' >> $GITHUB_OUTPUT
-        working-directory: result
-
-  publish_option_npm:
-    needs: release_option
-    if: ${{ needs.release_option.outputs.option_release == 'true' }}
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module: [option, result]
+        registry: [jsr, npm]
+        exclude:
+          - module: ${{ needs.release.outputs.option_release != 'true' && 'option' }}
+          - module: ${{ needs.release.outputs.result_release != 'true' && 'result' }}
     permissions:
       contents: read
       id-token: write # The OIDC ID token is used for authentication with JSR.
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          registry-url: 'https://registry.npmjs.org'
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
-      - name: Build @fp-utils/option npm package
-        run: deno task build --allow-net --mod option
-      - name: Publish @fp-utils/option to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: option/dist
-        run: npm publish
-
-  publish_option_jsr:
-    needs: release_option
-    if: ${{ needs.release_option.outputs.option_release == 'true' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # The OIDC ID token is used for authentication with JSR.
-    steps:
-      - uses: actions/checkout@v4
-      - name: Publish @fp-utils/option to jsr
-        working-directory: option
+      - name: Publish @fp-utils/${{ matrix.module }} to jsr
+        if: ${{ matrix.registry == 'jsr' }}
+        working-directory: ${{ matrix.module }}
         run: npx jsr publish
-
-  publish_result_npm:
-    needs: release_result
-    if: ${{ needs.release_result.outputs.result_release == 'true' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # The OIDC ID token is used for authentication with JSR.
-    steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
+        if: ${{ matrix.registry == 'npm' }}
         with:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: v1.x
-      - name: Build @fp-utils/result npm package
-        run: deno task build --allow-net --mod result
-      - name: Publish @fp-utils/result to npm
+      - name: Build @fp-utils/${{ matrix.module }} npm package
+        if: ${{ matrix.registry == 'npm' }}
+        run: deno task build --allow-net --mod ${{ matrix.module }}
+      - name: Publish @fp-utils/${{ matrix.module }} to npm
+        if: ${{ matrix.registry == 'npm' }}
+        working-directory: ${{ matrix.module }}/dist
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: result/dist
         run: npm publish
-
-  publish_result_jsr:
-    needs: release_result
-    if: ${{ needs.release_result.outputs.result_release == 'true' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # The OIDC ID token is used for authentication with JSR.
-    steps:
-      - uses: actions/checkout@v4
-      - name: Publish @fp-utils/result to jsr
-        working-directory: result
-        run: npx jsr publish
