@@ -3,12 +3,11 @@ name: Main
 on: [push, workflow_dispatch]
 
 jobs:
-  verify:
+  prepare:
     runs-on: ubuntu-latest
     outputs:
       option: ${{ steps.module.outputs.option }}
       result: ${{ steps.module.outputs.result }}
-
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -20,26 +19,23 @@ jobs:
             result:
               - 'result/deno.json'
 
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        command: ['fmt --check', 'task check', 'lint', 'task test']
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
-
-      - name: Check formatting
-        run: deno fmt --check
-
-      - name: Run type checker
-        run: deno task check
-
-      - name: Run linter
-        run: deno lint
-
-      - name: Run tests
-        run: deno task test
+      - run: deno ${{ matrix.command }}
 
   release:
     runs-on: ubuntu-latest
-    needs: verify
+    needs: [prepare, verify]
     strategy:
       matrix:
         module: [option, result]
