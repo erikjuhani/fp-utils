@@ -705,6 +705,40 @@ export abstract class Result<T, TError> {
   ): U1 | U2;
 
   /**
+   * Result.partition unwraps an array of results into a tuple of unwrapped Ok
+   * and Err values. This is especially useful if for example all errors and
+   * success cases need to be evaluated individually.
+   *
+   * @example
+   * ```ts
+   * Result
+   *   .partition([]); // Evaluates to [[], []]
+   *
+   * Result
+   *   .partition([Ok(42)]); // Evaluates to [[42], []]
+   *
+   * Result
+   *   .partition([Err(42)]); // Evaluates to [[], [42]]
+   *
+   * Result
+   *   .partition([Ok(42), Err(84), Ok("Ok"), Err("Error")]); // Evaluates to [[10, "Ok"], ["Error", 84]]
+   * ```
+   */
+  // deno-lint-ignore no-explicit-any
+  static partition<Results extends Result<any, any>[]>(
+    results: Results,
+  ): Results[number] extends Result<infer O, infer E> ? [[O], [E]] : never {
+    return results.reduce<[unknown[], unknown[]]>(
+      (acc, result) =>
+        result.isOk()
+          ? [[...acc[0], result.unwrap()], acc[1]]
+          : [acc[0], [...acc[1], result.unwrapErr()]],
+      [[], []],
+    ) as Results[number] extends Result<infer O, infer E> ? [[O], [E]]
+      : never;
+  }
+
+  /**
    * Result.toString returns the string representation of the result and the
    * stringified value as `Ok(value)` if the result is `Ok` or `Err(value)` if
    * the result is `Err`.

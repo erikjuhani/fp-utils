@@ -146,6 +146,20 @@ test("Result.toString", () => {
   }
 });
 
+test("Result.partition", () => {
+  const tests: [Result<unknown, unknown>[], [unknown[], unknown[]]][] = [
+    [[], [[], []]],
+    [[Err(10)], [[], [10]]],
+    [[Ok(10)], [[10], []]],
+    [[Ok(10), Err("error")], [[10], ["error"]]],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = Result.partition(input);
+    assertEquals(actual, expected);
+  }
+});
+
 test("Result.from", () => {
   const predicate = (x: number) => x >= 5;
   const tests: [Result<number, unknown>, boolean][] = [

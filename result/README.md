@@ -757,6 +757,33 @@ Result
 
 </details>
 
+#### `Result.partition`
+
+Signature: `partition(results: Result<T, TError>[]): [[T], [TError]]`
+
+Result.partition unwraps an array of results into a tuple of unwrapped Ok and
+Err values. This is especially useful if for example all errors and success
+cases need to be evaluated individually.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Result
+  .partition([]); // Evaluates to [[], []]
+
+Result
+  .partition([Ok(42)]); // Evaluates to [[42], []]
+
+Result
+  .partition([Err(42)]); // Evaluates to [[], [42]]
+
+Result
+  .partition([Ok(42), Err(84), Ok("Ok"), Err("Error")]); // Evaluates to [[10, "Ok"], ["Error", 84]]
+```
+
+</details>
+
 #### `Result.toString`
 
 Signature: `toString(result: Result<T, TError>): "Ok(value)" | "Err(value)"`
