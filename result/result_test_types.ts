@@ -39,6 +39,25 @@ import { Err, Ok, Result } from "@fp-utils/result";
   assertType<IsExact<typeof t, string>>(true);
 });
 
+// Result.partition - array of results
+(() => {
+  const results = [
+    Ok("42"),
+    Err(84),
+    Ok(),
+    Err("Error") as Result<number, string>,
+    Ok({ kind: "ok" as const }),
+    Err({ kind: "err" as const }),
+  ];
+
+  const [ok, err] = Result.partition(results);
+
+  assertType<
+    IsExact<typeof ok, (string | number | { kind: "ok" } | undefined)[]>
+  >(true);
+  assertType<IsExact<typeof err, (string | number | { kind: "err" })[]>>(true);
+});
+
 // Result.isErr and Result.isOk
 (() => {
   const result: Result<string, string> = Ok("42");

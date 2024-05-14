@@ -727,14 +727,14 @@ export abstract class Result<T, TError> {
   // deno-lint-ignore no-explicit-any
   static partition<Results extends Result<any, any>[]>(
     results: Results,
-  ): Results[number] extends Result<infer O, infer E> ? [[O], [E]] : never {
+  ): Results[number] extends Result<infer O, infer E> ? [O[], E[]] : never {
     return results.reduce<[unknown[], unknown[]]>(
       (acc, result) =>
         result.isOk()
           ? [[...acc[0], result.unwrap()], acc[1]]
           : [acc[0], [...acc[1], result.unwrapErr()]],
       [[], []],
-    ) as Results[number] extends Result<infer O, infer E> ? [[O], [E]]
+    ) as Results[number] extends Result<infer O, infer E> ? [O[], E[]]
       : never;
   }
 
