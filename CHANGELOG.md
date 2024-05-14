@@ -1,3 +1,11 @@
+## 0.13.1
+
+FEATURES:
+
+- [Add Result.partition static method](https://github.com/erikjuhani/fp-utils/commit/b46e9f53ada4d83caa757003fffeca06dc5adce4)
+- [Add Result.toString method and higher-order function variant](https://github.com/erikjuhani/fp-utils/commit/0a0943f75935784f3d6d52f08beedde0b7e64030)
+- [Add Option.toString method and higher-order function variant](https://github.com/erikjuhani/fp-utils/commit/290a7ec80130def8e0e5cf8ffff6f3d0ce0a1a69)
+
 ## 0.13.0
 
 FEATURES:
