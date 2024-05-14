@@ -45,7 +45,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' && (needs.prepare.outputs.option == 'true' || needs.prepare.outputs.result == 'true') }}
     outputs:
       option_release: ${{ steps.should_run.outputs.option_release == 'true' && needs.prepare.outputs.option == 'true' && 'true' }}
-      result_release: ${{ steps.should_run.outputs.result_release == 'true '&& needs.prepare.result.option == 'true' && 'true' }}
+      result_release: ${{ steps.should_run.outputs.result_release == 'true '&& needs.prepare.outputs.result == 'true' && 'true' }}
     steps:
       - uses: actions/checkout@v4
         with:
