@@ -6,16 +6,18 @@
       "jsr:@deno/dnt@^0.41.1": "jsr:@deno/dnt@0.41.1",
       "jsr:@deno/graph@^0.69.7": "jsr:@deno/graph@0.69.7",
       "jsr:@std/assert@^0.218.2": "jsr:@std/assert@0.218.2",
-      "jsr:@std/assert@^0.223.0": "jsr:@std/assert@0.223.0",
+      "jsr:@std/assert@^0.224.0": "jsr:@std/assert@0.224.0",
+      "jsr:@std/assert@^0.225.3": "jsr:@std/assert@0.225.3",
       "jsr:@std/bytes@^0.218.2": "jsr:@std/bytes@0.218.2",
-      "jsr:@std/cli@^0.223.0": "jsr:@std/cli@0.223.0",
+      "jsr:@std/cli@^0.224.3": "jsr:@std/cli@0.224.3",
       "jsr:@std/fmt@^0.218.2": "jsr:@std/fmt@0.218.2",
-      "jsr:@std/fmt@^0.223.0": "jsr:@std/fmt@0.223.0",
+      "jsr:@std/fmt@^0.224.0": "jsr:@std/fmt@0.224.0",
       "jsr:@std/fs@^0.218.2": "jsr:@std/fs@0.218.2",
+      "jsr:@std/internal@^0.224.0": "jsr:@std/internal@0.224.0",
+      "jsr:@std/internal@^1.0.0": "jsr:@std/internal@1.0.0",
       "jsr:@std/io@^0.218.2": "jsr:@std/io@0.218.2",
       "jsr:@std/path@^0.218.2": "jsr:@std/path@0.218.2",
-      "jsr:@std/testing": "jsr:@std/testing@0.223.0",
-      "jsr:@std/testing@^0.223.0": "jsr:@std/testing@0.223.0",
+      "jsr:@std/testing@^0.224.0": "jsr:@std/testing@0.224.0",
       "npm:@ts-morph/bootstrap@0.22": "npm:@ts-morph/bootstrap@0.22.0",
       "npm:code-block-writer@^13.0.1": "npm:code-block-writer@13.0.1"
     },
@@ -45,26 +47,33 @@
       "@std/assert@0.218.2": {
         "integrity": "7f0a5a1a8cf86607cd6c2c030584096e1ffad27fc9271429a8cb48cfbdee5eaf"
       },
-      "@std/assert@0.223.0": {
-        "integrity": "eb8d6d879d76e1cc431205bd346ed4d88dc051c6366365b1af47034b0670be24",
+      "@std/assert@0.224.0": {
+        "integrity": "8643233ec7aec38a940a8264a6e3eed9bfa44e7a71cc6b3c8874213ff401967f",
         "dependencies": [
-          "jsr:@std/fmt@^0.223.0"
+          "jsr:@std/fmt@^0.224.0",
+          "jsr:@std/internal@^0.224.0"
+        ]
+      },
+      "@std/assert@0.225.3": {
+        "integrity": "b3c2847aecf6955b50644cdb9cf072004ea3d1998dd7579fc0acb99dbb23bd4f",
+        "dependencies": [
+          "jsr:@std/internal@^1.0.0"
         ]
       },
       "@std/bytes@0.218.2": {
         "integrity": "91fe54b232dcca73856b79a817247f4a651dbb60d51baafafb6408c137241670"
       },
-      "@std/cli@0.223.0": {
-        "integrity": "2feb7970f2028904c3edc22ea916ce9538113dfc170844f3eae03578c333c356",
+      "@std/cli@0.224.3": {
+        "integrity": "54fd879e24b738f6812dcc75bcae1534ba8f014245064ceae1bcfc2996c06d44",
         "dependencies": [
-          "jsr:@std/assert@^0.223.0"
+          "jsr:@std/assert@^0.225.3"
         ]
       },
       "@std/fmt@0.218.2": {
         "integrity": "99526449d2505aa758b6cbef81e7dd471d8b28ec0dcb1491d122b284c548788a"
       },
-      "@std/fmt@0.223.0": {
-        "integrity": "6deb37794127dfc7d7bded2586b9fc6f5d50e62a8134846608baf71ffc1a5208"
+      "@std/fmt@0.224.0": {
+        "integrity": "e20e9a2312a8b5393272c26191c0a68eda8d2c4b08b046bad1673148f1d69851"
       },
       "@std/fs@0.218.2": {
         "integrity": "dd9431453f7282e8c577cc22c9e6d036055a9a980b5549f887d6012969fabcca",
@@ -72,6 +81,12 @@
           "jsr:@std/assert@^0.218.2",
           "jsr:@std/path@^0.218.2"
         ]
+      },
+      "@std/internal@0.224.0": {
+        "integrity": "afc50644f9cdf4495eeb80523a8f6d27226b4b36c45c7c195dfccad4b8509291"
+      },
+      "@std/internal@1.0.0": {
+        "integrity": "ac6a6dfebf838582c4b4f61a6907374e27e05bedb6ce276e0f1608fe84e7cd9a"
       },
       "@std/io@0.218.2": {
         "integrity": "c64fbfa087b7c9d4d386c5672f291f607d88cb7d44fc299c20c713e345f2785f",
@@ -85,10 +100,10 @@
           "jsr:@std/assert@^0.218.2"
         ]
       },
-      "@std/testing@0.223.0": {
-        "integrity": "7a48b9a14589ed16beb2a31ec7150e9fff3acda58f3077af6a1fcdb92375143b",
+      "@std/testing@0.224.0": {
+        "integrity": "371b8a929aa7132240d5dd766a439be8f780ef5c176ab194e0bcab72370c761e",
         "dependencies": [
-          "jsr:@std/assert@^0.223.0"
+          "jsr:@std/assert@^0.224.0"
         ]
       }
     },
@@ -360,9 +375,9 @@
   "workspace": {
     "dependencies": [
       "jsr:@deno/dnt@^0.41.1",
-      "jsr:@std/assert@^0.223.0",
-      "jsr:@std/cli@^0.223.0",
-      "jsr:@std/testing@^0.223.0"
+      "jsr:@std/assert@^0.225.3",
+      "jsr:@std/cli@^0.224.3",
+      "jsr:@std/testing@^0.224.0"
     ]
   }
 }
