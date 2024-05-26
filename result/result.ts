@@ -918,7 +918,7 @@ export class Err<TError> extends Result<never, TError> {
 
   /** {@link Result.expect} */
   expect(value: string): never {
-    throw new Error(value);
+    throw new Error(value, { cause: this.#value });
   }
 
   /** {@link Result.expectErr} */
