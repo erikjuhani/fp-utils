@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        command: ['format', 'typecheck', 'lint', 'test']
+        command: ['format', 'typecheck', 'lint', 'test', 'build --mod option', 'build --mod result']
     steps:
       - uses: actions/checkout@v4
 
