@@ -77,6 +77,9 @@ async function buildModule(module: string) {
     // Do not include test files in the artifact
     test: false,
     package: denoJson,
+    compilerOptions: {
+      target: "ES2022",
+    },
     postBuild: () => {
       copyLicense();
       copyReadme();
