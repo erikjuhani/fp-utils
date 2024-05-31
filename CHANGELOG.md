@@ -1,3 +1,18 @@
+## 0.14.0
+
+BREAKING CHANGES:
+
+- [Change build_npm target to ES2022 to support cause property](https://github.com/erikjuhani/fp-utils/commit/48568a5f13620e51b0ae4f11e97843c5144e3d3d)
+
+CHANGES:
+
+- [Add cause property when throwing with expect on Err type](https://github.com/erikjuhani/fp-utils/commit/7a6c57b395133a3c7ee18a8a16e579f9a8fd9a5e)
+
+FEATURES:
+
+- [Add Option.all and Option.any static methods](https://github.com/erikjuhani/fp-utils/commit/71bf4ab2392e09573afc5b9f0b60fbdc901455a4)
+- [Add Result.all and Result.any static methods](https://github.com/erikjuhani/fp-utils/commit/5e26b90a61e9aeb31952f31b791c0323c8ca7eff)
+
 ## 0.13.1
 
 FEATURES:
