@@ -5,12 +5,70 @@
  */
 export abstract class Option<T> {
   /**
+   * Option.all returns all Some option values as an array within a Some
+   * option. If None option exists in the array, None is returned. An empty
+   * array signifies success, resulting in a Some with an empty array.
+   *
+   * @example
+   * ```ts
+   * Result
+   *   .all([]); // Evaluates to Some []
+   *
+   * Option
+   *   .all([Some(10), Some(42), Some(84)]); // Evaluates to Some [10, 42, 84]
+   *
+   * Result
+   *   .all([Some(10), Some(42), None, Some(84)]); // Evaluates to None
+   *
+   * Result
+   *   .all([None]); // Evaluates to None
+   * ```
+   */
+  // deno-lint-ignore no-explicit-any
+  static all<const Options extends Option<any>[]>(
+    options: Options,
+  ): All<Options> {
+    return (options.find(Option.isNone)
+      ? Option.none()
+      : Option.some(options.map(Option.unwrap))) as All<Options>;
+  }
+
+  /**
+   * Option.any returns the first Some option encountered. If no Some options are
+   * found in the array None is returned.
+   *
+   * @example
+   * ```ts
+   * Result
+   *   .any([]); // Evaluates to None
+   *
+   * Option
+   *   .any([Some(10), Some(42), Some(84)]); // Evaluates to Some 10
+   *
+   * Result
+   *   .any([Some(10), Some(42), None, Some(84)]); // Evaluates to None
+   *
+   * Result
+   *   .any([None]); // Evaluates to None
+   * ```
+   */
+  // deno-lint-ignore no-explicit-any
+  static any<const Options extends Option<any>[]>(
+    options: Options,
+  ): Any<Options> {
+    return (options.find(Option.isSome) ??
+      Option.none()) as Any<Options>;
+  }
+
+  /**
    * Option.filter returns a boolean that is evaluated with the given
    * `predicate` function which is applied on the option value `T`. None
    * evaluates to `false`.
    *
    * @example
    * ```ts
+   * import { Option, Some, None } from "@fp-utils/option";
+   *
    * Option
    *   .filter((x: number) => x >= 5)(Some(2)); // evaluates to false
    *
@@ -38,6 +96,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { Option, Some, None } from "./mod.ts"
+   *
    * type TryParse = (input: string) => Option<number>;
    *
    * const tryParse: TryParse = (input: string) => {
@@ -717,3 +777,35 @@ function isPromiseLike<T>(value: unknown): value is PromiseLike<T> {
 function isNonNullable<T>(value: T): value is NonNullable<T> {
   return value !== null && value !== undefined;
 }
+
+/**
+ * Type helper to find None options
+ */
+type IsNone<T> = T extends None | Option<never> ? true
+  : false;
+
+/**
+ * Recursive type helper to deduce Option.any return type.
+ */
+type Any<Options extends Option<unknown>[], Acc extends unknown[] = []> =
+  Options extends [infer Head, ...infer Tail extends Option<unknown>[]]
+    ? IsNone<Head> extends true ? Any<Tail, Acc>
+    : Any<
+      Tail,
+      [...Acc, Head extends Some<infer U> | Option<infer U> ? U : never]
+    >
+    : Acc extends [] ? None
+    : Option<Acc[number]>;
+
+/**
+ * Recursive type helper to deduce Option.all return type.
+ */
+type All<Options extends Option<unknown>[], Acc extends unknown[] = []> =
+  Options extends [infer Head, ...infer Tail extends Option<unknown>[]]
+    ? IsNone<Head> extends true ? None
+    : All<
+      Tail,
+      [...Acc, Head extends Some<infer U> | Option<infer U> ? U : never]
+    >
+    : Acc extends [] ? None
+    : Option<(Acc[number])[]>;

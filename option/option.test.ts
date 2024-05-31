@@ -109,6 +109,38 @@ test("Option.zip", () => {
   }
 });
 
+test("Option.all", () => {
+  const tests: [Option<unknown>[], Option<unknown>][] = [
+    [[], Some([])],
+    [[None], None],
+    [[Some(10)], Some([10])],
+    [[Some(10), None], None],
+    [[Some(10), Some("42")], Some([10, "42"])],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = Option.all(input);
+    assertEquals(actual.toString(), expected.toString());
+  }
+});
+
+test("Result.any", () => {
+  const tests: [Option<unknown>[], Option<unknown>][] = [
+    [[], None],
+    [[None], None],
+    [[Some(10)], Some(10)],
+    [[Some(10), None], Some(10)],
+    [[Some(10), Some("42")], Some(10)],
+    [[None, Some("42"), Some(10)], Some("42")],
+    [[None, None], None],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = Option.any(input);
+    assertEquals(actual.toString(), expected.toString());
+  }
+});
+
 test("Option.filter", () => {
   const predicate = (x: number) => x >= 5;
   const tests: [input: Option<number>, expected: boolean][] = [

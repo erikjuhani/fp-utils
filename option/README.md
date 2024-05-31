@@ -456,6 +456,59 @@ Option
 
 Static methods for working with options.
 
+#### `Option.all`
+
+Signature: `all(options: Option<T>[]): Option<T[]>`
+
+Option.all returns all Some option values as an array within a Some option. If
+None option exists in the array, None is returned. An empty array signifies
+success, resulting in a Some with an empty array.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Result
+  .all([]); // Evaluates to Some []
+
+Option
+  .all([Some(10), Some(42), Some(84)]); // Evaluates to Some [10, 42, 84]
+
+Result
+  .all([Some(10), Some(42), None, Some(84)]); // Evaluates to None
+
+Result
+  .all([None]); // Evaluates to None
+```
+
+</details>
+
+#### `Option.any`
+
+Signature: `any(options: Option<T>[]): Option<T>`
+
+Option.any returns the first Some option encountered. If no Some options are
+found in the array None is returned.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Result
+  .any([]); // Evaluates to None
+
+Option
+  .any([Some(10), Some(42), Some(84)]); // Evaluates to Some 10
+
+Result
+  .any([Some(10), Some(42), None, Some(84)]); // Evaluates to None
+
+Result
+  .any([None]); // Evaluates to None
+```
+
+</details>
+
 #### `Option.from`
 
 Signature: `from(value: T | (() => T)): From<T>`
