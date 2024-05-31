@@ -5,6 +5,63 @@
  */
 export abstract class Result<T, TError> {
   /**
+   * Result.all returns all Ok result values as an array within an Ok result if
+   * no Err results are present. If any Err result exists in the array, the
+   * first one is returned. An empty array signifies success, resulting in an
+   * Ok with an empty array.
+   *
+   * @example
+   * ```ts
+   * Result
+   *   .all([]); // Evaluates to Ok []
+   *
+   * Result
+   *   .all([Ok(10), Ok(42), Ok(84)]); // Evaluates to Ok [10, 42, 84]
+   *
+   * Result
+   *   .all([Ok(10), Ok(42), Err("Error"), Ok(84)]); // Evaluates to Err "Error"
+   *
+   * Result
+   *   .all([Err("Error")]); // Evaluates to Err "Error"
+   * ```
+   */
+  // deno-lint-ignore no-explicit-any
+  static all<const Results extends Result<any, any>[]>(
+    results: Results,
+  ): All<Results> {
+    const [ok, err] = Result.partition(results);
+    return (err.length ? Result.err(err[0]) : Result.ok(ok)) as All<Results>;
+  }
+
+  /**
+   * Result.any returns the first Ok result encountered. If no Ok results are
+   * found in the array, all Err result values are returned as an array within
+   * an Err result.
+   *
+   * @example
+   * ```ts
+   * Result
+   *   .any([]); // Evaluates to Err []
+   *
+   * Result
+   *   .any(Ok(10), Ok(42), Ok(84)); // Evaluates to Ok 10
+   *
+   * Result
+   *   .any([Ok(10), Ok(42), Err("Error"), Ok(84)]); // Evaluates to Ok 10
+   *
+   * Result
+   *   .any([Err("Error")]); // Evaluates to Err ["Error"]
+   * ```
+   */
+  // deno-lint-ignore no-explicit-any
+  static any<const Results extends Result<any, any>[]>(
+    results: Results,
+  ): Any<Results> {
+    const [ok, err] = Result.partition(results);
+    return (ok.length ? Result.ok(ok[0]) : Result.err(err)) as Any<Results>;
+  }
+
+  /**
    * Result.err creates a result Err with error value `TError`. Type
    * `undefined` can be interpreted to have the same significance as the `unit`
    * type. Unit type signifies the absence of a specific value and acts as a
@@ -1028,3 +1085,19 @@ function isPromiseLike<T>(value: unknown): value is PromiseLike<T> {
 function isNonNullable<T>(value: T): value is NonNullable<T> {
   return value !== null && value !== undefined;
 }
+
+/**
+ * Type helper to deduce Result.any return type.
+ */
+type Any<Results extends Result<unknown, unknown>[]> = Results extends []
+  ? Err<[]>
+  : Results[number] extends Result<infer O, infer E> ? Result<O, E[]>
+  : never;
+
+/**
+ * Type helper to deduce Result.any return type.
+ */
+type All<Results extends Result<unknown, unknown>[]> = Results extends []
+  ? Ok<[]>
+  : Results[number] extends Result<infer O, infer E> ? Result<O[], E>
+  : never;

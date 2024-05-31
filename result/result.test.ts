@@ -160,6 +160,37 @@ test("Result.partition", () => {
   }
 });
 
+test("Result.all", () => {
+  const tests: [Result<unknown, unknown>[], Result<unknown, unknown>][] = [
+    [[], Ok([])],
+    [[Err(10)], Err(10)],
+    [[Ok(10)], Ok([10])],
+    [[Ok(10), Err("error")], Err("error")],
+    [[Ok(10), Ok("42")], Ok([10, "42"])],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = Result.all(input);
+    assertEquals(actual.toString(), expected.toString());
+  }
+});
+
+test("Result.any", () => {
+  const tests: [Result<unknown, unknown>[], Result<unknown, unknown>][] = [
+    [[], Err([])],
+    [[Err(10)], Err([10])],
+    [[Ok(10)], Ok(10)],
+    [[Ok(10), Err("error")], Ok(10)],
+    [[Ok(10), Ok("42")], Ok(10)],
+    [[Err(10), Err("error")], Err([10, "error"])],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = Result.any(input);
+    assertEquals(actual.toString(), expected.toString());
+  }
+});
+
 test("Result.from", () => {
   const predicate = (x: number) => x >= 5;
   const tests: [Result<number, unknown>, boolean][] = [

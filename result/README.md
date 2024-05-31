@@ -614,6 +614,61 @@ Result
 
 Static methods for working with results.
 
+#### `Result.all`
+
+Signature: `all(results: Result<T, TError>[]): Result<T[], TError>`
+
+Result.all returns all Ok result values as an array within an Ok result if no
+Err results are present. If any Err result exists in the array, the first one is
+returned. An empty array signifies success, resulting in an Ok with an empty
+array.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Result
+  .all([]); // Evaluates to Ok []
+
+Result
+  .all([Ok(10), Ok(42), Ok(84)]); // Evaluates to Ok [10, 42, 84]
+
+Result
+  .all([Ok(10), Ok(42), Err("Error"), Ok(84)]); // Evaluates to Err "Error"
+
+Result
+  .all([Err("Error")]); // Evaluates to Err "Error"
+```
+
+</details>
+
+#### `Result.any`
+
+Signature: `any(results: Result<T, TError>[]): Result<T, TError[]>`
+
+Result.any returns the first Ok result encountered. If no Ok results are found
+in the array, all Err result values are returned as an array within an Err
+result.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Result
+  .any([]); // Evaluates to Err []
+
+Result
+  .any(Ok(10), Ok(42), Ok(84)); // Evaluates to Ok 10
+
+Result
+  .any([Ok(10), Ok(42), Err("Error"), Ok(84)]); // Evaluates to Ok 10
+
+Result
+  .any([Err("Error")]); // Evaluates to Err ["Error"]
+```
+
+</details>
+
 #### `Result.err`
 
 Signature: `err(value?: T): Err<T>`
