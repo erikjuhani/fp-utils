@@ -293,6 +293,27 @@ Err(42)
 
 </details>
 
+#### `Result.toJSON`
+
+Signature: `(): { "ok"?: T; "err"?: TError" }`
+
+Result.toJSON serializes the result into JSON format. An Ok value will be
+serialized to `{ "ok": T }`, and an Err value will be serialized to
+`{ "err": TError }`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Ok(42)
+  .toJSON(); // Evaluates to { "ok": 42 }
+
+Err(84)
+  .toJSON(); // Evaluates to { "err": 84 }
+```
+
+</details>
+
 #### `Result.toString`
 
 Signature: `(): "Ok(value)" | "Err(value)"`
@@ -838,6 +859,25 @@ Result
 ```
 
 </details>
+
+#### `Result.toJSON`
+
+Signature: `toJSON(result: Result<T, TError>): { "ok"?: T; "err"?: TError" }`
+
+Result.toJSON serializes the result into JSON format. An Ok value will be
+serialized to `{ "ok": T }`, and an Err value will be serialized to
+`{ "err": TError }`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Result
+  .toJSON(Ok(42)); // Evaluates to { "ok": 42 }
+
+Result
+  .toJSON(Err(84)); // Evaluates to { "err": 84 }
+```
 
 #### `Result.toString`
 

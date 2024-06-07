@@ -485,6 +485,26 @@ export abstract class Result<T, TError> {
   }
 
   /**
+   * Result.toJSON serializes the result into JSON format. An Ok value will be
+   * serialized to `{ "ok": T }`, and an Err value will be serialized to
+   * `{ "err": TError }`.
+   *
+   * @example
+   * ```ts
+   * Result
+   *   .toJSON(Ok(42)); // Evaluates to { "ok": 42 }
+   *
+   * Result
+   *   .toJSON(Err(84)); // Evaluates to { "err": 84 }
+   * ```
+   */
+  static toJSON<T, TError>(
+    result: Result<T, TError>,
+  ): ToJSON<T, TError> {
+    return result.toJSON();
+  }
+
+  /**
    * Result.toString returns the string representation of the result and the
    * stringified value as `Ok(value)` if the result is `Ok` or `Err(value)` if
    * the result is `Err`.
@@ -796,6 +816,22 @@ export abstract class Result<T, TError> {
   }
 
   /**
+   * Result.toJSON serializes the result into JSON format. An Ok value will be
+   * serialized to `{ "ok": T }`, and an Err value will be serialized to
+   * `{ "err": TError }`.
+   *
+   * @example
+   * ```ts
+   * Ok(42)
+   *   .toJSON(); // Evaluates to { "ok": 42 }
+   *
+   * Err(84)
+   *   .toJSON(); // Evaluates to { "err": 84 }
+   * ```
+   */
+  abstract toJSON(): ToJSON<T, TError>;
+
+  /**
    * Result.toString returns the string representation of the result and the
    * stringified value as `Ok(value)` if the result is `Ok` or `Err(value)` if
    * the result is `Err`.
@@ -932,6 +968,13 @@ export class Ok<T> extends Result<T, never> {
     return onOk(this.#value);
   }
 
+  /** {@link Result.toJSON} */
+  toJSON(): ToJSON<T, never> {
+    return {
+      "ok": this.#value instanceof Result ? this.#value.toJSON() : this.#value,
+    } as ToJSON<T, never>;
+  }
+
   /** {@link Result.toString} */
   toString(): `Ok(${string})` {
     return `Ok(${
@@ -1031,6 +1074,13 @@ export class Err<TError> extends Result<never, TError> {
     return onErr(this.#value);
   }
 
+  /** {@link Result.toJSON} */
+  toJSON(): ToJSON<never, TError> {
+    return {
+      "err": this.#value instanceof Result ? this.#value.toJSON() : this.#value,
+    } as ToJSON<never, TError>;
+  }
+
   /** {@link Result.toString} */
   toString(): `Err(${string})` {
     return `Err(${
@@ -1101,3 +1151,15 @@ type All<Results extends Result<unknown, unknown>[]> = Results extends []
   ? Ok<[]>
   : Results[number] extends Result<infer O, infer E> ? Result<O[], E>
   : never;
+
+/**
+ * Type helper to serialize Result into json.
+ */
+type ToJSON<T, TError> = {
+  "ok"?: T extends Result<infer U, infer UError> ? ToJSON<U, UError>
+    : T extends Ok<infer U> ? ToJSON<U, never>
+    : T;
+  "err"?: TError extends Result<infer U, infer UError> ? ToJSON<U, UError>
+    : TError extends Err<infer UError> ? ToJSON<never, UError>
+    : TError;
+};

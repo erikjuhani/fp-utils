@@ -367,3 +367,23 @@ test("Result.from", async () => {
     "error",
   );
 });
+
+test("Result.toJSON", () => {
+  const tests: [
+    Result<unknown, unknown>,
+    { "ok": unknown } | { "err": unknown },
+  ][] = [
+    [Err(10), { "err": 10 }],
+    [Ok(42), { "ok": 42 }],
+    [Err(), { "err": undefined }],
+    [Ok(), { "ok": undefined }],
+    [Ok(Ok(84)), { "ok": { "ok": 84 } }],
+    [Ok(Err(84)), { "ok": { "err": 84 } }],
+    [Ok(Err(Ok(84))), { "ok": { "err": { "ok": 84 } } }],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = Result.toJSON(input);
+    assertEquals(actual, expected);
+  }
+});
