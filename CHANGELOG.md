@@ -1,3 +1,10 @@
+## 0.15.0
+
+BREAKING CHANGES:
+
+- [Add Result.toJSON method and static variant](https://github.com/erikjuhani/fp-utils/commit/7019c03743dace4d39e9119f94f86b1f7b8f6193)
+- [Add Option.toJSON method and static variant](https://github.com/erikjuhani/fp-utils/commit/f08f1bf17bc29a482d13c0281a2134106a5589a4)
+
 ## 0.14.0
 
 BREAKING CHANGES:
