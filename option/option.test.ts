@@ -276,3 +276,20 @@ test("Option.from", async () => {
     assertEquals(actual, expected);
   }
 });
+
+test("Option.toJSON", () => {
+  const tests: [
+    Option<unknown>,
+    unknown | null,
+  ][] = [
+    [None, null],
+    [Some(42), 42],
+    [Some(Some(84)), 84],
+    [Some(None), null],
+  ];
+
+  for (const [input, expected] of tests) {
+    const actual = Option.toJSON(input);
+    assertEquals(actual, expected);
+  }
+});

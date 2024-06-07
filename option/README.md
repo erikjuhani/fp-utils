@@ -204,6 +204,25 @@ None
 
 </details>
 
+#### `Option.toJSON`
+
+Signature: `(): T | null`
+
+Option.toJSON serializes the option into JSON format. If the option is None, it
+will be serialized to `null`. If the option is Some, it will be serialized to
+the unwrapped value `T`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Some(42)
+  .toJSON(); // Evaluates to 42
+
+None
+  .toJSON(); // Evaluates to null
+```
+
 #### `Option.toString`
 
 Signature: `(): "Some(value)" | "None"`
@@ -625,6 +644,25 @@ Option
 ```
 
 </details>
+
+#### `Option.toJSON`
+
+Signature: `toJSON(option: Option<T>): T | null`
+
+Option.toJSON serializes the option into JSON format. If the option is None, it
+will be serialized to `null`. If the option is Some, it will be serialized to
+the unwrapped value `T`.
+
+<details>
+  <summary>Example</summary>
+
+```ts
+Option
+  .toJSON(Some(42)); // Evaluates to 42
+
+Option
+  .toJSON(None); // Evaluates to null
+```
 
 #### `Option.toString`
 

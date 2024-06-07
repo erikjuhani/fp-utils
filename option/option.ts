@@ -329,6 +329,24 @@ export abstract class Option<T> {
   }
 
   /**
+   * Option.toJSON serializes the option into JSON format. If the option is
+   * None, it will be serialized to `null`. If the option is Some, it will be
+   * serialized to the unwrapped value `T`.
+   *
+   * @example
+   * ```ts
+   * Option
+   *   .toJSON(Some(42)); // Evaluates to 42
+   *
+   * Option
+   *   .toJSON(None); // Evaluates to null
+   * ```
+   */
+  static toJSON<T>(option: Option<T>): T | null {
+    return option.toJSON();
+  }
+
+  /**
    * Option.toString returns the string representation of the result and the
    * stringified value as `Some(value)` if the result is `Some` or `None` if
    * the result is `None`.
@@ -545,6 +563,22 @@ export abstract class Option<T> {
   ): U1 | U2;
 
   /**
+   * Option.toJSON serializes the option into JSON format. If the option is
+   * None, it will be serialized to `null`. If the option is Some, it will be
+   * serialized to the unwrapped value `T`.
+   *
+   * @example
+   * ```ts
+   * Some(42)
+   *   .toJSON(); // Evaluates to 42
+   *
+   * None
+   *   .toJSON(); // Evaluates to null
+   * ```
+   */
+  abstract toJSON(): T | null;
+
+  /**
    * Option.toString returns the string representation of the option and the
    * stringified value as `Some(value)` if the result is `Some` or `None` if
    * the result is `None`.
@@ -656,6 +690,11 @@ export class Some<T> extends Option<T> {
     return false;
   }
 
+  /** {@link Option.toJSON} */
+  toJSON(): T {
+    return this.#value instanceof Option ? this.#value.toJSON() : this.#value;
+  }
+
   /** {@link Option.toString} */
   toString(): `Some(${string})` {
     return `Some(${
@@ -725,6 +764,11 @@ export class None extends Option<never> {
   /** {@link Option.isNone} */
   isNone(): this is None {
     return true;
+  }
+
+  /** {@link Option.toJSON} */
+  toJSON(): null {
+    return null;
   }
 
   /** {@link Option.toString} */
