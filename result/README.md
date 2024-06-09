@@ -609,6 +609,8 @@ Result
   .match((x: number) => x * 2, (err: number) => err + 10)(Err(42)); // Evaluates to 52
 ```
 
+</details>
+
 #### `Result.unwrapOr`
 
 Signature: `unwrapOr(defaultValue: T): (result: Result<T, TError>) => T`
@@ -626,8 +628,6 @@ Result
 Result
   .unwrapOr(99)(Err(42)); // Evaluates to 99
 ```
-
-</details>
 
 </details>
 
@@ -878,6 +878,8 @@ Result
 Result
   .toJSON(Err(84)); // Evaluates to { "err": 84 }
 ```
+
+</details>
 
 #### `Result.toString`
 

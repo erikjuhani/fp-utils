@@ -223,6 +223,8 @@ None
   .toJSON(); // Evaluates to null
 ```
 
+</details>
+
 #### `Option.toString`
 
 Signature: `(): "Some(value)" | "None"`
@@ -663,6 +665,8 @@ Option
 Option
   .toJSON(None); // Evaluates to null
 ```
+
+</details>
 
 #### `Option.toString`
 
