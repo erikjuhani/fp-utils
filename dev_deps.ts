@@ -9,3 +9,4 @@ import "@deno/dnt";
 import "@std/assert";
 import "@std/cli";
 import "@std/testing/mock";
+import "terser";

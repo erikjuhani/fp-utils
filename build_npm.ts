@@ -1,6 +1,7 @@
 import { parseArgs } from "@std/cli";
 import { build, emptyDir } from "@deno/dnt";
 import { Err, Ok, Result } from "@fp-utils/result";
+import { minify_sync } from "terser";
 
 type Args = { mod?: string };
 
@@ -17,6 +18,8 @@ type DenoJSON = {
   repository: { type: string; url: string };
 };
 
+const decoder = new TextDecoder("utf-8");
+
 const parseModuleDir = (args: string[]) =>
   Result.from(() => parseArgs<Args>(args))
     .flatMap(({ mod }) =>
@@ -32,47 +35,48 @@ const loadDenoJSON = (moduleDir: string): Promise<Result<DenoJSON, unknown>> =>
     return denoJson;
   });
 
-const commentsRegex = /\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm;
-
 async function buildModule(args: string[]) {
-  const moduleDir = parseModuleDir(args).expect(
-    "The required `--mod` option is missing",
-  );
+  const moduleDir = parseModuleDir(args)
+    .expect("The required `--mod` option is missing");
 
-  const denoJson = (await loadDenoJSON(moduleDir)).expect(
-    "Unable to load module `deno.json` file",
+  const denoJson = await loadDenoJSON(moduleDir).then(
+    Result.expect(`Unable to load \`deno.json\` file from ${moduleDir}`),
   );
 
   const outDir = `./${moduleDir}/dist`;
 
-  const copyReadme = () => Deno.copyFileSync("LICENSE", `${outDir}/LICENSE`);
+  const copyLicense = () => Deno.copyFileSync("LICENSE", `${outDir}/LICENSE`);
 
-  const copyLicense = () =>
+  const copyReadme = () =>
     Deno.copyFileSync(`./${moduleDir}/README.md`, `${outDir}/README.md`);
 
-  const decoder = new TextDecoder("utf-8");
-
   const readFile = (filepath: string) =>
-    Result
-      .from(() => decoder.decode(Deno.readFileSync(filepath)));
+    Result.from(() => decoder.decode(Deno.readFileSync(filepath)));
 
-  const stripComments = (filepath: string) => {
-    const strippedContent = readFile(filepath)
-      .map((content) => content.replace(commentsRegex, ""))
-      .expect("Could not read file");
+  const replace = (from: string, to: string) => (content: string) =>
+    content.replaceAll(from, to);
+
+  const minifyFile = (filepath: string) => (content: string) =>
+    minify_sync(content, {
+      ecma: 2020,
+      module: filepath.includes("esm"),
+    }).code ?? "";
+
+  const minify = (filepath: string) => {
+    const minifiedContent = readFile(filepath)
+      .map(minifyFile(filepath))
+      .expect(`Could not read file in ${filepath}`);
 
     Deno.writeTextFileSync(
       filepath,
-      strippedContent,
+      minifiedContent,
     );
   };
 
   const replaceDenoSymbols = (filepath: string) => {
     const replacedContent = readFile(filepath)
-      .map((content) =>
-        content.replaceAll("Deno.customInspect", "nodejs.util.inspect.custom")
-      )
-      .expect("Could not read file");
+      .map(replace("Deno.customInspect", "nodejs.util.inspect.custom"))
+      .expect(`Could not read file in ${filepath}`);
 
     Deno.writeTextFileSync(
       filepath,
@@ -106,8 +110,8 @@ async function buildModule(args: string[]) {
       ];
 
       files.forEach((filepath) => {
-        stripComments(filepath);
         replaceDenoSymbols(filepath);
+        minify(filepath);
       });
     },
   });
