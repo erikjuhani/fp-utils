@@ -686,7 +686,7 @@ export class Some<T> extends Option<T> {
   }
 
   /** {@link Option.isNone} */
-  isNone(): false {
+  isNone(): this is never {
     return false;
   }
 
@@ -757,7 +757,7 @@ export class None extends Option<never> {
   }
 
   /** {@link Option.isSome} */
-  isSome(): false {
+  isSome(): this is never {
     return false;
   }
 

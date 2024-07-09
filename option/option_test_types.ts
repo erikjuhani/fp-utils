@@ -97,7 +97,7 @@ import { assertType, type IsExact } from "@std/testing/types";
   const option2 = Some(42);
 
   if (option2.isNone()) {
-    assertType<IsExact<typeof option2, Some<42>>>(true);
+    assertType<IsExact<typeof option2, never>>(true);
   }
 
   if (Option.isNone(option2)) {
@@ -123,7 +123,7 @@ import { assertType, type IsExact } from "@std/testing/types";
   }
 
   if (option3.isSome()) {
-    assertType<IsExact<typeof option3, None>>(true);
+    assertType<IsExact<typeof option3, never>>(true);
   }
 
   if (Option.isSome(option3)) {
