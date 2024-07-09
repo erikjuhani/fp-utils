@@ -3,6 +3,7 @@
 BREAKING CHANGES:
 
 - [Change type guards to return never instead of false](https://github.com/erikjuhani/fp-utils/commit/88e7f0447a3205d7bf7feae0101d9d4eae4fdd93)
+- [Change type guards to return never instead of false in option](https://github.com/erikjuhani/fp-utils/commit/3a11cc7f5514ab475596014d68daf8d132a7acdf)
 
 CHANGES:
 
