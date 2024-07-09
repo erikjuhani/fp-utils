@@ -1,3 +1,17 @@
+## 0.16.0
+
+BREAKING CHANGES:
+
+- [Change type guards to return never instead of false](https://github.com/erikjuhani/fp-utils/commit/88e7f0447a3205d7bf7feae0101d9d4eae4fdd93)
+
+CHANGES:
+
+- [Add terser to minify code published to npm](https://github.com/erikjuhani/fp-utils/commit/b79677dc608659c40e826ebe8cae0bb95f905e45)
+
+FIXES:
+
+- [Fix details tags in Option and Result README](https://github.com/erikjuhani/fp-utils/commit/2ab1a3f0e0c0ea2ff38291597b275e577a25d3d1)
+
 ## 0.15.0
 
 BREAKING CHANGES:
