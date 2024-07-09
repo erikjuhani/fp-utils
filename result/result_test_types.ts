@@ -99,7 +99,7 @@ import { Err, Ok, Result } from "@fp-utils/result";
   const result2 = Ok(42);
 
   if (result2.isErr()) {
-    assertType<IsExact<typeof result2, Ok<number>>>(true);
+    assertType<IsExact<typeof result2, never>>(true);
   }
 
   if (Result.isErr(result2)) {
@@ -125,7 +125,7 @@ import { Err, Ok, Result } from "@fp-utils/result";
   }
 
   if (result3.isOk()) {
-    assertType<IsExact<typeof result3, Err<number>>>(true);
+    assertType<IsExact<typeof result3, never>>(true);
   }
 
   if (Result.isOk(result3)) {

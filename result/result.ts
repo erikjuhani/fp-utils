@@ -940,7 +940,7 @@ export class Ok<T> extends Result<T, never> {
   }
 
   /** {@link Result.isErr} */
-  isErr(): false {
+  isErr(): this is never {
     return false;
   }
 
@@ -1055,7 +1055,7 @@ export class Err<TError> extends Result<never, TError> {
   }
 
   /** {@link Result.isOk} */
-  isOk(): false {
+  isOk(): this is never {
     return false;
   }
 
