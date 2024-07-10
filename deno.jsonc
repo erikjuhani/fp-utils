@@ -1,7 +1,7 @@
 {
   "tasks": {
     "build": "deno run --allow-sys --allow-net --allow-ffi --allow-run --allow-write --allow-env --allow-read ./build_npm.ts",
-    "test": "deno test --allow-env --allow-read",
+    "test": "deno test --doc --ignore=\"*/dist\" --allow-env --allow-read",
     "format": "deno fmt --check --ignore=\"*/dist\"",
     "lint": "deno lint --ignore=\"*/dist\"",
     "typecheck": "deno task check-option && deno task check-result",

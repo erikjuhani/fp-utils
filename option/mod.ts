@@ -46,6 +46,8 @@ export { Option };
  *
  * @example
  * ```ts
+ * import { Some } from "@fp-utils/option";
+ *
  * Some(42); // Evaluates to Some 42
  *
  * Some(undefined); // Throws an exception or compiler error!
@@ -60,6 +62,8 @@ export const Some = Option.some;
  *
  * @example
  * ```ts
+ * import { None } from "@fp-utils/option";
+ *
  * const none = None; // Evaluates to None
  * ```
  */

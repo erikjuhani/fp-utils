@@ -51,6 +51,8 @@ export { Result };
  *
  * @example
  * ```ts
+ * import { Ok } from "@fp-utils/result";
+ *
  * Ok("value"); // Evaluates to Ok "value"
  *
  * Ok(42); // Evaluates to Ok 42
@@ -70,6 +72,8 @@ export const Ok = Result.ok;
  *
  * @example
  * ```ts
+ * import { Err } from "@fp-utils/result";
+ *
  * Err("error"); // Evaluates to Err "error"
  *
  * Err(42); // Evaluates to Err 42

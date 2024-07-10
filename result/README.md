@@ -48,6 +48,8 @@ Use `Ok(42)` constructor to wrap a value for success and for errors use
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 const ok = Ok(42);
 const err = Err(42);
 ```
@@ -71,6 +73,8 @@ message.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .expect("Value should exist"); // evaluates 42
 
@@ -92,6 +96,8 @@ error message.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .expectErr("Value should exist"); // Throws an exception with message Value should exist!
 
@@ -112,6 +118,8 @@ function which is applied on the result value `T`. Err evaluates to `false`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(2)
   .filter((x) => x >= 5); // evaluates to false
 
@@ -135,6 +143,8 @@ transforms it into a result containing value `U`.
 <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 type TryParse = (input: string) => Result<number, string>;
 
 const tryParse: TryParse = (input: string) => {
@@ -165,6 +175,8 @@ contained result value `T` if the result is ok.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .inspect((x) => console.log(x * 2)); // Prints 84
 
@@ -185,6 +197,8 @@ contained result error value `TError` if the result is err.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .inspectErr((x) => console.log(x * 2)); // Prints nothing
 
@@ -204,6 +218,8 @@ Result.isErr returns `true` if the result is `Err`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .isErr(); // Evaluates to false
 
@@ -223,6 +239,8 @@ Result.isOk returns `true` if the result is `Ok`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .isOk(); // Evaluates to true
 
@@ -243,6 +261,8 @@ value `U`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .map((x) => x * 2); // Evaluates to Ok 84
 
@@ -263,6 +283,8 @@ transforms it into value `U`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .mapErr((x) => x * 2); // Evaluates to Ok 42
 
@@ -284,6 +306,8 @@ returns `U1`. If the result is Err, the error value `TError` is transformed to
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .match((x) => x * 2, (err) => err + 10); // Evaluates to 84
 
@@ -305,6 +329,8 @@ serialized to `{ "ok": T }`, and an Err value will be serialized to
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .toJSON(); // Evaluates to { "ok": 42 }
 
@@ -326,6 +352,8 @@ result is `Err`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .toString(); // Evaluates to "Ok(42)"
 
@@ -346,6 +374,8 @@ otherwise it will throw.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .unwrap(); // Evaluates to 42
 
@@ -366,6 +396,8 @@ Result.unwrapErr returns the value `TError` from the associated result if it is
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .unwrapErr(); // Throws an exception!
 
@@ -386,6 +418,8 @@ default value if the result is `Err`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok } from "@fp-utils/result";
+
 Ok(42)
   .unwrapOr(99); // Evaluates to 42
 
@@ -401,9 +435,11 @@ Result higher-order functions enable chainability of Result Ok `T` or Err
 `TError`> values within callbacks.
 
 ```ts
+import { Result } from "@fp-utils/result";
+
 Promise.resolve(42)
   .then(Result.from) // Evaluates to Ok 42
-  .then(Result.inspect) // Prints 42
+  .then(Result.inspect(console.log)) // Prints 42
   .then(Result.map((value) => value + 10)) // Evaluates to 52
   .then(Result.unwrap); // Returns 52
 ```
@@ -420,6 +456,8 @@ message.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .expect("Value should exist")(Ok(42)); // Evaluates 42
 
@@ -441,6 +479,8 @@ error message.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .expectErr("Value should exist")(Ok(42)); // Throws an exception with message Value should exist!
 
@@ -462,6 +502,8 @@ function which is applied on the result value `T`. Err evaluates to `false`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .filter((x: number) => x >= 5)(Ok(2)); // evaluates to false
 
@@ -486,6 +528,8 @@ transforms it into a result containing value `U`.
 <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 type TryParse = (input: string) => Result<number, string>;
 
 const tryParse: TryParse = (input: string) => {
@@ -517,6 +561,8 @@ contained result value `T` if the result is ok.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .inspect((x: number) => console.log(x * 2))(Ok(42)); // Prints 84
 
@@ -538,6 +584,8 @@ contained result error value `TError` if the result is err.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .inspectErr((x: number) => console.log(x * 2))(Ok(42)); // Prints nothing
 
@@ -559,6 +607,8 @@ value `U`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .map((x: number) => x * 2)(Ok(42)); // Evaluates to Ok 84
 
@@ -580,6 +630,8 @@ transforms it into value `U`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .mapErr((x: number) => x * 2)(Ok(42)); // Evaluates to Ok 42
 
@@ -602,6 +654,8 @@ returns `U1`. If the result is Err, the error value `TError` is transformed to
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .match((x: number) => x * 2, (err: number) => err + 10)(Ok(42)); // Evaluates to 84
 
@@ -622,6 +676,8 @@ default value if the result is `Err`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .unwrapOr(99)(Ok(42)); // Evaluates to 42
 
@@ -648,6 +704,8 @@ array.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .all([]); // Evaluates to Ok []
 
@@ -675,11 +733,13 @@ result.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .any([]); // Evaluates to Err []
 
 Result
-  .any(Ok(10), Ok(42), Ok(84)); // Evaluates to Ok 10
+  .any([Ok(10), Ok(42), Ok(84)]); // Evaluates to Ok 10
 
 Result
   .any([Ok(10), Ok(42), Err("Error"), Ok(84)]); // Evaluates to Ok 10
@@ -703,6 +763,8 @@ other value exits or is needed.
   <summary>Example</summary>
 
 ```ts
+import { Result } from "@fp-utils/result";
+
 Result
   .err("error"); // Evaluates to Err "error"
 
@@ -737,6 +799,8 @@ When the function receives undefined value Ok<undefined> will be returned.
   <summary>Example</summary>
 
 ```ts
+import { Result } from "@fp-utils/result";
+
 Result
   .from(42); // Evaluates to Ok 42
 
@@ -756,13 +820,15 @@ Result
   .from(Promise.reject(), "Rejected"); // Evaluates to Promise Err "Rejected"
 
 Result
-  .from<R, SyntaxError>(() => JSON.parse(rawJson)); // Evaluates to Result<R, SyntaxError>
+  .from<{ property: number }, SyntaxError>(() =>
+    JSON.parse('{ "property": 42 }')
+  ); // Evaluates to Result<{ property: number }, SyntaxError>
 
 Result
   .from(
-    () => JSON.parse(rawJson) as ReturnValue,
+    () => JSON.parse('{ "property": 42 }') as { property: number },
     (err: SyntaxError) => err.message,
-  ); // Evaluates to Result<ReturnValue, string>
+  ); // Evaluates to Result<{ property: number }, string>
 ```
 
 </details>
@@ -777,6 +843,8 @@ Result.isErr returns `true` if the result is `Err`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .isErr(Ok(42)); // Evaluates to false
 
@@ -796,6 +864,8 @@ Result.isOk returns `true` if the result is `Ok`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .isOk(Ok(42)); // Evaluates to true
 
@@ -818,6 +888,8 @@ value and acts as a placeholder when no other value exits or is needed.
   <summary>Example</summary>
 
 ```ts
+import { Result } from "@fp-utils/result";
+
 Result
   .ok("value"); // Evaluates to Ok "value"
 
@@ -845,6 +917,8 @@ cases need to be evaluated individually.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .partition([]); // Evaluates to [[], []]
 
@@ -872,6 +946,8 @@ serialized to `{ "ok": T }`, and an Err value will be serialized to
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .toJSON(Ok(42)); // Evaluates to { "ok": 42 }
 
@@ -893,6 +969,8 @@ result is `Err`.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .toString(Ok(42)); // Evaluates to "Ok(42)"
 
@@ -913,6 +991,8 @@ otherwise it will throw.
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .unwrap(Ok(42)); // Evaluates to 42
 
@@ -933,6 +1013,8 @@ Result.unwrapErr returns the value `TError` from the associated result if it is
   <summary>Example</summary>
 
 ```ts
+import { Err, Ok, Result } from "@fp-utils/result";
+
 Result
   .unwrapErr(Ok(42)); // Throws an exception!
 

@@ -12,6 +12,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .all([]); // Evaluates to Ok []
    *
@@ -40,11 +42,13 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .any([]); // Evaluates to Err []
    *
    * Result
-   *   .any(Ok(10), Ok(42), Ok(84)); // Evaluates to Ok 10
+   *   .any([Ok(10), Ok(42), Ok(84)]); // Evaluates to Ok 10
    *
    * Result
    *   .any([Ok(10), Ok(42), Err("Error"), Ok(84)]); // Evaluates to Ok 10
@@ -69,6 +73,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Result } from "@fp-utils/result";
+   *
    * Result
    *   .err("error"); // Evaluates to Err "error"
    *
@@ -96,6 +102,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .expect("Value should exist")(Ok(42)); // Evaluates 42
    *
@@ -118,6 +126,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .expectErr("Value should exist")(Ok(42)); // Throws an exception with message Value should exist!
    *
@@ -142,6 +152,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .filter((x: number) => x >= 5)(Ok(2)); // evaluates to false
    *
@@ -170,6 +182,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * type TryParse = (input: string) => Result<number, string>;
    *
    * const tryParse: TryParse = (input: string) => {
@@ -230,6 +244,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Result } from "@fp-utils/result";
+   *
    * Result
    *   .from(42); // Evaluates to Ok 42
    *
@@ -249,10 +265,15 @@ export abstract class Result<T, TError> {
    *   .from(Promise.reject(), "Rejected"); // Evaluates to Promise Err "Rejected"
    *
    * Result
-   *   .from<R, SyntaxError>(() => JSON.parse(rawJson)); // Evaluates to Result<R, SyntaxError>
+   *   .from<{ property: number }, SyntaxError>(() =>
+   *     JSON.parse('{ "property": 42 }')
+   *   ); // Evaluates to Result<{ property: number }, SyntaxError>
    *
    * Result
-   *   .from(() => JSON.parse(rawJson) as ReturnValue, (err: SyntaxError) => err.message); // Evaluates to Result<ReturnValue, string>
+   *   .from(
+   *     () => JSON.parse('{ "property": 42 }') as { property: number },
+   *     (err: SyntaxError) => err.message
+   *   ); // Evaluates to Result<{ property: number }, string>
    * ```
    */
   static from<T, TError = unknown>(
@@ -290,6 +311,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .inspect((x: number) => console.log(x * 2))(Ok(42)); // Prints 84
    *
@@ -313,6 +336,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .inspectErr((x: number) => console.log(x * 2))(Ok(42)); // Prints nothing
    *
@@ -335,6 +360,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .isErr(Ok(42)); // Evaluates to false
    *
@@ -353,6 +380,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .isOk(Ok(42)); // Evaluates to true
    *
@@ -372,6 +401,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .map((x: number) => x * 2)(Ok(42)); // Evaluates to Ok 84
    *
@@ -401,6 +432,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .mapErr((x: number) => x * 2)(Ok(42)); // Evaluates to Ok 42
    *
@@ -431,6 +464,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .match((x: number) => x * 2, (err: number) => err + 10)(Ok(42)); // Evaluates to 84
    *
@@ -466,6 +501,8 @@ export abstract class Result<T, TError> {
    * @example
    *
    * ```ts
+   * import { Result } from "@fp-utils/result";
+   *
    * Result
    *   .ok("value"); // Evaluates to Ok "value"
    *
@@ -492,6 +529,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .toJSON(Ok(42)); // Evaluates to { "ok": 42 }
    *
@@ -512,6 +551,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .toString(Ok(42)); // Evaluates to "Ok(42)"
    *
@@ -531,6 +572,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .unwrap(Ok(42)); // Evaluates to 42
    *
@@ -552,6 +595,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .unwrapErr(Ok(42)); // Throws an exception!
    *
@@ -573,6 +618,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .unwrapOr(99)(Ok(42)); // Evaluates to 42
    *
@@ -599,6 +646,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .expect("Value should exist"); // evaluates 42
    *
@@ -615,6 +664,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .expect("Value should exist"); // Throws an exception with message Value should exist!
    *
@@ -631,6 +682,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(2)
    *   .filter((x) => x >= 5); // evaluates to false
    *
@@ -649,6 +702,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * type TryParse = (input: string) => Result<number, string>;
    *
    * const tryParse: TryParse = (input: string) => {
@@ -679,6 +734,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .inspect((x) => console.log(x * 2)); // Prints 84
    *
@@ -694,6 +751,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .inspectErr((x) => console.log(x * 2)); // Prints nothing
    *
@@ -709,6 +768,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .isOk(); // Evaluates to false
    *
@@ -723,6 +784,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .isOk(); // Evaluates to true
    *
@@ -738,6 +801,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .map((x) => x * 2); // Evaluates to Ok 84
    *
@@ -754,6 +819,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .mapErr((x) => x * 2); // Evaluates to Ok 42
    *
@@ -770,6 +837,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .match((x) => x * 2, (err) => err + 10); // Evaluates to 84
    *
@@ -789,6 +858,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok, Result } from "@fp-utils/result";
+   *
    * Result
    *   .partition([]); // Evaluates to [[], []]
    *
@@ -823,6 +894,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .toJSON(); // Evaluates to { "ok": 42 }
    *
@@ -839,6 +912,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .toString(); // Evaluates to "Ok(42)"
    *
@@ -854,6 +929,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .unwrap(); // Evaluates to 42
    *
@@ -869,6 +946,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Err(42)
    *   .unwrapErr(); // Evaluates to 42
    *
@@ -884,6 +963,8 @@ export abstract class Result<T, TError> {
    *
    * @example
    * ```ts
+   * import { Err, Ok } from "@fp-utils/result";
+   *
    * Ok(42)
    *   .unwrapOr(99); // Evaluates to 42
    *

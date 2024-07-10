@@ -6,7 +6,7 @@ import { assertType, type IsExact } from "@std/testing/types";
   const some = Some(42);
 
   const t0 = some.map((value) => {
-    assertType<IsExact<typeof value, 42>>(true);
+    assertType<IsExact<typeof value, number>>(true);
     return value.toString();
   });
 
@@ -17,7 +17,6 @@ import { assertType, type IsExact } from "@std/testing/types";
 
 // Test for nullable values
 (() => {
-  // @ts-expect-error doesn't actually allow to pass a null or undefined to Some in compile time
   const some = Some(undefined);
 
   assertType<IsExact<typeof some, Some<never>>>(true);
@@ -26,7 +25,7 @@ import { assertType, type IsExact } from "@std/testing/types";
 
   // @ts-expect-error doesn't actually allow to pass a null or undefined to Some in compile time
   const t1 = option.map((value) => {
-    assertType<IsExact<typeof value, 42>>(true);
+    assertType<IsExact<typeof value, number>>(true);
     return undefined;
   });
 
@@ -34,8 +33,7 @@ import { assertType, type IsExact } from "@std/testing/types";
   assertType<IsExact<typeof t1, Option<{}>>>(true);
 
   const t2 = option.flatMap((value) => {
-    assertType<IsExact<typeof value, 42>>(true);
-    // @ts-expect-error doesn't actually allow to pass a null or undefined to Some in compile time
+    assertType<IsExact<typeof value, number>>(true);
     return Some(null);
   });
 
@@ -101,15 +99,15 @@ import { assertType, type IsExact } from "@std/testing/types";
   }
 
   if (Option.isNone(option2)) {
-    assertType<IsExact<typeof option2, Some<42> & None>>(true);
+    assertType<IsExact<typeof option2, Some<number> & None>>(true);
   }
 
   if (option2.isSome()) {
-    assertType<IsExact<typeof option2, Some<42>>>(true);
+    assertType<IsExact<typeof option2, Some<number>>>(true);
   }
 
   if (Option.isSome(option2)) {
-    assertType<IsExact<typeof option2, Some<42>>>(true);
+    assertType<IsExact<typeof option2, Some<number>>>(true);
   }
 
   const option3 = None;
@@ -161,7 +159,7 @@ import { assertType, type IsExact } from "@std/testing/types";
   });
 
   assertType<
-    IsExact<typeof t0, Some<42> | Some<"Ok"> | None>
+    IsExact<typeof t0, Some<number> | Some<"Ok"> | None>
   >(true);
 
   const t1 = await Promise.resolve(unionOption).then(
@@ -200,7 +198,7 @@ import { assertType, type IsExact } from "@std/testing/types";
     Option.zip(Some("abc")),
   );
 
-  assertType<IsExact<typeof t5, Option<[string | number | boolean, "abc"]>>>(
+  assertType<IsExact<typeof t5, Option<[string | number | boolean, string]>>>(
     true,
   );
 
@@ -236,7 +234,7 @@ import { assertType, type IsExact } from "@std/testing/types";
   );
 
   assertType<
-    IsExact<typeof t0, Option<"Ok" | 42 | boolean>>
+    IsExact<typeof t0, Option<"Ok" | number | boolean>>
   >(true);
 
   // When the Option.flatMap function is not used in a callback and the option
@@ -250,7 +248,7 @@ import { assertType, type IsExact } from "@std/testing/types";
   })(unionOption);
 
   assertType<
-    IsExact<typeof t1, Option<"Ok" | 42>>
+    IsExact<typeof t1, Option<"Ok" | number>>
   >(true);
 });
 
@@ -265,7 +263,7 @@ import { assertType, type IsExact } from "@std/testing/types";
   }
 
   await unionTypePromise().then(Option.match((value) => {
-    assertType<IsExact<typeof value, "42" | number | { number: number }>>(
+    assertType<IsExact<typeof value, string | number | { number: number }>>(
       true,
     );
     return value;

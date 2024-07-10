@@ -46,6 +46,8 @@ non-existent value use the static `None` class.
   <summary>Example</summary>
 
 ```ts
+import { None, Some } from "@fp-utils/option";
+
 const some = Some(42);
 const none = None;
 ```
@@ -68,6 +70,8 @@ function which is applied on the option value `T`. None evaluates to `false`.
   <summary>Example</summary>
 
 ```ts
+import { None, Some } from "@fp-utils/option";
+
 Some(2)
   .filter((x) => x >= 5); // evaluates to false
 
@@ -91,6 +95,8 @@ transforms it into an option `U`.
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 type TryParse = (input: string) => Option<number>;
 
 const tryParse: TryParse = (input: string) => {
@@ -121,6 +127,8 @@ contained option value `T` if the option is some.
   <summary>Example</summary>
 
 ```ts
+import { None, Some } from "@fp-utils/option";
+
 Some(42)
   .inspect((x) => console.log(x * 2)); // Prints 84
 
@@ -140,6 +148,8 @@ Option.isNone returns `true` if the option is `None`
   <summary>Example</summary>
 
 ```ts
+import { None, Some } from "@fp-utils/option";
+
 Some(42).isNone(); // Evaluates to false
 
 None.isNone(); // Evaluates to true
@@ -157,6 +167,8 @@ Option.isSome returns `true` if the option is `Some`
   <summary>Example</summary>
 
 ```ts
+import { None, Some } from "@fp-utils/option";
+
 Some(42).isSome(); // Evaluates to true
 
 None.isSome(); // Evaluates to false
@@ -175,6 +187,8 @@ value `U`.
   <summary>Example</summary>
 
 ```ts
+import { None, Some } from "@fp-utils/option";
+
 Some(42)
   .map((x) => x * 2); // Evaluates to Some 84
 
@@ -195,6 +209,8 @@ returns `U1`. If the option is None, `onNone` is called and `U2` returned.
   <summary>Example</summary>
 
 ```ts
+import { None, Some } from "@fp-utils/option";
+
 Some(42)
   .match((x) => x * 2, () => 99); // Evaluates to 84
 
@@ -216,6 +232,8 @@ the unwrapped value `T`.
   <summary>Example</summary>
 
 ```ts
+import { None, Some } from "@fp-utils/option";
+
 Some(42)
   .toJSON(); // Evaluates to 42
 
@@ -237,6 +255,8 @@ result is `None`.
   <summary>Example</summary>
 
 ```ts
+import { None, Some } from "@fp-utils/option";
+
 Some(42)
   .toString(); // Evaluates to "Some(42)"
 
@@ -257,9 +277,11 @@ otherwise it will throw.
   <summary>Example</summary>
 
 ```ts
+import { None, Some } from "@fp-utils/option";
+
 Some(42).unwrap(); // Evaluates to 42
 
-None().unwrap(); // Throws an exception!
+None.unwrap(); // Throws an exception!
 ```
 
 </details>
@@ -275,6 +297,8 @@ default value if the option is `None`.
   <summary>Example</summary>
 
 ```ts
+import { None, Some } from "@fp-utils/option";
+
 Some(42).unwrapOr(99); // Evaluates to 42
 
 None.unwrapOr(99); // Evaluates to 99
@@ -293,6 +317,8 @@ in Option.
   <summary>Example</summary>
 
 ```ts
+import { None, Some } from "@fp-utils/option";
+
 Some(42).zip(Some(84)); // Evaluates to Some<[42, 84]>
 
 Some(42).zip(None); // Evaluates to None
@@ -308,9 +334,11 @@ Option higher-order functions allow for Option value `T` chainability within
 callbacks like Promise.then.
 
 ```ts
+import { Option } from "@fp-utils/option";
+
 Promise.resolve(42)
   .then(Option.from)
-  .then(Option.inspect)
+  .then(Option.inspect(console.log))
   .then(Option.map((value) => value + 10))
   .then(Option.unwrap); // Evaluates to 52
 ```
@@ -326,6 +354,8 @@ function which is applied on the option value `T`. None evaluates to `false`.
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 Option
   .filter((x: number) => x >= 5)(Some(2)); // evaluates to false
 
@@ -350,6 +380,8 @@ transforms it into an option `U`.
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 type TryParse = (input: string) => Option<number>;
 
 const tryParse: TryParse = (input: string) => {
@@ -380,6 +412,8 @@ contained option value `T` if the option is some.
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 Option
   .inspect((x: number) => console.log(x * 2))(Some(42)); // Prints 84
 
@@ -400,6 +434,8 @@ value `U`.
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 Option
   .map((x: number) => x * 2)(Some(42)); // Evaluates to Some 84
 
@@ -421,6 +457,8 @@ returns `U1`. If the option is None, `onNone` is called and `U2` returned.
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 Option
   .match((x: number) => x * 2, () => 99)(Some(42)); // Evaluates to 84
 
@@ -441,6 +479,8 @@ default value if the option is `None`.
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 Option
   .unwrapOr(99)(Some(42)); // Evaluates to 42
 
@@ -461,6 +501,8 @@ in Option.
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 Option
   .zip(Some(84))(Some(42)); // Evaluates to Some<[42, 84]>
 
@@ -489,16 +531,18 @@ success, resulting in a Some with an empty array.
   <summary>Example</summary>
 
 ```ts
-Result
+import { None, Option, Some } from "@fp-utils/option";
+
+Option
   .all([]); // Evaluates to Some []
 
 Option
   .all([Some(10), Some(42), Some(84)]); // Evaluates to Some [10, 42, 84]
 
-Result
+Option
   .all([Some(10), Some(42), None, Some(84)]); // Evaluates to None
 
-Result
+Option
   .all([None]); // Evaluates to None
 ```
 
@@ -515,16 +559,18 @@ found in the array None is returned.
   <summary>Example</summary>
 
 ```ts
-Result
+import { None, Option, Some } from "@fp-utils/option";
+
+Option
   .any([]); // Evaluates to None
 
 Option
   .any([Some(10), Some(42), Some(84)]); // Evaluates to Some 10
 
-Result
+Option
   .any([Some(10), Some(42), None, Some(84)]); // Evaluates to None
 
-Result
+Option
   .any([None]); // Evaluates to None
 ```
 
@@ -541,6 +587,8 @@ promise to an option.
   <summary>Example</summary>
 
 ```ts
+import { Option } from "@fp-utils/option";
+
 Option
   .from(undefined); // Evaluates to None
 
@@ -581,6 +629,8 @@ Option.isNone returns `true` if the option is `None`
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 Option
   .isNone(Some(42)); // Evaluates to false
 
@@ -600,6 +650,8 @@ Option.isSome returns `true` if the option is `Some`
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 Option
   .isSome(Some(42)); // Evaluates to true
 
@@ -619,6 +671,8 @@ Option.none returns a None option.
   <summary>Example</summary>
 
 ```ts
+import { Option } from "@fp-utils/option";
+
 Option
   .none(); // Evaluates to None
 ```
@@ -635,6 +689,8 @@ Option.some creates an option Some with value `T`.
   <summary>Example</summary>
 
 ```ts
+import { Option } from "@fp-utils/option";
+
 Option
   .some(42); // Evaluates to Some 42
 
@@ -659,6 +715,8 @@ the unwrapped value `T`.
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 Option
   .toJSON(Some(42)); // Evaluates to 42
 
@@ -680,6 +738,8 @@ result is `None`.
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 Option
   .toString(Some(42)); // Evaluates to "Some(42)"
 
@@ -700,6 +760,8 @@ otherwise it will throw.
   <summary>Example</summary>
 
 ```ts
+import { None, Option, Some } from "@fp-utils/option";
+
 Option
   .unwrap(Some(42)); // Evaluates to 42
 

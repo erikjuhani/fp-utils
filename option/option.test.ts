@@ -7,7 +7,6 @@ const { test } = Deno;
 test("Option.some passing null or undefined throws", () => {
   [null, undefined].forEach((value) => {
     assertThrows(
-      // @ts-expect-error doesn't actually allow to pass a null or undefined to Option.some in compile time
       () => Some(value),
       "Trying to pass nullable value to Some",
     );

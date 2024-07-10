@@ -11,16 +11,18 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
-   * Result
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
+   * Option
    *   .all([]); // Evaluates to Some []
    *
    * Option
    *   .all([Some(10), Some(42), Some(84)]); // Evaluates to Some [10, 42, 84]
    *
-   * Result
+   * Option
    *   .all([Some(10), Some(42), None, Some(84)]); // Evaluates to None
    *
-   * Result
+   * Option
    *   .all([None]); // Evaluates to None
    * ```
    */
@@ -39,16 +41,18 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
-   * Result
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
+   * Option
    *   .any([]); // Evaluates to None
    *
    * Option
    *   .any([Some(10), Some(42), Some(84)]); // Evaluates to Some 10
    *
-   * Result
+   * Option
    *   .any([Some(10), Some(42), None, Some(84)]); // Evaluates to None
    *
-   * Result
+   * Option
    *   .any([None]); // Evaluates to None
    * ```
    */
@@ -67,7 +71,7 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
-   * import { Option, Some, None } from "@fp-utils/option";
+   * import { None, Option, Some } from "@fp-utils/option";
    *
    * Option
    *   .filter((x: number) => x >= 5)(Some(2)); // evaluates to false
@@ -96,7 +100,7 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
-   * import { Option, Some, None } from "./mod.ts"
+   * import { None, Option, Some } from "@fp-utils/option";
    *
    * type TryParse = (input: string) => Option<number>;
    *
@@ -136,6 +140,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
    * Option
    *   .from(undefined); // Evaluates to None
    *
@@ -191,6 +197,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
    * Option
    *   .inspect((x: number) => console.log(x * 2))(Some(42)); // Prints 84
    *
@@ -214,6 +222,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
    * Option
    *   .isNone(Some(42)); // Evaluates to false
    *
@@ -230,6 +240,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
    * Option
    *   .isSome(Some(42)); // Evaluates to true
    *
@@ -249,6 +261,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
    * Option
    *   .map((x: number) => x * 2)(Some(42)); // Evaluates to Some 84
    *
@@ -274,6 +288,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
    * Option
    *   .match((x: number) => x * 2, () => 99)(Some(42)); // Evaluates to 84
    *
@@ -302,6 +318,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { Option } from "@fp-utils/option";
+   *
    * Option
    *   .none(); // Evaluates to None
    * ```
@@ -315,6 +333,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { Option } from "@fp-utils/option";
+   *
    * Option
    *   .some(42); // Evaluates to Some 42
    *
@@ -325,8 +345,8 @@ export abstract class Option<T> {
    *   .some(null); // Throws an exception or compiler error!
    * ```
    */
-  static some<T>(value: NonNullable<T>): Some<NonNullable<T>> {
-    return new Some(value);
+  static some<T>(value: T): Some<NonNullable<T>> {
+    return new Some(value) as Some<NonNullable<T>>;
   }
 
   /**
@@ -336,6 +356,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
    * Option
    *   .toJSON(Some(42)); // Evaluates to 42
    *
@@ -354,6 +376,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
    * Option
    *   .toString(Some(42)); // Evaluates to "Some(42)"
    *
@@ -371,6 +395,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
    * Option
    *   .unwrap(Some(42)); // Evaluates to 42
    *
@@ -393,6 +419,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
    * Option
    *   .unwrapOr(99)(Some(42)); // Evaluates to 42
    *
@@ -415,6 +443,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
    * Option
    *   .zip(Some(84))(Some(42)); // Evaluates to Some<[42, 84]>
    *
@@ -446,6 +476,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Some } from "@fp-utils/option";
+   *
    * Some(2)
    *   .filter((x) => x >= 5); // evaluates to false
    *
@@ -464,6 +496,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Option, Some } from "@fp-utils/option";
+   *
    * type TryParse = (input: string) => Option<number>;
    *
    * const tryParse: TryParse = (input: string) => {
@@ -496,6 +530,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Some } from "@fp-utils/option";
+   *
    * Some(42)
    *   .inspect((x) => console.log(x * 2)); // Prints 84
    *
@@ -510,6 +546,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Some } from "@fp-utils/option";
+   *
    * Some(42).isNone(); // Evaluates to false
    *
    * None.isNone(); // Evaluates to true
@@ -522,6 +560,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Some } from "@fp-utils/option";
+   *
    * Some(42).isSome(); // Evaluates to true
    *
    * None.isSome(); // Evaluates to false
@@ -535,6 +575,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { Option } from "@fp-utils/option";
+   *
    * Option.none()
    *   .map((x) => x * 2); // Evaluates to None
    *
@@ -551,6 +593,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Some } from "@fp-utils/option";
+   *
    * Some(42)
    *   .match((x) => x * 2, () => 99); // Evaluates to 84
    *
@@ -570,6 +614,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Some } from "@fp-utils/option";
+   *
    * Some(42)
    *   .toJSON(); // Evaluates to 42
    *
@@ -586,6 +632,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Some } from "@fp-utils/option";
+   *
    * Some(42)
    *   .toString(); // Evaluates to "Some(42)"
    *
@@ -601,6 +649,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Some } from "@fp-utils/option";
+   *
    * Some(42).unwrap(); // Evaluates to 42
    *
    * None.unwrap(); // Throws an exception!
@@ -614,6 +664,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Some } from "@fp-utils/option";
+   *
    * Some(42).unwrapOr(99); // Evaluates to 42
    *
    * None.unwrapOr(99); // Evaluates to 99
@@ -628,6 +680,8 @@ export abstract class Option<T> {
    *
    * @example
    * ```ts
+   * import { None, Some } from "@fp-utils/option";
+   *
    * Some(42).zip(Some(84)); // Evaluates to Some<[42, 84]>
    *
    * Some(42).zip(None); // Evaluates to None
