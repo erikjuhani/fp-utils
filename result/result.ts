@@ -443,7 +443,8 @@ export abstract class Result<T, TError> {
     TError,
     U1,
     U2,
-    TResult extends Result<unknown, unknown>,
+    // deno-lint-ignore no-explicit-any
+    TResult extends Result<any, any>,
   >(
     onOk: (value: TResult extends Result<infer U, infer _> ? U : never) => U1,
     onErr: (value: TResult extends Result<infer _, infer U> ? U : never) => U2,

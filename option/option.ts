@@ -281,7 +281,8 @@ export abstract class Option<T> {
    *   .match((x: number) => x * 2, () => 99)(None); // Evaluates to 99
    * ```
    */
-  static match<T, U1, U2, TOption extends Option<unknown>>(
+  // deno-lint-ignore no-explicit-any
+  static match<T, U1, U2, TOption extends Option<any>>(
     onSome: (
       value: TOption extends Some<infer U> ? U
         : TOption extends Option<infer U> ? U
