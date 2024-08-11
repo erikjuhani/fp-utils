@@ -18,6 +18,7 @@
       "jsr:@std/testing@^0.225.2": "jsr:@std/testing@0.225.2",
       "npm:@ts-morph/bootstrap@0.22": "npm:@ts-morph/bootstrap@0.22.0",
       "npm:code-block-writer@^13.0.1": "npm:code-block-writer@13.0.1",
+      "npm:fast-check@3.21.0": "npm:fast-check@3.21.0",
       "npm:terser@5.31.1": "npm:terser@5.31.1"
     },
     "jsr": {
@@ -25,8 +26,10 @@
         "integrity": "e87e80a404958f6350d903e6238b72afb92468378b0b32111f7a1e4916ac7fe7",
         "dependencies": [
           "jsr:@deno/graph@^0.69.7",
+          "jsr:@std/fmt@^0.218.2",
           "jsr:@std/fs@^0.218.2",
-          "jsr:@std/io@^0.218.2"
+          "jsr:@std/io@^0.218.2",
+          "jsr:@std/path@^0.218.2"
         ]
       },
       "@deno/dnt@0.41.2": {
@@ -53,7 +56,10 @@
         ]
       },
       "@std/assert@1.0.0-rc.2": {
-        "integrity": "0484eab1d76b55fca1c3beaff485a274e67dd3b9f065edcbe70030dfc0b964d3"
+        "integrity": "0484eab1d76b55fca1c3beaff485a274e67dd3b9f065edcbe70030dfc0b964d3",
+        "dependencies": [
+          "jsr:@std/internal@^1.0.0"
+        ]
       },
       "@std/bytes@0.218.2": {
         "integrity": "91fe54b232dcca73856b79a817247f4a651dbb60d51baafafb6408c137241670"
@@ -77,6 +83,7 @@
       "@std/io@0.218.2": {
         "integrity": "c64fbfa087b7c9d4d386c5672f291f607d88cb7d44fc299c20c713e345f2785f",
         "dependencies": [
+          "jsr:@std/assert@^0.218.2",
           "jsr:@std/bytes@^0.218.2"
         ]
       },
@@ -193,6 +200,12 @@
         "integrity": "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==",
         "dependencies": {}
       },
+      "fast-check@3.21.0": {
+        "integrity": "sha512-QpmbiqRFRZ+SIlBJh6xi5d/PgXciUc/xWKc4Vi2RWEHHIRx6oM3f0fWNna++zP9VB5HUBTObUK9gTKQP3vVcrQ==",
+        "dependencies": {
+          "pure-rand": "pure-rand@6.1.0"
+        }
+      },
       "fast-glob@3.3.2": {
         "integrity": "sha512-oX2ruAFQwf/Orj8m737Y5adxDQO0LAB7/S5MnxCdTNDd4p6BsyIVsv9JQsATbTSq8KHRpLwIHbVlUNatxd+1Ow==",
         "dependencies": {
@@ -262,6 +275,10 @@
       },
       "picomatch@2.3.1": {
         "integrity": "sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==",
+        "dependencies": {}
+      },
+      "pure-rand@6.1.0": {
+        "integrity": "sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==",
         "dependencies": {}
       },
       "queue-microtask@1.2.3": {
@@ -430,6 +447,7 @@
       "jsr:@std/assert@^0.226.0",
       "jsr:@std/cli@^0.224.7",
       "jsr:@std/testing@^0.225.2",
+      "npm:fast-check@3.21.0",
       "npm:terser@5.31.1"
     ]
   }
