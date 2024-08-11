@@ -15,9 +15,9 @@
     "@deno/dnt": "jsr:@deno/dnt@^0.41.2",
     "@fp-utils/option": "./option/mod.ts",
     "@fp-utils/result": "./result/mod.ts",
-    "@std/assert": "jsr:@std/assert@^0.226.0",
-    "@std/cli": "jsr:@std/cli@^0.224.7",
-    "@std/testing": "jsr:@std/testing@^0.225.2",
+    "@std/assert": "jsr:@std/assert@^1.0.2",
+    "@std/cli": "jsr:@std/cli@^1.0.3",
+    "@std/testing": "jsr:@std/testing@^1.0.0",
     "fast-check": "npm:fast-check@3.21.0",
     "terser": "npm:terser@5.31.1"
   }
