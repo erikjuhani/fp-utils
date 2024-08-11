@@ -2,7 +2,8 @@
   <img src="assets/fp-utils.png">
 </p>
 
-<p align="center"><b>fp-utils</b> - Functional utility library for Deno / Node</p>
+<h1 align="center">fp-utils&nbsp;&nbsp;</h1>
+<p align="center"><b>Functional utility library for TypeScript&nbsp;&nbsp;&nbsp;&nbsp;
 
 ## Background
 
