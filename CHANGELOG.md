@@ -1,3 +1,9 @@
+## 0.16.1
+
+FIXES:
+
+- [Fix match type inference for match function in result and option modules](https://github.com/erikjuhani/fp-utils/commit/8cb17df025a63ac7b567a2f6022349672ba36a70)
+
 ## 0.16.0
 
 BREAKING CHANGES:
