@@ -1,3 +1,9 @@
+## 0.17.0
+
+BREAKING CHANGES:
+
+- [Propagate errors when calling Result.flatMap.](https://github.com/erikjuhani/fp-utils/commit/a78e27a35312edc51ffa144151f5dd20f65e9d79)
+
 ## 0.16.1
 
 FIXES:
