@@ -723,10 +723,10 @@ export abstract class Result<T, TError> {
    */
   abstract flatMap<U, UError>(
     fn: (value: T) => Ok<U> | Err<UError>,
-  ): Result<U, UError>;
+  ): Result<U, TError | UError>;
   abstract flatMap<U, UError>(
     fn: (value: T) => Result<U, UError>,
-  ): Result<U, UError>;
+  ): Result<U, TError | UError>;
 
   /**
    * Result.inspect calls the provided function `fn` with a reference to the

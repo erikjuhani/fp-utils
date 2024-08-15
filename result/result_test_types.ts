@@ -197,7 +197,33 @@ import { Err, Ok, Result } from "@fp-utils/result";
   const t4 = (Ok(10) as Result<number, string>).flatMap((value) =>
     value > 10 ? Ok("10") : Err(10)
   );
-  assertType<IsExact<typeof t4, Result<string, number>>>(true);
+  assertType<IsExact<typeof t4, Result<string, string | number>>>(true);
+
+  // Errors should propagate to the returned type from flatMap
+  const t5 = (Ok(10) as Result<number, "invalid" | "unexpected">).flatMap((
+    value,
+  ) => value > 10 ? Ok(value) : Err("number too big" as const));
+  assertType<
+    IsExact<
+      typeof t5,
+      Result<number, "invalid" | "unexpected" | "number too big">
+    >
+  >(true);
+
+  const t6 = Promise.resolve(
+    Ok(10) as Result<number, "invalid" | "unexpected">,
+  ).then(
+    Result.flatMap((value) =>
+      value > 10 ? Ok(value) : Err("number too big" as const)
+    ),
+  );
+
+  assertType<
+    IsExact<
+      typeof t6,
+      Promise<Result<number, "invalid" | "unexpected" | "number too big">>
+    >
+  >(true);
 });
 
 // Result.flatMap - union input type and union return type (callback)
