@@ -1,8 +1,186 @@
 import { assertSpyCalls, spy } from "@std/testing/mock";
 import { assertEquals, assertThrows } from "@std/assert";
 import { None, Option, Some } from "@fp-utils/option";
+import {
+  anything,
+  type Arbitrary,
+  array,
+  assert,
+  constant,
+  integer,
+  oneof,
+  property,
+  string,
+  tuple,
+} from "fast-check";
 
 const { test } = Deno;
+
+// Property testing arbitraries
+
+const some = <T>(arb: Arbitrary<T>): Arbitrary<Some<T>> =>
+  arb.map((value) => Some(value));
+
+const none = constant(None);
+
+const anyNonNullable = (): Arbitrary<unknown> =>
+  anything().filter((value: unknown) => value !== undefined && value !== null);
+
+const option = <T>(
+  arb: Arbitrary<T>,
+): Arbitrary<Option<T>> => oneof(some(arb), none);
+
+test("Option.unwrap", () => {
+  assert(property(
+    anyNonNullable().chain((value) =>
+      tuple(option(constant(value)), constant(value))
+    ),
+    ([option, value]) => {
+      if (option.isSome()) assertEquals(Option.unwrap(option), value);
+      else {
+        assertThrows(
+          () => Option.unwrap(option),
+          Error,
+          "Called unwrap on None",
+        );
+      }
+    },
+  ));
+});
+
+test("Option.unwrapOr", () => {
+  assert(property(
+    anyNonNullable().chain((value) =>
+      tuple(option(constant(value)), anything(), constant(value))
+    ),
+    ([option, or, value]) => {
+      if (option.isSome()) assertEquals(Option.unwrapOr(or)(option), value);
+      else assertEquals(Option.unwrapOr(or)(option), or);
+    },
+  ));
+});
+
+test("Option.toString", () => {
+  assert(property(
+    oneof(
+      anyNonNullable().chain((value) =>
+        tuple(
+          some(constant(value)),
+          constant(value).map((value) =>
+            `Some(${value !== undefined ? JSON.stringify(value) : ""})`
+          ),
+        )
+      ),
+      tuple(
+        none,
+        constant("None"),
+      ),
+    ),
+    ([input, expected]) => {
+      assertEquals(Option.toString(input), expected);
+    },
+  ));
+});
+
+test("Option.all", () => {
+  assert(property(
+    array(anyNonNullable().chain((value) => option(constant(value)))),
+    (arr) =>
+      assertEquals(
+        Option.all(arr),
+        arr.find(Option.isNone) ?? Some(arr.map(Option.unwrap)),
+      ),
+  ));
+});
+
+test("Option.all", () => {
+  assert(property(
+    array(anyNonNullable().chain((value) => option(constant(value)))),
+    (arr) =>
+      assertEquals(
+        Option.all(arr),
+        arr.find(Option.isNone) ?? Some(arr.map(Option.unwrap)),
+      ),
+  ));
+});
+
+test("Option.any", () => {
+  assert(property(
+    array(anyNonNullable().chain((value) => option(constant(value)))),
+    (arr) =>
+      assertEquals(
+        Option.any(arr),
+        arr.find(Option.isSome) ?? None,
+      ),
+  ));
+});
+
+test("Option.zip", () => {
+  assert(property(
+    tuple(option(anyNonNullable()), option(anyNonNullable())),
+    ([a, b]) => {
+      if (a.isSome() && b.isSome()) {
+        assertEquals(
+          Option.zip(b)(a).unwrap(),
+          [a.unwrap(), b.unwrap()],
+        );
+      } else {
+        assertEquals(Option.zip(b)(a), None);
+      }
+    },
+  ));
+});
+
+test("Option.flatMap", () => {
+  assert(property(
+    option(oneof(string(), integer().map(String))),
+    (input) => {
+      const tryParseInt = (input: string) => {
+        const value = parseInt(input);
+        return !isNaN(value) ? Some(value) : None;
+      };
+
+      const actual = Option.flatMap(tryParseInt)(input);
+
+      if (input.isNone()) return assertEquals(actual, input);
+      if (input.map(parseInt).filter(isNaN)) {
+        return assertEquals(
+          actual,
+          None,
+        );
+      }
+      assertEquals(actual, input.map(parseInt));
+    },
+  ));
+});
+
+test("Option.toJSON", () => {
+  assert(property(
+    anyNonNullable().chain((value) =>
+      oneof(
+        tuple(
+          some(constant(value)),
+          constant(value),
+        ),
+        tuple(
+          some(some(constant(value))),
+          constant(value),
+        ),
+        tuple(
+          some(none),
+          constant(null),
+        ),
+        tuple(
+          none,
+          constant(null),
+        ),
+      )
+    ),
+    ([input, expected]) => {
+      assertEquals(Option.toJSON(input), expected);
+    },
+  ));
+});
 
 test("Option.some passing null or undefined throws", () => {
   [null, undefined].forEach((value) => {
@@ -35,22 +213,6 @@ test("Option.isNone", () => {
   });
 });
 
-test("Option.unwrap on Some returns Option value", () => {
-  assertEquals(Option.unwrap(Some(0)), 0);
-});
-
-test("Option.unwrap on None throws", () => {
-  assertThrows(() => Option.unwrap(None), "Called unwrap on None");
-});
-
-test("Option.unwrapOr on Some returns Option value", () => {
-  assertEquals(Option.unwrapOr(1)(Some(0)), 0);
-});
-
-test("Option.unwrapOr on None returns or value", () => {
-  assertEquals(Option.unwrapOr(1)(None), 1);
-});
-
 test("Option.inspect", () => {
   const mapSpy = spy((value: number) => value + 1);
   const actual = Option.inspect(mapSpy)(Some(0));
@@ -65,79 +227,11 @@ test("Option.inspect on None does not execute", () => {
   assertEquals(actual, None);
 });
 
-test("Option.toString", () => {
-  const tests: [Option<unknown>, string][] = [
-    [None, "None"],
-    [Some(10), "Some(10)"],
-    [Some(Some(10)), "Some(Some(10))"],
-    [Some(None), "Some(None)"],
-    [Some({ value: "some" }), 'Some({"value":"some"})'],
-  ];
-
-  for (const [input, expected] of tests) {
-    const actual = Option.toString(input);
-    assertEquals(actual, expected);
-  }
-});
-
 test("Option.map", () => {
   const mapSpy = spy((value: number) => value + 1);
   const actual = Option.map(mapSpy)(Some(0));
   assertSpyCalls(mapSpy, 1);
   assertEquals(actual, Some(1));
-});
-
-test("Option.zip", () => {
-  const tests: [
-    a: Option<unknown>,
-    b: Option<unknown>,
-    expected: Option<unknown[]>,
-  ][] = [
-    [Some(42), Some(84), Some([42, 84])],
-    [Some(42), Some("84"), Some([42, "84"])],
-    [None, Some(84), None],
-    [Some(42), None, None],
-  ];
-
-  for (const [a, b, expected] of tests) {
-    const actual = a.zip(b);
-    assertEquals(actual, expected);
-
-    const actualHof = Option.zip(b)(a);
-    assertEquals(actualHof, expected);
-  }
-});
-
-test("Option.all", () => {
-  const tests: [Option<unknown>[], Option<unknown>][] = [
-    [[], Some([])],
-    [[None], None],
-    [[Some(10)], Some([10])],
-    [[Some(10), None], None],
-    [[Some(10), Some("42")], Some([10, "42"])],
-  ];
-
-  for (const [input, expected] of tests) {
-    const actual = Option.all(input);
-    assertEquals(actual.toString(), expected.toString());
-  }
-});
-
-test("Result.any", () => {
-  const tests: [Option<unknown>[], Option<unknown>][] = [
-    [[], None],
-    [[None], None],
-    [[Some(10)], Some(10)],
-    [[Some(10), None], Some(10)],
-    [[Some(10), Some("42")], Some(10)],
-    [[None, Some("42"), Some(10)], Some("42")],
-    [[None, None], None],
-  ];
-
-  for (const [input, expected] of tests) {
-    const actual = Option.any(input);
-    assertEquals(actual.toString(), expected.toString());
-  }
 });
 
 test("Option.filter", () => {
@@ -160,39 +254,6 @@ test("Option.map on None does not execute", () => {
 
   assertSpyCalls(mapSpy, 0);
   assertEquals(actual, None);
-});
-
-test("Option.flatMap", () => {
-  const flatMapSpy = spy((value: number) => Some(value + 1));
-  const actual = Option.flatMap(flatMapSpy)(Some(0));
-  assertSpyCalls(flatMapSpy, 1);
-  assertEquals(actual, Some(1));
-});
-
-test("Option.flatMap on None does not execute", () => {
-  const flatMapSpy = spy((value: number) => Some(value + 1));
-  const actual = Option.flatMap(flatMapSpy)(None);
-  assertSpyCalls(flatMapSpy, 0);
-  assertEquals(actual, None);
-});
-
-test("Option.flatMap example", () => {
-  type TryParse = (input: string) => Option<number>;
-
-  const tryParse: TryParse = (input: string) => {
-    const value = parseInt(input);
-    return isNaN(value) ? None : Some(value);
-  };
-
-  const tests: [Option<string>, Option<number>][] = [
-    [Some("42"), Some(42)],
-    [None, None],
-    [Some("Forty-two"), None],
-  ];
-
-  tests.forEach(([input, expected]) => {
-    assertEquals(input.flatMap(tryParse), expected);
-  });
 });
 
 test("Option.flatMap union Some<string> | Some<number> | None", async () => {
@@ -272,23 +333,6 @@ test("Option.from", async () => {
 
   for (const [input, expected] of tests) {
     const actual = await Option.from(input);
-    assertEquals(actual, expected);
-  }
-});
-
-test("Option.toJSON", () => {
-  const tests: [
-    Option<unknown>,
-    unknown | null,
-  ][] = [
-    [None, null],
-    [Some(42), 42],
-    [Some(Some(84)), 84],
-    [Some(None), null],
-  ];
-
-  for (const [input, expected] of tests) {
-    const actual = Option.toJSON(input);
     assertEquals(actual, expected);
   }
 });

@@ -54,6 +54,21 @@ import { assertType, type IsExact } from "@std/testing/types";
   assertType<IsExact<typeof t, string>>(true);
 });
 
+// Option.all
+// (() => {
+//   const options0: Option<string>[] = [Some("42")];
+//
+//   const t0 = Option.all(options0);
+//
+//   assertType<IsExact<typeof t0, Some<string[]>>>(true);
+//
+//   const options1 = [Some("42"), Some(42)];
+//
+//   const t1 = Option.all(options1);
+//
+//   assertType<IsExact<typeof t1, Some<string[]>>>(true);
+// });
+
 // Option.isNone and Option.isSome
 (() => {
   const option: Option<string> = Some("42");
