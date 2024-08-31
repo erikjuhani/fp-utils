@@ -1,0 +1,21 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    # Run daily
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hasundue/molt-action@v1
+        with:
+          commit-prefix: ''
+          token: ${{ secrets.GITHUB_TOKEN }}
