@@ -166,7 +166,7 @@ import { Err, Ok, Result } from "@fp-utils/result";
   assertType<
     IsExact<
       typeof t0,
-      Err<string> | Err<number> | Result<"Ok" | undefined, string>
+      Err<number> | Result<"Ok" | undefined, string>
     >
   >(true);
 
@@ -180,7 +180,6 @@ import { Err, Ok, Result } from "@fp-utils/result";
       | Result<string, string>
       | Ok<number>
       | Ok<undefined>
-      | Err<string>
       | Err<number>
     >
   >(
