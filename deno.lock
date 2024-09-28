@@ -37,7 +37,7 @@
       "jsr:@ts-morph/bootstrap@^0.24.0": "jsr:@ts-morph/bootstrap@0.24.0",
       "jsr:@ts-morph/common@^0.24.0": "jsr:@ts-morph/common@0.24.0",
       "npm:fast-check@3.22.0": "npm:fast-check@3.22.0",
-      "npm:terser@5.31.6": "npm:terser@5.31.6"
+      "npm:terser@5.34.1": "npm:terser@5.34.1"
     },
     "jsr": {
       "@david/code-block-writer@13.0.2": {
@@ -255,8 +255,8 @@
         "integrity": "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==",
         "dependencies": {}
       },
-      "terser@5.31.6": {
-        "integrity": "sha512-PQ4DAriWzKj+qgehQ7LK5bQqCFNMmlhjR2PFFLuqGCpuCAauxemVBWwWOxo3UIwWQx8+Pr61Df++r76wDmkQBg==",
+      "terser@5.34.1": {
+        "integrity": "sha512-FsJZ7iZLd/BXkz+4xrRTGJ26o/6VTjQytUk8b8OxkwcD2I+79VPJlz7qss1+zE7h8GNIScFqXcDyJ/KqBYZFVA==",
         "dependencies": {
           "@jridgewell/source-map": "@jridgewell/source-map@0.3.6",
           "acorn": "acorn@8.12.1",
@@ -274,7 +274,7 @@
       "jsr:@std/cli@^1.0.3",
       "jsr:@std/testing@^1.0.0",
       "npm:fast-check@3.22.0",
-      "npm:terser@5.31.6"
+      "npm:terser@5.34.1"
     ]
   }
 }
