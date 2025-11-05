@@ -12,7 +12,7 @@
     "up": "find . -type f -name 'deno.json*' | xargs jq -r '.imports | select(. != null) | .[] | select(. | startswith(\"jsr\")) | . | ltrimstr(\"jsr:\") | split(\"@^\") | .[0]' | xargs deno add && deno cache ./dev_deps.ts"
   },
   "imports": {
-    "@deno/dnt": "jsr:@deno/dnt@^0.41.2",
+    "@deno/dnt": "jsr:@deno/dnt@^0.42.0",
     "@fp-utils/option": "./option/mod.ts",
     "@fp-utils/result": "./result/mod.ts",
     "@std/assert": "jsr:@std/assert@^1.0.2",
