@@ -1,9 +1,9 @@
 name: Update Dependencies
 
 on:
-  schedule:
+  # schedule:
     # Run daily
-    - cron: '0 23 * * *'
+    # - cron: '0 23 * * *'
   workflow_dispatch:
 
 permissions:
