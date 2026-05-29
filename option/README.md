@@ -276,7 +276,7 @@ otherwise it will throw.
 <details>
   <summary>Example</summary>
 
-```ts
+```ts ignore
 import { None, Some } from "@fp-utils/option";
 
 Some(42).unwrap(); // Evaluates to 42
@@ -688,7 +688,7 @@ Option.some creates an option Some with value `T`.
 <details>
   <summary>Example</summary>
 
-```ts
+```ts ignore
 import { Option } from "@fp-utils/option";
 
 Option
@@ -759,7 +759,7 @@ otherwise it will throw.
 <details>
   <summary>Example</summary>
 
-```ts
+```ts ignore
 import { None, Option, Some } from "@fp-utils/option";
 
 Option

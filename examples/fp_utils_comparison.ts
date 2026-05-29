@@ -23,6 +23,11 @@
  * Although with some of the libraries we need to make compromises with the
  * expectations.
  */
+
+// The comparison libraries are imported inline by design rather than pinned in
+// the import map, so opt this example out of the dependency-specifier rules.
+// deno-lint-ignore-file no-import-prefix no-unversioned-import
+
 import { assertType, IsExact } from "@std/testing/types";
 import { assertEquals } from "@std/assert";
 import * as fp_utils from "@fp-utils/result";

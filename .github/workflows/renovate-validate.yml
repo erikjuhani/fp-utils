@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths:
-      - 'renovate-config.json'
+      - "renovate-config.json"
   pull_request:
     types:
       - opened
       - synchronize
       - reopened
     paths:
-      - 'renovate-config.json'
+      - "renovate-config.json"
   workflow_dispatch:
 
 concurrency:
