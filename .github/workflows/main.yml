@@ -28,9 +28,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup Deno
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v2
         with:
-          deno-version: v1.x
+          deno-version: v2.x
       - run: deno task ${{ matrix.command }}
 
   release:
@@ -77,9 +77,9 @@ jobs:
       id-token: write # The OIDC ID token is used for authentication with JSR.
     steps:
       - uses: actions/checkout@v4
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@v2
         with:
-          deno-version: v1.x
+          deno-version: v2.x
       - name: Publish @fp-utils/${{ matrix.module }} to jsr
         if: ${{ matrix.registry == 'jsr' }}
         working-directory: ${{ matrix.module }}
