@@ -1,0 +1,99 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-global-schema.json",
+  "extends": [
+    "config:best-practices",
+    ":disableDependencyDashboard",
+    "schedule:daily"
+  ],
+  "rebaseWhen": "behind-base-branch",
+  "onboarding": false,
+  "commitBodyTable": true,
+  "minimumReleaseAge": "3 days",
+  "osvVulnerabilityAlerts": true,
+  "minimumReleaseAgeBehaviour": "timestamp-optional",
+  "requireConfig": "optional",
+  "semanticCommits": "disabled",
+  "prBodyTemplate": "{{{table}}}{{{warnings}}}{{{notes}}}{{{changelogs}}}",
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        ".github/workflows/renovate.yml",
+        ".github/workflows/renovate-validate.yml"
+      ],
+      "matchStrings": [
+        "renovate-version: (?<currentValue>[^\\s]+)",
+        "ghcr\\.io/renovatebot/renovate:(?<currentValue>[^\\s]+)"
+      ],
+      "depNameTemplate": "ghcr.io/renovatebot/renovate",
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchDepNames": [
+        "ghcr.io/renovatebot/renovate"
+      ],
+      "pinDigests": false
+    },
+    {
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchDepNames": [
+        "ghcr.io/renovatebot/renovate"
+      ],
+      "matchUpdateTypes": [
+        "pinDigest"
+      ],
+      "enabled": false
+    },
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchDepNames": [
+        "ghcr.io/renovatebot/renovate"
+      ],
+      "automerge": true,
+      "schedule": [
+        "* 0-4 * * 1"
+      ]
+    },
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchDepNames": [
+        "renovatebot/github-action"
+      ],
+      "automerge": true,
+      "schedule": [
+        "* 0-4 * * 1"
+      ]
+    },
+    {
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "matchManagers": [
+        "github-actions"
+      ],
+      "automerge": true
+    }
+  ]
+}
