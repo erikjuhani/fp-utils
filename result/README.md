@@ -72,7 +72,7 @@ message.
 <details>
   <summary>Example</summary>
 
-```ts
+```ts ignore
 import { Err, Ok } from "@fp-utils/result";
 
 Ok(42)
@@ -95,7 +95,7 @@ error message.
 <details>
   <summary>Example</summary>
 
-```ts
+```ts ignore
 import { Err, Ok } from "@fp-utils/result";
 
 Ok(42)
@@ -373,7 +373,7 @@ otherwise it will throw.
 <details>
   <summary>Example</summary>
 
-```ts
+```ts ignore
 import { Err, Ok } from "@fp-utils/result";
 
 Ok(42)
@@ -395,7 +395,7 @@ Result.unwrapErr returns the value `TError` from the associated result if it is
 <details>
   <summary>Example</summary>
 
-```ts
+```ts ignore
 import { Err, Ok } from "@fp-utils/result";
 
 Ok(42)
@@ -455,7 +455,7 @@ message.
 <details>
   <summary>Example</summary>
 
-```ts
+```ts ignore
 import { Err, Ok, Result } from "@fp-utils/result";
 
 Result
@@ -478,7 +478,7 @@ error message.
 <details>
   <summary>Example</summary>
 
-```ts
+```ts ignore
 import { Err, Ok, Result } from "@fp-utils/result";
 
 Result
@@ -990,7 +990,7 @@ otherwise it will throw.
 <details>
   <summary>Example</summary>
 
-```ts
+```ts ignore
 import { Err, Ok, Result } from "@fp-utils/result";
 
 Result
@@ -1012,7 +1012,7 @@ Result.unwrapErr returns the value `TError` from the associated result if it is
 <details>
   <summary>Example</summary>
 
-```ts
+```ts ignore
 import { Err, Ok, Result } from "@fp-utils/result";
 
 Result

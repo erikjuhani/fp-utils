@@ -5,20 +5,20 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       log_level:
-        description: 'Log level'
+        description: "Log level"
         required: false
-        default: 'info'
+        default: "info"
         type: choice
         options:
           - info
           - debug
           - warn
       repoCache:
-        description: 'Repository cache mode'
+        description: "Repository cache mode"
         required: false
         type: choice
         default: enabled
@@ -108,7 +108,7 @@ jobs:
         with:
           renovate-version: 43.195.1
           configurationFile: renovate-config.json
-          token: '${{ steps.app-token.outputs.token }}'
+          token: "${{ steps.app-token.outputs.token }}"
 
       - name: Delete previous cache
         if: ${{ github.event.inputs.repoCache != 'disabled' && steps.cache-restore.outputs.cache-hit }}

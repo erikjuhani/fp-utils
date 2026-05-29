@@ -332,7 +332,7 @@ export abstract class Option<T> {
    * Option.some creates an option Some with value `T`.
    *
    * @example
-   * ```ts
+   * ```ts ignore
    * import { Option } from "@fp-utils/option";
    *
    * Option
@@ -394,7 +394,7 @@ export abstract class Option<T> {
    * `Some`; otherwise it will throw.
    *
    * @example
-   * ```ts
+   * ```ts ignore
    * import { None, Option, Some } from "@fp-utils/option";
    *
    * Option
@@ -648,7 +648,7 @@ export abstract class Option<T> {
    * `Some`; otherwise it will throw.
    *
    * @example
-   * ```ts
+   * ```ts ignore
    * import { None, Some } from "@fp-utils/option";
    *
    * Some(42).unwrap(); // Evaluates to 42

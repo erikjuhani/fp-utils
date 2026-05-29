@@ -1,5 +1,5 @@
 import { assertSpyCalls, spy } from "@std/testing/mock";
-import { assertEquals, assertThrows } from "@std/assert";
+import { assertEquals, assertInstanceOf, assertThrows } from "@std/assert";
 import { Err, Ok, Result } from "@fp-utils/result";
 import {
   anything,
@@ -260,13 +260,12 @@ test("Result.from", async () => {
     "original error",
   );
 
-  // Result.from without expected defined
-  assertEquals(
-    Result.from(() => {
-      throw new Error("error");
-    }).unwrapErr(),
-    new Error("error"),
-  );
+  // Result.from without expected defined passes the thrown error through
+  const error = Result.from(() => {
+    throw new Error("error");
+  }).unwrapErr();
+  assertInstanceOf(error, Error);
+  assertEquals(error.message, "error");
 
   // Result.from expected as function
   assertEquals(

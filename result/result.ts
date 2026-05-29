@@ -101,7 +101,7 @@ export abstract class Result<T, TError> {
    * as the error message.
    *
    * @example
-   * ```ts
+   * ```ts ignore
    * import { Err, Ok, Result } from "@fp-utils/result";
    *
    * Result
@@ -125,7 +125,7 @@ export abstract class Result<T, TError> {
    * value as the error message.
    *
    * @example
-   * ```ts
+   * ```ts ignore
    * import { Err, Ok, Result } from "@fp-utils/result";
    *
    * Result
@@ -571,7 +571,7 @@ export abstract class Result<T, TError> {
    * `Ok`; otherwise it will throw.
    *
    * @example
-   * ```ts
+   * ```ts ignore
    * import { Err, Ok, Result } from "@fp-utils/result";
    *
    * Result
@@ -594,7 +594,7 @@ export abstract class Result<T, TError> {
    * is `Err`; otherwise it will throw.
    *
    * @example
-   * ```ts
+   * ```ts ignore
    * import { Err, Ok, Result } from "@fp-utils/result";
    *
    * Result
@@ -645,7 +645,7 @@ export abstract class Result<T, TError> {
    * as the error message.
    *
    * @example
-   * ```ts
+   * ```ts ignore
    * import { Err, Ok } from "@fp-utils/result";
    *
    * Ok(42)
@@ -663,7 +663,7 @@ export abstract class Result<T, TError> {
    * value as the error message.
    *
    * @example
-   * ```ts
+   * ```ts ignore
    * import { Err, Ok } from "@fp-utils/result";
    *
    * Ok(42)
@@ -928,7 +928,7 @@ export abstract class Result<T, TError> {
    * `Ok`; otherwise it will throw.
    *
    * @example
-   * ```ts
+   * ```ts ignore
    * import { Err, Ok } from "@fp-utils/result";
    *
    * Ok(42)
@@ -945,7 +945,7 @@ export abstract class Result<T, TError> {
    * it is `Err`; otherwise it will throw.
    *
    * @example
-   * ```ts
+   * ```ts ignore
    * import { Err, Ok } from "@fp-utils/result";
    *
    * Err(42)

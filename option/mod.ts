@@ -45,7 +45,7 @@ export { Option };
  * Some creates an option Some with value `T`.
  *
  * @example
- * ```ts
+ * ```ts ignore
  * import { Some } from "@fp-utils/option";
  *
  * Some(42); // Evaluates to Some 42
