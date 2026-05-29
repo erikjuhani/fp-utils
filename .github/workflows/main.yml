@@ -94,7 +94,7 @@ jobs:
       - uses: actions/setup-node@v4
         if: ${{ matrix.registry == 'npm' }}
         with:
-          node-version: "20.x"
+          node-version: "24.x"
           registry-url: "https://registry.npmjs.org"
       - name: Build @fp-utils/${{ matrix.module }} npm package
         if: ${{ matrix.registry == 'npm' }}
