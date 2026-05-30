@@ -9,8 +9,8 @@ jobs:
       option: ${{ steps.module.outputs.option }}
       result: ${{ steps.module.outputs.result }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590 # v3
         id: module
         with:
           filters: |
@@ -32,7 +32,7 @@ jobs:
           "build --mod result",
         ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -54,7 +54,7 @@ jobs:
       option_release: ${{ steps.should_run.outputs.option_release }}
       result_release: ${{ steps.should_run.outputs.result_release }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 2
       - name: Check for version changes
@@ -83,7 +83,7 @@ jobs:
       contents: read
       id-token: write # The OIDC ID token is used for authentication with JSR.
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
@@ -91,7 +91,7 @@ jobs:
         if: ${{ matrix.registry == 'jsr' }}
         working-directory: ${{ matrix.module }}
         run: npx jsr publish
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         if: ${{ matrix.registry == 'npm' }}
         with:
           node-version: "24.x"
