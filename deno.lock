@@ -19,7 +19,7 @@
     "jsr:@std/testing@1": "1.0.19",
     "jsr:@ts-morph/bootstrap@0.27": "0.27.0",
     "jsr:@ts-morph/common@0.27": "0.27.0",
-    "npm:fast-check@3.23.2": "3.23.2",
+    "npm:fast-check@4.8.0": "4.8.0",
     "npm:terser@5.48.0": "5.48.0"
   },
   "jsr": {
@@ -137,14 +137,14 @@
     "commander@2.20.3": {
       "integrity": "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ=="
     },
-    "fast-check@3.23.2": {
-      "integrity": "sha512-h5+1OzzfCC3Ef7VbtKdcv7zsstUQwUDlYpUTvjeUsJAssPgLn7QzbboPtL5ro04Mq0rPOsMzl7q5hIbRs2wD1A==",
+    "fast-check@4.8.0": {
+      "integrity": "sha512-GOJ158CUMnN6cSahsv4+ExARvIDuzzinFjkp0E9WtiBa5zcVeLozVkWaE4IzFcc+Y48Wp1EDlUZsXRyAztQcSg==",
       "dependencies": [
         "pure-rand"
       ]
     },
-    "pure-rand@6.1.0": {
-      "integrity": "sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA=="
+    "pure-rand@8.4.0": {
+      "integrity": "sha512-IoM8YF/jY0hiugFo/wOWqfmarlE6J0wc6fDK1PhftMk7MGhVZl88sZimmqBBFomLOCSmcCCpsfj7wXASCpvK9A=="
     },
     "source-map-support@0.5.21": {
       "integrity": "sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==",
@@ -173,7 +173,7 @@
       "jsr:@std/assert@^1.0.2",
       "jsr:@std/cli@^1.0.3",
       "jsr:@std/testing@1",
-      "npm:fast-check@3.23.2",
+      "npm:fast-check@4.8.0",
       "npm:terser@5.48.0"
     ]
   }
